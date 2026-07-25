@@ -1,124 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOMNI Test Checkout</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://js.paystack.co/v1/inline.js"></script>
+<title>KOMNI Checkout</title>
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Inter,Arial,sans-serif;
-        }
+<script src="https://js.paystack.co/v1/inline.js"></script>
 
-        body{
-            background:#0f1115;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-            color:#fff;
-        }
+<style>
 
-        .card{
-            background:#181b22;
-            padding:40px;
-            border-radius:18px;
-            width:420px;
-            text-align:center;
-            box-shadow:0 15px 40px rgba(0,0,0,.35);
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+}
 
-        h1{
-            margin-bottom:10px;
-        }
+body{
 
-        p{
-            opacity:.7;
-            margin-bottom:30px;
-        }
+    background:#0c0d11;
+    color:white;
 
-        button{
-            width:100%;
-            padding:16px;
-            font-size:16px;
-            cursor:pointer;
-            border:none;
-            border-radius:10px;
-            background:white;
-            color:black;
-            transition:.2s;
-        }
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-        button:hover{
-            transform:translateY(-2px);
-        }
+    min-height:100vh;
 
-        #status{
-            margin-top:20px;
-            opacity:.8;
-            font-size:14px;
-        }
-    </style>
+    overflow:hidden;
+
+}
+
+/* Background */
+
+.bg{
+
+    position:fixed;
+    inset:0;
+
+    background:
+    radial-gradient(circle at top,#1b2435 0%,transparent 40%),
+    radial-gradient(circle at bottom,#0b1320 0%,transparent 45%),
+    #0c0d11;
+
+}
+
+.grid{
+
+    position:absolute;
+    inset:0;
+
+    background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+
+    background-size:45px 45px;
+
+    opacity:.25;
+
+}
+
+/* Card */
+
+.card{
+
+    position:relative;
+
+    width:470px;
+
+    background:rgba(20,22,30,.95);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:24px;
+
+    padding:40px;
+
+    backdrop-filter:blur(30px);
+
+    box-shadow:0 25px 70px rgba(0,0,0,.45);
+
+}
+
+.logo{
+
+    font-size:42px;
+    font-weight:700;
+    letter-spacing:6px;
+    text-align:center;
+    margin-bottom:30px;
+
+}
+
+.badge{
+
+    display:inline-block;
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    background:#171b24;
+
+    color:#8da7ff;
+
+    font-size:12px;
+
+    margin-bottom:25px;
+
+}
+
+.company{
+
+    font-size:28px;
+    font-weight:600;
+    margin-bottom:8px;
+
+}
+
+.desc{
+
+    color:#9aa0ab;
+    margin-bottom:28px;
+
+}
+
+.amount{
+
+    font-size:46px;
+    font-weight:700;
+
+    margin-bottom:35px;
+
+}
+
+.info{
+
+    display:flex;
+    justify-content:space-between;
+
+    padding:14px 0;
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+}
+
+.info span:last-child{
+
+    color:#cfd3dd;
+
+}
+
+.secure{
+
+    margin-top:30px;
+
+    display:grid;
+
+    gap:12px;
+
+}
+
+.secure div{
+
+    padding:12px 15px;
+
+    border-radius:12px;
+
+    background:#171b24;
+
+    color:#cfd3dd;
+
+    font-size:14px;
+
+}
+
+button{
+
+    margin-top:35px;
+
+    width:100%;
+
+    padding:18px;
+
+    border:none;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    background:white;
+
+    transition:.25s;
+
+}
+
+button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.footer{
+
+    text-align:center;
+
+    margin-top:22px;
+
+    color:#767b84;
+
+    font-size:13px;
+
+}
+
+#status{
+
+    margin-top:20px;
+
+    text-align:center;
+
+    color:#7CFFB2;
+
+}
+
+</style>
+
 </head>
+
 <body>
+
+<div class="bg">
+<div class="grid"></div>
+</div>
 
 <div class="card">
 
-    <h1>KOMNI</h1>
+<div class="logo">
 
-    <p>Powered by KOMNI Checkout Test</p>
+KOMNI
 
-    <button onclick="payNow()">
-        Test Checkout
-    </button>
+</div>
 
-    <div id="status"></div>
+<div class="badge">
+
+Enterprise Secure Checkout
+
+</div>
+
+<div class="company">
+
+Acme Corporation
+
+</div>
+
+<div class="desc">
+
+Invoice #1045
+
+</div>
+
+<div class="amount">
+
+KES 5,000
+
+</div>
+
+<div class="info">
+
+<span>Recipient</span>
+
+<span>Acme Corporation</span>
+
+</div>
+
+<div class="info">
+
+<span>Reference</span>
+
+<span>INV-1045</span>
+
+</div>
+
+<div class="info">
+
+<span>Settlement</span>
+
+<span>Instant</span>
+
+</div>
+
+<div class="secure">
+
+<div>✓ Enterprise encrypted session</div>
+
+<div>✓ Protected payment workflow</div>
+
+<div>✓ Audit-ready transaction record</div>
+
+</div>
+
+<button onclick="payNow()">
+
+Continue to Secure Payment
+
+</button>
+
+<div id="status"></div>
+
+<div class="footer">
+
+Powered by KOMNI • Secure payment processing by Paystack
+
+</div>
 
 </div>
 
 <script>
 
-const PAYSTACK_PUBLIC_KEY = "pk_test_23bdfd623e0070e98e160bc73e7fe9066c13a245";
+const PAYSTACK_KEY = "YOUR_PK_TEST_KEY";
 
 function payNow(){
 
-    const handler = PaystackPop.setup({
+const handler = PaystackPop.setup({
 
-        key: PAYSTACK_PUBLIC_KEY,
+key:PAYSTACK_KEY,
 
-        email: "customer@example.com",
+email:"customer@example.com",
 
-        amount: 5000,
+amount:500000,
 
-        currency: "KES",
+currency:"KES",
 
-        ref: "KOMNI_" + Date.now(),
+ref:"KOMNI-"+Date.now(),
 
-        callback: function(response){
+callback:function(response){
 
-            document.getElementById("status").innerHTML =
-                "✅ Payment Successful<br><br>Reference:<br>" +
-                response.reference;
+document.getElementById("status").innerHTML=
+"✅ Payment Successful<br><br>"+response.reference;
 
-            console.log(response);
+console.log(response);
 
-        },
+},
 
-        onClose: function(){
+onClose:function(){
 
-            document.getElementById("status").innerHTML =
-                "Checkout Closed";
+document.getElementById("status").innerHTML=
+"Payment Cancelled";
 
-        }
+}
 
-    });
+});
 
-    handler.openIframe();
+handler.openIframe();
 
 }
 
