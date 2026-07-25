@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOMNI Test Checkout</title>
+
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Inter,Arial,sans-serif;
+        }
+
+        body{
+            background:#0f1115;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            color:#fff;
+        }
+
+        .card{
+            background:#181b22;
+            padding:40px;
+            border-radius:18px;
+            width:420px;
+            text-align:center;
+            box-shadow:0 15px 40px rgba(0,0,0,.35);
+        }
+
+        h1{
+            margin-bottom:10px;
+        }
+
+        p{
+            opacity:.7;
+            margin-bottom:30px;
+        }
+
+        button{
+            width:100%;
+            padding:16px;
+            font-size:16px;
+            cursor:pointer;
+            border:none;
+            border-radius:10px;
+            background:white;
+            color:black;
+            transition:.2s;
+        }
+
+        button:hover{
+            transform:translateY(-2px);
+        }
+
+        #status{
+            margin-top:20px;
+            opacity:.8;
+            font-size:14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <h1>KOMNI</h1>
+
+    <p>Powered by KOMNI Checkout Test</p>
+
+    <button onclick="payNow()">
+        Test Checkout
+    </button>
+
+    <div id="status"></div>
+
+</div>
+
+<script>
+
+const PAYSTACK_PUBLIC_KEY = "pk_test_23bdfd623e0070e98e160bc73e7fe9066c13a245";
+
+function payNow(){
+
+    const handler = PaystackPop.setup({
+
+        key: PAYSTACK_PUBLIC_KEY,
+
+        email: "customer@example.com",
+
+        amount: 5000,
+
+        currency: "KES",
+
+        ref: "KOMNI_" + Date.now(),
+
+        callback: function(response){
+
+            document.getElementById("status").innerHTML =
+                "✅ Payment Successful<br><br>Reference:<br>" +
+                response.reference;
+
+            console.log(response);
+
+        },
+
+        onClose: function(){
+
+            document.getElementById("status").innerHTML =
+                "Checkout Closed";
+
+        }
+
+    });
+
+    handler.openIframe();
+
+}
+
+</script>
+
+</body>
+</html>
