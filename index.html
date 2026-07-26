@@ -8,7 +8,10 @@
   <!-- Inter Font Load -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&display=swap" rel="stylesheet">
+
+  <!-- GSAP Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
   <style>
     /* ==========================================================================
@@ -27,6 +30,13 @@
       
       --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
+
+      /* Advert Variables */
+      --bg-black: #030308;
+      --main-gradient: linear-gradient(135deg, #6036E1 0%, #a83ac8 50%, #D83DC2 100%);
+      --accent-violet: #6036E1;
+      --accent-magenta: #D83DC2;
+      --text-sub: #a1a1aa;
     }
 
     * {
@@ -123,7 +133,6 @@
       will-change: transform, opacity, filter;
     }
 
-    /* --- Text Brand Logo --- */
     .brand-logo {
       font-size: clamp(68px, 10vw, 130px);
       font-weight: 800;
@@ -150,7 +159,6 @@
       transform: scale(1);
     }
 
-    /* --- Tagline Element --- */
     .brand-tagline {
       margin-top: 28px;
       font-size: clamp(11px, 1.2vw, 15px);
@@ -177,7 +185,6 @@
       transform: translateY(0);
     }
 
-    /* Scroll Indicator Prompt */
     .scroll-hint {
       position: absolute;
       bottom: 40px;
@@ -274,7 +281,6 @@
       align-items: center;
     }
 
-    /* --- Hero Section --- */
     .hero-content {
       max-width: 900px;
       width: 90%;
@@ -300,7 +306,6 @@
       color: var(--text-secondary);
     }
 
-    /* --- Section Framing --- */
     .section-container {
       width: 100%;
       max-width: 1140px;
@@ -329,7 +334,6 @@
       color: var(--text-primary);
     }
 
-    /* --- Scroll Reveal Primers --- */
     .reveal-on-scroll {
       opacity: 0;
       transform: translateY(32px);
@@ -352,7 +356,6 @@
     .stagger-3 { transition-delay: 0.3s; }
     .stagger-4 { transition-delay: 0.4s; }
 
-    /* --- Architecture Grid --- */
     .architecture-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -398,7 +401,6 @@
       color: var(--text-secondary);
     }
 
-    /* --- Pillar Grid --- */
     .pillar-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -410,14 +412,8 @@
       border-right: 1px solid var(--border-subtle);
     }
 
-    .pillar-column:first-child {
-      padding-left: 0;
-    }
-
-    .pillar-column:last-child {
-      border-right: none;
-      padding-right: 0;
-    }
+    .pillar-column:first-child { padding-left: 0; }
+    .pillar-column:last-child { border-right: none; padding-right: 0; }
 
     .pillar-column h4 {
       font-size: 13px;
@@ -435,7 +431,6 @@
       color: var(--text-secondary);
     }
 
-    /* --- Metrics Strip --- */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -448,9 +443,7 @@
       border-right: 1px solid var(--border-subtle);
     }
 
-    .metric-item:last-child {
-      border-right: none;
-    }
+    .metric-item:last-child { border-right: none; }
 
     .metric-value {
       font-size: 32px;
@@ -469,7 +462,178 @@
     }
 
     /* ==========================================================================
-       5. COMPREHENSIVE ENTERPRISE FOOTER
+       5. 16:9 VISUAL SHOWCASE ADVERT CONTAINER
+       ========================================================================== */
+    .showcase-frame-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(96, 54, 225, 0.15);
+      background-color: var(--bg-black);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .advert-frame-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, #0d0722 0%, #030308 100%);
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .advert-frame-container canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+    }
+
+    .advert-frame-container .ambient-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 1;
+      animation: pulseGlow 12s infinite alternate ease-in-out;
+    }
+
+    .advert-frame-container .glow-1 { top: -10%; left: -10%; background: var(--accent-violet); }
+    .advert-frame-container .glow-2 { bottom: -10%; right: -10%; background: var(--accent-magenta); animation-delay: -6s; }
+
+    @keyframes pulseGlow {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.2; }
+      100% { transform: scale(1.3) translate(50px, 30px); opacity: 0.35; }
+    }
+
+    .advert-frame-container .app-logo-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      width: clamp(200px, 32vw, 480px);
+      opacity: 0.2;
+      pointer-events: none;
+      filter: drop-shadow(0 0 35px rgba(216, 61, 194, 0.3));
+      transition: transform 0.8s ease-out;
+    }
+
+    .advert-frame-container .director-ui {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .advert-frame-container .scene-container {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      perspective: 1200px;
+    }
+
+    .advert-frame-container .scene-content {
+      position: absolute;
+      width: 90%;
+      max-width: 900px;
+      text-align: center;
+      top: 50%;
+      left: 50%;
+      opacity: 0;
+      transform: translate3d(-50%, calc(-50% + 50px), -100px) rotateX(-15deg);
+      filter: blur(12px);
+      transition: all 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+      visibility: hidden;
+    }
+
+    .advert-frame-container .scene-content.active {
+      opacity: 1;
+      transform: translate3d(-50%, -50%, 0) rotateX(0deg);
+      filter: blur(0px);
+      visibility: visible;
+    }
+
+    .advert-frame-container .scene-content.exit {
+      opacity: 0;
+      transform: translate3d(-50%, calc(-50% - 50px), 100px) rotateX(15deg);
+      filter: blur(16px);
+      visibility: visible;
+    }
+
+    .advert-frame-container h1 {
+      font-size: clamp(2rem, 5.5vw, 4.8rem);
+      margin: 0;
+      background: var(--main-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .advert-frame-container p {
+      font-size: clamp(0.85rem, 1.5vw, 1.2rem);
+      color: var(--text-sub);
+      margin-top: 16px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .advert-frame-container #finaleStage {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
+    .advert-frame-container #finaleStage.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .advert-frame-container .intro-svg {
+      width: 800px;
+      max-width: 85vw;
+      height: 160px;
+      overflow: visible;
+    }
+
+    .advert-frame-container .fill-text {
+      font-size: 100px;
+      font-weight: 800;
+      fill: url(#svgGrad);
+      letter-spacing: -0.03em;
+    }
+
+    .advert-frame-container .sub-url-path {
+      font-size: 18px;
+      font-weight: 800;
+      fill: #ffffff;
+      letter-spacing: 0.5em;
+      opacity: 0.8;
+    }
+
+    /* ==========================================================================
+       6. COMPREHENSIVE ENTERPRISE FOOTER
        ========================================================================== */
     footer {
       border-top: 1px solid var(--border-subtle);
@@ -587,69 +751,22 @@
     }
 
     /* ==========================================================================
-       6. RESPONSIVE BREAKPOINTS
+       7. RESPONSIVE BREAKPOINTS
        ========================================================================== */
     @media (max-width: 900px) {
-      nav {
-        padding: 20px 30px;
-      }
-
-      .nav-links {
-        gap: 24px;
-      }
-
-      .architecture-grid {
-        grid-template-columns: 1fr;
-        border-left: none;
-      }
-
-      .arch-card {
-        border-left: none;
-        padding: 40px 24px;
-      }
-
-      .pillar-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .pillar-column {
-        padding: 36px 0;
-        border-right: none;
-        border-bottom: 1px solid var(--border-subtle);
-      }
-
-      .pillar-column:last-child {
-        border-bottom: none;
-      }
-
-      .metrics-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .metric-item {
-        border-right: none;
-        border-bottom: 1px solid var(--border-subtle);
-      }
-
-      .metric-item:last-child {
-        border-bottom: none;
-      }
-
-      footer {
-        padding: 60px 30px 36px;
-      }
-
-      .footer-container {
-        grid-template-columns: 1fr;
-        gap: 40px;
-        margin-bottom: 48px;
-      }
-
-      .footer-bottom {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
-      }
+      nav { padding: 20px 30px; }
+      .nav-links { gap: 24px; }
+      .architecture-grid { grid-template-columns: 1fr; border-left: none; }
+      .arch-card { border-left: none; padding: 40px 24px; }
+      .pillar-grid { grid-template-columns: 1fr; }
+      .pillar-column { padding: 36px 0; border-right: none; border-bottom: 1px solid var(--border-subtle); }
+      .pillar-column:last-child { border-bottom: none; }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .metric-item { border-right: none; border-bottom: 1px solid var(--border-subtle); }
+      .metric-item:last-child { border-bottom: none; }
+      footer { padding: 60px 30px 36px; }
+      .footer-container { grid-template-columns: 1fr; gap: 40px; margin-bottom: 48px; }
+      .footer-bottom { flex-direction: column; gap: 16px; align-items: flex-start; }
     }
   </style>
 </head>
@@ -678,6 +795,7 @@
         <li><a href="#about">About</a></li>
         <li><a href="#architecture">Architecture</a></li>
         <li><a href="#governance">Governance</a></li>
+        <li><a href="#showcase">Showcase</a></li>
         <li><a href="#enterprise">Enterprise</a></li>
       </ul>
     </nav>
@@ -758,7 +876,69 @@
         </div>
       </section>
 
-      <!-- Section 3: Key Performance Metrics -->
+      <!-- Section 3: Visual Showcase Frame (16:9 Advert) -->
+      <section class="section-container reveal-on-scroll" id="showcase">
+        <div class="section-header">
+          <span class="section-label">Visual Interpretation</span>
+          <h2 class="section-title">Dynamic Operations Showcase</h2>
+        </div>
+
+        <div class="showcase-frame-wrapper">
+          <div class="advert-frame-container">
+            <div class="ambient-glow glow-1"></div>
+            <div class="ambient-glow glow-2"></div>
+
+            <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="app-logo-watermark" id="brandWatermark" alt="KOMNI Logo">
+
+            <div class="director-ui">
+              <div class="scene-container">
+                <!-- Scene 1 -->
+                <div class="scene-content active">
+                  <h1>KOMNI</h1>
+                  <p>Centralized operational governance & payment workflows.</p>
+                </div>
+                <!-- Scene 2 -->
+                <div class="scene-content">
+                  <h1>Unified Infrastructure</h1>
+                  <p>Connect payment providers with absolute transaction oversight.</p>
+                </div>
+                <!-- Scene 3 -->
+                <div class="scene-content">
+                  <h1>Observable Controls</h1>
+                  <p>Traceable, structured execution designed for mission-critical operations.</p>
+                </div>
+                <!-- Scene 4 -->
+                <div class="scene-content">
+                  <h1>Institutional Resilience</h1>
+                  <p>Architected for evolving enterprise requirements & security compliance.</p>
+                </div>
+                <!-- Scene 5 -->
+                <div class="scene-content">
+                  <h1>Financial Operations</h1>
+                  <p>Bring consistency, speed, and accountability to every workflow.</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="finaleStage">
+              <svg class="intro-svg" viewBox="0 0 900 200">
+                <defs>
+                  <linearGradient id="svgGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#6036E1;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#D83DC2;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="fill-text" id="fillLayer">KOMNI</text>
+                <text x="50%" y="80%" text-anchor="middle" class="sub-url-path" id="urlLayer">KOMNI.COM</text>
+              </svg>
+            </div>
+
+            <canvas id="advertCanvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Key Performance Metrics -->
       <section class="section-container" id="enterprise">
         <div class="metrics-grid reveal-on-scroll">
           <div class="metric-item">
@@ -801,8 +981,8 @@
             <li><a href="#about">Platform Overview</a></li>
             <li><a href="#architecture">Infrastructure Coexistence</a></li>
             <li><a href="#governance">Governance Controls</a></li>
+            <li><a href="#showcase">Visual Showcase</a></li>
             <li><a href="#enterprise">Enterprise Solutions</a></li>
-            <li><a href="#">API Documentation</a></li>
           </ul>
         </div>
 
@@ -926,6 +1106,134 @@
       }
 
       runOpeningSequence();
+
+      // ==========================================================================
+      // 3. ADVERT CANVAS & KINETIC ENGINE
+      // ==========================================================================
+      const canvas = document.getElementById('advertCanvas');
+      const ctx = canvas.getContext('2d');
+      const container = canvas.parentElement;
+      const scenes = container.querySelectorAll('.scene-content');
+      const watermark = container.querySelector('#brandWatermark');
+      const finaleStage = container.querySelector('#finaleStage');
+
+      let width, height, currentScene = 0, frame = 0;
+      const SCENE_DURATION = 160; 
+
+      function resizeAdvertCanvas() {
+        width = canvas.width = container.clientWidth;
+        height = canvas.height = container.clientHeight;
+      }
+      window.addEventListener('resize', resizeAdvertCanvas);
+      resizeAdvertCanvas();
+
+      class DynamicParticle {
+        constructor() { this.reset(true); }
+        reset(init = false) {
+          this.x = (Math.random() - 0.5) * width * 3;
+          this.y = (Math.random() - 0.5) * height * 3;
+          this.z = init ? Math.random() * 1800 : 1800;
+          this.pz = this.z;
+          this.size = Math.random() * 2 + 1;
+          this.color = Math.random() > 0.4 ? '#6036E1' : '#D83DC2';
+        }
+        update(speed) {
+          this.pz = this.z;
+          this.z -= speed;
+          if (this.z < 1) this.reset();
+        }
+        draw(speedFactor) {
+          const s = 600 / this.z;
+          const ps = 600 / this.pz;
+          const x = this.x * s + width / 2;
+          const y = this.y * s + height / 2;
+          const px = this.x * ps + width / 2;
+          const py = this.y * ps + height / 2;
+
+          ctx.globalAlpha = Math.min(0.8, (1800 - this.z) / 1000);
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = this.size * s * (speedFactor * 0.2);
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(px, py);
+          ctx.stroke();
+        }
+      }
+
+      const particleCount = 700;
+      const particles = Array.from({ length: particleCount }, () => new DynamicParticle());
+      let currentSpeed = 12;
+
+      function cycleScenes() {
+        const current = scenes[currentScene];
+        currentScene = (currentScene + 1) % (scenes.length + 1);
+
+        if (currentScene === scenes.length) {
+          current.classList.remove('active');
+          current.classList.add('exit');
+          
+          finaleStage.classList.add('active');
+          
+          gsap.to(watermark, { scale: 1.3, opacity: 0.4, duration: 1.2, ease: "power2.out" });
+          gsap.to({ speed: 12 }, { 
+            speed: 45, 
+            duration: 1.5, 
+            onUpdate: function() { currentSpeed = this.targets()[0].speed; },
+            onComplete: () => {
+              setTimeout(() => {
+                finaleStage.classList.remove('active');
+                gsap.to(watermark, { scale: 1, opacity: 0.2, duration: 1.5 });
+                gsap.to({ speed: 45 }, { 
+                  speed: 12, 
+                  duration: 1.5, 
+                  onUpdate: function() { currentSpeed = this.targets()[0].speed; } 
+                });
+                
+                scenes.forEach(s => s.classList.remove('active', 'exit'));
+                currentScene = 0;
+                scenes[0].classList.add('active');
+              }, 2500);
+            }
+          });
+        } else {
+          const prev = container.querySelector('.scene-content.active');
+          if (prev) {
+            prev.classList.remove('active');
+            prev.classList.add('exit');
+            setTimeout(() => prev.classList.remove('exit'), 1000);
+          }
+          scenes[currentScene].classList.add('active');
+
+          gsap.to(watermark, {
+            scale: 0.95 + Math.random() * 0.1,
+            rotate: (Math.random() - 0.5) * 4,
+            duration: 2,
+            ease: "power1.out"
+          });
+        }
+      }
+
+      function renderAdvert() {
+        frame++;
+        if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
+          frame = 0;
+          cycleScenes();
+        }
+
+        ctx.fillStyle = 'rgba(3, 3, 8, 0.25)'; 
+        ctx.fillRect(0, 0, width, height);
+
+        const speedFactor = currentSpeed / 12;
+        particles.forEach(p => {
+          p.update(currentSpeed);
+          p.draw(speedFactor);
+        });
+
+        requestAnimationFrame(renderAdvert);
+      }
+
+      renderAdvert();
     });
   </script>
 </body>
