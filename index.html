@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KOMNI — Enterprise Financial Intelligence</title>
+  <title>KOMNI — Self-Orchestrating Infrastructure for Enterprise Financial Continuity</title>
   
   <!-- Inter Font Load -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       1. VARIABLES & BASE STYLES
+       1. SYSTEM VARIABLES & BASE STYLES
        ========================================================================== */
     :root {
       --bg-color: #000000;
       --text-primary: #FFFFFF;
       --text-secondary: #8A8A8A;
+      --text-muted: #525252;
       --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
       
       --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
       --tagline-gradient: linear-gradient(135deg, #5A8CFF, #AEE7FF);
@@ -45,7 +47,7 @@
     }
 
     /* ==========================================================================
-       2. HERO & INITIALIZATION ANIMATION CONTAINER
+       2. BOOT STAGE & INITIALIZATION ANIMATION
        ========================================================================== */
     .intro-stage {
       position: fixed;
@@ -64,7 +66,7 @@
 
     /* Target state when hero shifts upward */
     body.is-initialized .intro-stage {
-      transform: translateY(-140px);
+      transform: translateY(-160px);
     }
 
     /* --- Logo Element --- */
@@ -95,13 +97,15 @@
       transform: scale(1);
     }
 
-    /* --- Tagline Element --- */
+    /* --- Updated Tagline Element --- */
     .brand-tagline {
-      margin-top: 24px;
-      font-size: clamp(14px, 1.8vw, 20px);
-      font-weight: 400;
-      letter-spacing: 0.25em;
+      margin-top: 28px;
+      font-size: clamp(11px, 1.2vw, 15px);
+      font-weight: 500;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
+      text-align: center;
+      padding: 0 20px;
       background: var(--tagline-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -122,7 +126,7 @@
     }
 
     /* ==========================================================================
-       3. ENTERPRISE LANDING PAGE CONTENT
+       3. ENTERPRISE LANDING PAGE LAYOUT
        ========================================================================== */
     .site-wrapper {
       opacity: 0;
@@ -139,7 +143,7 @@
       opacity: 1;
     }
 
-    /* --- Navigation --- */
+    /* --- Minimalist Navigation --- */
     nav {
       position: fixed;
       top: 0;
@@ -148,13 +152,17 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 40px 60px;
+      padding: 36px 60px;
       z-index: 200;
+      border-bottom: 1px solid var(--border-subtle);
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .nav-brand {
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       letter-spacing: 3px;
       color: var(--text-primary);
       text-transform: uppercase;
@@ -162,7 +170,7 @@
 
     .nav-links {
       display: flex;
-      gap: 40px;
+      gap: 48px;
       list-style: none;
     }
 
@@ -182,46 +190,148 @@
     /* --- Main Layout --- */
     main {
       flex: 1;
-      padding-top: calc(50vh + 80px); /* Alignment offset relative to moved logo */
-      padding-bottom: 120px;
+      padding-top: calc(50vh + 60px);
+      padding-bottom: 160px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
+    /* --- Hero Section --- */
     .hero-content {
       max-width: 900px;
       width: 90%;
       text-align: center;
-      margin-bottom: 160px;
+      margin-bottom: 180px;
     }
 
     .hero-heading {
-      font-size: clamp(32px, 4.5vw, 56px);
+      font-size: clamp(34px, 4.8vw, 60px);
       font-weight: 300;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
       color: var(--text-primary);
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
 
     .hero-description {
       max-width: 650px;
       margin: 0 auto;
-      font-size: clamp(16px, 1.2vw, 19px);
+      font-size: clamp(16px, 1.25vw, 19px);
       font-weight: 300;
-      line-height: 1.6;
+      line-height: 1.65;
       color: var(--text-secondary);
     }
 
-    /* --- Enterprise Metrics Grid --- */
-    .metrics-section {
+    /* --- Section Framing --- */
+    .section-container {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1140px;
       padding: 0 40px;
-      margin-bottom: 160px;
+      margin-bottom: 180px;
     }
 
+    .section-header {
+      margin-bottom: 56px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: clamp(22px, 2.5vw, 32px);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    /* --- Grid Systems & Cards --- */
+    .architecture-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border-top: 1px solid var(--border-subtle);
+      border-left: 1px solid var(--border-subtle);
+    }
+
+    .arch-card {
+      padding: 56px 48px;
+      border-right: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .arch-card-num {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+    }
+
+    .arch-card h3 {
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .arch-card p {
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    /* --- Triple Pillar Layout --- */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .pillar-column {
+      padding: 48px 36px 48px 0;
+      border-right: 1px solid var(--border-subtle);
+      padding-right: 36px;
+      padding-left: 36px;
+    }
+
+    .pillar-column:first-child {
+      padding-left: 0;
+    }
+
+    .pillar-column:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+
+    .pillar-column h4 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .pillar-column p {
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    /* --- Enterprise Metrics Strip --- */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -254,40 +364,10 @@
       color: var(--text-secondary);
     }
 
-    /* --- Structural Information Section --- */
-    .architecture-section {
-      max-width: 900px;
-      width: 90%;
-      border-top: 1px solid var(--border-subtle);
-      padding-top: 120px;
-    }
-
-    .architecture-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-    }
-
-    .arch-column h3 {
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-    }
-
-    .arch-column p {
-      font-size: 15px;
-      font-weight: 300;
-      line-height: 1.65;
-      color: var(--text-secondary);
-    }
-
     /* --- Minimal Footer --- */
     footer {
       border-top: 1px solid var(--border-subtle);
-      padding: 40px 60px;
+      padding: 48px 60px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -296,16 +376,53 @@
       letter-spacing: 0.5px;
     }
 
+    .footer-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #22c55e;
+      border-radius: 50%;
+    }
+
     /* ==========================================================================
        4. RESPONSIVE BREAKPOINTS
        ========================================================================== */
-    @media (max-width: 868px) {
+    @media (max-width: 900px) {
       nav {
-        padding: 30px 30px;
+        padding: 24px 30px;
       }
 
       .nav-links {
-        gap: 20px;
+        gap: 24px;
+      }
+
+      .architecture-grid {
+        grid-template-columns: 1fr;
+        border-left: none;
+      }
+
+      .arch-card {
+        border-left: none;
+        padding: 40px 24px;
+      }
+
+      .pillar-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pillar-column {
+        padding: 36px 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      .pillar-column:last-child {
+        border-bottom: none;
       }
 
       .metrics-grid {
@@ -321,15 +438,10 @@
         border-bottom: none;
       }
 
-      .architecture-grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-
       footer {
-        padding: 30px 30px;
+        padding: 36px 30px;
         flex-direction: column;
-        gap: 16px;
+        gap: 20px;
         align-items: flex-start;
       }
     }
@@ -340,7 +452,7 @@
   <!-- Operating System Boot / Logo Stage -->
   <div class="intro-stage" id="introStage">
     <div class="brand-logo" id="brandLogo">KOMNI</div>
-    <div class="brand-tagline" id="brandTagline">Enterprise Financial Intelligence</div>
+    <div class="brand-tagline" id="brandTagline">Self-Orchestrating Infrastructure for Enterprise Financial Continuity</div>
   </div>
 
   <!-- Landing Infrastructure -->
@@ -349,89 +461,142 @@
       <div class="nav-brand">KOMNI</div>
       <ul class="nav-links">
         <li><a href="#about">About</a></li>
-        <li><a href="#security">Security</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#governance">Governance</a></li>
         <li><a href="#enterprise">Enterprise</a></li>
-        <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
 
     <main>
-      <section class="hero-content">
+      <!-- Hero Section -->
+      <section class="hero-content" id="about">
         <h1 class="hero-heading">
-          Enterprise Financial Infrastructure.<br> Built for Modern Institutions.
+          Unified Operational Layer for Enterprise Financial Workflows.
         </h1>
         <p class="hero-description">
-          KOMNI provides sovereign digital asset governance, deterministic settlement engines, and real-time liquidity intelligence engineered explicitly for global tier-one banking networks and institutional clearers.
+          KOMNI is an enterprise financial operations platform designed to help organizations securely manage payment workflows, transaction visibility, and operational governance through a single, unified interface.
         </p>
       </section>
 
-      <section class="metrics-section">
-        <div class="metrics-grid">
-          <div class="metric-item">
-            <div class="metric-value">&lt; 1.2ms</div>
-            <div class="metric-label">Deterministic Latency</div>
+      <!-- Section 1: Strategic Architecture (Cards) -->
+      <section class="section-container" id="architecture">
+        <div class="section-header">
+          <span class="section-label">Operational Philosophy</span>
+          <h2 class="section-title">Designed to complement, enhance, and scale.</h2>
+        </div>
+
+        <div class="architecture-grid">
+          <div class="arch-card">
+            <div class="arch-card-num">01 / INTEGRATION</div>
+            <div>
+              <h3>Infrastructure Coexistence</h3>
+              <p>Rather than replacing existing payment infrastructure, KOMNI is designed to complement and enhance it. By integrating with trusted payment providers and enterprise systems, the platform delivers centralized visibility, standardized operational workflows, and resilient transaction management while allowing organizations to continue using the financial services they already trust.</p>
+            </div>
           </div>
-          <div class="metric-item">
-            <div class="metric-value">99.999%</div>
-            <div class="metric-label">System Availability</div>
+
+          <div class="arch-card">
+            <div class="arch-card-num">02 / GOVERNANCE</div>
+            <div>
+              <h3>Observable & Traceable Control</h3>
+              <p>The platform is engineered around principles of security, transparency, and operational integrity. Every critical action is designed to be observable, traceable, and governed through structured controls, creating an environment where financial operations can be managed with greater confidence, consistency, and accountability.</p>
+            </div>
           </div>
-          <div class="metric-item">
-            <div class="metric-value">ISO 27001</div>
-            <div class="metric-label">Certified Framework</div>
+
+          <div class="arch-card">
+            <div class="arch-card-num">03 / COMPLEXITY</div>
+            <div>
+              <h3>Single Operational Environment</h3>
+              <p>As organizations grow, operational complexity increases. Multiple payment channels, distributed teams, disconnected systems, and evolving compliance requirements can make financial operations increasingly difficult to manage. KOMNI addresses these challenges by providing a single operational environment that brings payment activity, governance, and financial oversight together into one cohesive platform.</p>
+            </div>
+          </div>
+
+          <div class="arch-card">
+            <div class="arch-card-num">04 / SCALABILITY</div>
+            <div>
+              <h3>Long-Term Resilience</h3>
+              <p>Designed with enterprise scalability in mind, KOMNI serves as a foundation for organizations seeking greater operational resilience, stronger governance, and a more structured approach to managing modern financial workflows. Its architecture is intended to evolve alongside enterprise requirements, enabling future capabilities while maintaining a clear focus on reliability, security, and long-term operational excellence.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="architecture-section">
-        <div class="architecture-grid">
-          <div class="arch-column">
-            <h3>Institutional Grade Architecture</h3>
-            <p>
-              Designed to operate seamlessly alongside legacy ledger infrastructure without structural compromise. Complete multi-region isolation, programmatic compliance checks, and zero-knowledge ledger state verification.
-            </p>
+      <!-- Section 2: Core Platform Capabilities (Pillars) -->
+      <section class="section-container" id="governance">
+        <div class="section-header">
+          <span class="section-label">Capabilities</span>
+          <h2 class="section-title">Institutional governance by default.</h2>
+        </div>
+
+        <div class="pillar-grid">
+          <div class="pillar-column">
+            <h4>Payment Workflows</h4>
+            <p>Deploy and standardize payment experiences across distributed channels while maintaining full centralized command over execution and approval trees.</p>
           </div>
-          <div class="arch-column">
-            <h3>Sovereign Compliance</h3>
-            <p>
-              Embedded regulatory policy execution directly at the transaction layer. Dynamic policy adaptation supports evolving cross-border requirements across major institutional jurisdictions.
-            </p>
+          <div class="pillar-column">
+            <h4>Transaction Visibility</h4>
+            <p>Achieve real-time, deterministic oversight across all legacy ledgers, banking partners, and integration endpoints through a single pane of glass.</p>
+          </div>
+          <div class="pillar-column">
+            <h4>Operational Governance</h4>
+            <p>Establish strict, policy-driven audit records, role-based authority matrixes, and verifiable accountability structures for every institutional transaction.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Performance Metrics -->
+      <section class="section-container" id="enterprise">
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <div class="metric-value">100%</div>
+            <div class="metric-label">Audit Record Traceability</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">Zero</div>
+            <div class="metric-label">Infrastructure Replacement Needed</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">Unified</div>
+            <div class="metric-label">Financial Control Environment</div>
           </div>
         </div>
       </section>
     </main>
 
+    <!-- Footer -->
     <footer>
       <div>&copy; 2026 KOMNI Infrastructure Technologies Inc. All rights reserved.</div>
-      <div>Restricted Access — Institutional Framework</div>
+      <div class="footer-status">
+        <span class="status-dot"></span>
+        <span>Systems Operational — Enterprise Framework</span>
+      </div>
     </footer>
   </div>
 
-  <!-- Precision Sequence Script -->
+  <!-- Precision Boot Script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const logo = document.getElementById('brandLogo');
       const tagline = document.getElementById('brandTagline');
       
-      // Delay helper returning Promises for precise choreography
       const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
       async function runOpeningSequence() {
         // Step 1: 700ms of complete architectural silence
         await delay(700);
 
-        // Step 2: Reveal Brand Logo (Blur -> Focus / Scale Up / Fade In)
+        // Step 2: Reveal Brand Logo
         logo.classList.add('is-visible');
 
-        // Step 3: Wait 700ms after logo focus finishes
+        // Step 3: Wait 700ms after logo transition completes
         await delay(1600 + 700);
 
-        // Step 4: Smoothly elevate Tagline
+        // Step 4: Reveal Tagline
         tagline.classList.add('is-visible');
 
-        // Step 5: Pause to let full identity set in
+        // Step 5: Pause for full visual alignment
         await delay(1200 + 600);
 
-        // Step 6: Shift stage upward 140px and fade in platform content
+        // Step 6: Transition stage upward and display site layout
         document.body.classList.add('is-initialized');
       }
 
