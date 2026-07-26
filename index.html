@@ -190,7 +190,7 @@
     /* --- Main Content Flow --- */
     main {
       flex: 1;
-      padding-top: 85vh; /* Pushes software content naturally beneath the initial hero */
+      padding-top: 52vh; /* Reduced gap between brand logo and content */
       padding-bottom: 160px;
       display: flex;
       flex-direction: column;
@@ -202,7 +202,7 @@
       max-width: 900px;
       width: 90%;
       text-align: center;
-      margin-bottom: 220px;
+      margin-bottom: 180px;
     }
 
     .hero-heading {
@@ -429,7 +429,7 @@
       }
 
       main {
-        padding-top: 75vh;
+        padding-top: 48vh;
       }
 
       .architecture-grid {
@@ -626,7 +626,7 @@
         initScrollEngine();
       }
 
-      // 2. High-Precision Fade-Out Motion on Scroll
+      // 2. Responsive Fade-Out Engine on Scroll
       function initScrollEngine() {
         let ticking = false;
 
@@ -635,21 +635,18 @@
             window.requestAnimationFrame(() => {
               const scrollY = window.scrollY;
               
-              // Transition completes early (within first 350px of scrolling)
-              const maxScroll = 350;
+              // Dissolves completely within first 220px of scroll
+              const maxScroll = 220;
               const progress = Math.min(scrollY / maxScroll, 1);
               
-              // Calculate precision dissolution parameters
               const opacity = 1 - progress;
               const blur = progress * 16;
               const scale = 1 - (progress * 0.08);
 
-              // Apply inline style transitions
               introStage.style.opacity = opacity.toFixed(3);
               introStage.style.filter = `blur(${blur.toFixed(1)}px)`;
               introStage.style.transform = `translateY(${-80 - (scrollY * 0.3)}px) scale(${scale.toFixed(3)})`;
 
-              // Prevent pointer-events when transparent
               if (opacity <= 0) {
                 introStage.style.visibility = 'hidden';
               } else {
@@ -662,7 +659,7 @@
           }
         }, { passive: true });
 
-        // 3. Scroll Reveal for Content Blocks
+        // 3. Intersection Observer for Smooth Reveal
         const observerOptions = {
           root: null,
           rootMargin: '0px 0px -60px 0px',
