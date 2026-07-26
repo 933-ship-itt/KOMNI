@@ -20,7 +20,7 @@
       --text-secondary: #8A8A8A;
       --text-muted: #525252;
       --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.16);
+      --border-strong: rgba(255, 255, 255, 0.18);
       
       --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
       --tagline-gradient: linear-gradient(135deg, #5A8CFF, #AEE7FF);
@@ -43,41 +43,30 @@
       font-family: var(--font-main);
       overflow-x: hidden;
       width: 100%;
-      height: 100%;
     }
 
     /* ==========================================================================
-       2. BOOT STAGE & SCROLL-DISAPPEARING LOGO
+       2. INTRO HERO STAGE & DISSOLVING ANIMATION
        ========================================================================== */
     .intro-stage {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
-      width: 100vw;
+      width: 100%;
       height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 100;
+      z-index: 20;
       pointer-events: none;
       transition: transform 1.8s var(--ease-expensive);
       will-change: transform, opacity, filter;
     }
 
-    /* Target state when hero shifts upward after initial boot */
+    /* Target state when hero shifts upward slightly on finish */
     body.is-initialized .intro-stage {
-      transform: translateY(-160px);
-    }
-
-    /* Inner wrapper target for scroll-driven fade out */
-    .hero-brand-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      will-change: transform, opacity, filter;
-      transition: opacity 0.1s linear, transform 0.1s linear, filter 0.1s linear;
+      transform: translateY(-80px);
     }
 
     /* --- Logo Element --- */
@@ -90,7 +79,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       
-      /* Initial boot state */
+      /* Initial cinematic state */
       opacity: 0;
       filter: blur(24px);
       transform: scale(0.95);
@@ -121,7 +110,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       
-      /* Initial boot state */
+      /* Initial state */
       opacity: 0;
       transform: translateY(20px);
       transition: 
@@ -137,13 +126,13 @@
     }
 
     /* ==========================================================================
-       3. ENTERPRISE LANDING PAGE LAYOUT & SCROLL ANIMATIONS
+       3. ENTERPRISE LANDING PAGE LAYOUT
        ========================================================================== */
     .site-wrapper {
       opacity: 0;
       transition: opacity 1.6s var(--ease-expensive);
       position: relative;
-      z-index: 10;
+      z-index: 30;
       width: 100%;
       min-height: 100vh;
       display: flex;
@@ -154,7 +143,7 @@
       opacity: 1;
     }
 
-    /* --- Minimalist Navigation --- */
+    /* --- Navigation --- */
     nav {
       position: fixed;
       top: 0;
@@ -198,57 +187,22 @@
       color: var(--text-primary);
     }
 
-    /* --- Main Layout --- */
+    /* --- Main Content Flow --- */
     main {
       flex: 1;
-      padding-top: calc(50vh + 60px);
+      padding-top: 85vh; /* Pushes software content naturally beneath the initial hero */
       padding-bottom: 160px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* --- Scroll Reveal Framework --- */
-    .reveal-on-scroll {
-      opacity: 0;
-      transform: translateY(32px);
-      filter: blur(8px);
-      transition: 
-        opacity 1.2s var(--ease-expensive),
-        transform 1.2s var(--ease-expensive),
-        filter 1.2s var(--ease-expensive);
-      will-change: opacity, transform, filter;
-    }
-
-    .reveal-on-scroll.is-revealed {
-      opacity: 1;
-      transform: translateY(0);
-      filter: blur(0px);
-    }
-
-    /* Stagger children when revealed */
-    .stagger-parent .reveal-child {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 1s var(--ease-expensive), transform 1s var(--ease-expensive);
-    }
-
-    .stagger-parent.is-revealed .reveal-child {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .stagger-parent.is-revealed .reveal-child:nth-child(1) { transition-delay: 0.1s; }
-    .stagger-parent.is-revealed .reveal-child:nth-child(2) { transition-delay: 0.25s; }
-    .stagger-parent.is-revealed .reveal-child:nth-child(3) { transition-delay: 0.4s; }
-    .stagger-parent.is-revealed .reveal-child:nth-child(4) { transition-delay: 0.55s; }
-
     /* --- Hero Section --- */
     .hero-content {
       max-width: 900px;
       width: 90%;
       text-align: center;
-      margin-bottom: 180px;
+      margin-bottom: 220px;
     }
 
     .hero-heading {
@@ -274,7 +228,7 @@
       width: 100%;
       max-width: 1140px;
       padding: 0 40px;
-      margin-bottom: 180px;
+      margin-bottom: 200px;
     }
 
     .section-header {
@@ -298,7 +252,30 @@
       color: var(--text-primary);
     }
 
-    /* --- Grid Systems & Cards --- */
+    /* --- Scroll Reveal Primers --- */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(32px);
+      filter: blur(8px);
+      transition: 
+        opacity 1.2s var(--ease-expensive),
+        transform 1.2s var(--ease-expensive),
+        filter 1.2s var(--ease-expensive);
+      will-change: opacity, transform, filter;
+    }
+
+    .reveal-on-scroll.is-revealed {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0px);
+    }
+
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+
+    /* --- Architecture Grid --- */
     .architecture-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -313,10 +290,11 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: background-color 0.4s ease;
+      transition: border-color 0.4s ease, background-color 0.4s ease;
     }
 
     .arch-card:hover {
+      border-color: var(--border-strong);
       background-color: rgba(255, 255, 255, 0.015);
     }
 
@@ -343,7 +321,7 @@
       color: var(--text-secondary);
     }
 
-    /* --- Triple Pillar Layout --- */
+    /* --- Pillar Grid --- */
     .pillar-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -351,10 +329,8 @@
     }
 
     .pillar-column {
-      padding: 48px 36px 48px 0;
+      padding: 48px 36px;
       border-right: 1px solid var(--border-subtle);
-      padding-right: 36px;
-      padding-left: 36px;
     }
 
     .pillar-column:first-child {
@@ -382,7 +358,7 @@
       color: var(--text-secondary);
     }
 
-    /* --- Enterprise Metrics Strip --- */
+    /* --- Metrics Strip --- */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -415,7 +391,7 @@
       color: var(--text-secondary);
     }
 
-    /* --- Minimal Footer --- */
+    /* --- Footer --- */
     footer {
       border-top: 1px solid var(--border-subtle);
       padding: 48px 60px;
@@ -450,6 +426,10 @@
 
       .nav-links {
         gap: 24px;
+      }
+
+      main {
+        padding-top: 75vh;
       }
 
       .architecture-grid {
@@ -500,12 +480,10 @@
 </head>
 <body>
 
-  <!-- Operating System Boot / Logo Stage with Scroll Fade Inner Container -->
+  <!-- Operating System Boot / Logo Hero Stage -->
   <div class="intro-stage" id="introStage">
-    <div class="hero-brand-inner" id="heroBrandInner">
-      <div class="brand-logo" id="brandLogo">KOMNI</div>
-      <div class="brand-tagline" id="brandTagline">Self-Orchestrating Infrastructure for Enterprise Financial Continuity</div>
-    </div>
+    <div class="brand-logo" id="brandLogo">KOMNI</div>
+    <div class="brand-tagline" id="brandTagline">Self-Orchestrating Infrastructure for Enterprise Financial Continuity</div>
   </div>
 
   <!-- Landing Infrastructure -->
@@ -521,7 +499,7 @@
     </nav>
 
     <main>
-      <!-- Hero Section -->
+      <!-- Hero Text Section -->
       <section class="hero-content reveal-on-scroll" id="about">
         <h1 class="hero-heading">
           Unified Operational Layer for Enterprise Financial Workflows.
@@ -531,15 +509,15 @@
         </p>
       </section>
 
-      <!-- Section 1: Strategic Architecture (Cards with Scroll Reveal) -->
+      <!-- Section 1: Architecture Cards -->
       <section class="section-container" id="architecture">
         <div class="section-header reveal-on-scroll">
           <span class="section-label">Operational Philosophy</span>
           <h2 class="section-title">Designed to complement, enhance, and scale.</h2>
         </div>
 
-        <div class="architecture-grid stagger-parent reveal-on-scroll">
-          <div class="arch-card reveal-child">
+        <div class="architecture-grid">
+          <div class="arch-card reveal-on-scroll stagger-1">
             <div class="arch-card-num">01 / INTEGRATION</div>
             <div>
               <h3>Infrastructure Coexistence</h3>
@@ -547,7 +525,7 @@
             </div>
           </div>
 
-          <div class="arch-card reveal-child">
+          <div class="arch-card reveal-on-scroll stagger-2">
             <div class="arch-card-num">02 / GOVERNANCE</div>
             <div>
               <h3>Observable & Traceable Control</h3>
@@ -555,7 +533,7 @@
             </div>
           </div>
 
-          <div class="arch-card reveal-child">
+          <div class="arch-card reveal-on-scroll stagger-3">
             <div class="arch-card-num">03 / COMPLEXITY</div>
             <div>
               <h3>Single Operational Environment</h3>
@@ -563,7 +541,7 @@
             </div>
           </div>
 
-          <div class="arch-card reveal-child">
+          <div class="arch-card reveal-on-scroll stagger-4">
             <div class="arch-card-num">04 / SCALABILITY</div>
             <div>
               <h3>Long-Term Resilience</h3>
@@ -573,41 +551,41 @@
         </div>
       </section>
 
-      <!-- Section 2: Core Platform Capabilities (Pillars) -->
+      <!-- Section 2: Platform Pillars -->
       <section class="section-container" id="governance">
         <div class="section-header reveal-on-scroll">
           <span class="section-label">Capabilities</span>
           <h2 class="section-title">Institutional governance by default.</h2>
         </div>
 
-        <div class="pillar-grid stagger-parent reveal-on-scroll">
-          <div class="pillar-column reveal-child">
+        <div class="pillar-grid">
+          <div class="pillar-column reveal-on-scroll stagger-1">
             <h4>Payment Workflows</h4>
             <p>Deploy and standardize payment experiences across distributed channels while maintaining full centralized command over execution and approval trees.</p>
           </div>
-          <div class="pillar-column reveal-child">
+          <div class="pillar-column reveal-on-scroll stagger-2">
             <h4>Transaction Visibility</h4>
             <p>Achieve real-time, deterministic oversight across all legacy ledgers, banking partners, and integration endpoints through a single pane of glass.</p>
           </div>
-          <div class="pillar-column reveal-child">
+          <div class="pillar-column reveal-on-scroll stagger-3">
             <h4>Operational Governance</h4>
             <p>Establish strict, policy-driven audit records, role-based authority matrixes, and verifiable accountability structures for every institutional transaction.</p>
           </div>
         </div>
       </section>
 
-      <!-- Section 3: Performance Metrics -->
+      <!-- Section 3: Key Performance Metrics -->
       <section class="section-container" id="enterprise">
-        <div class="metrics-grid stagger-parent reveal-on-scroll">
-          <div class="metric-item reveal-child">
+        <div class="metrics-grid reveal-on-scroll">
+          <div class="metric-item">
             <div class="metric-value">100%</div>
             <div class="metric-label">Audit Record Traceability</div>
           </div>
-          <div class="metric-item reveal-child">
+          <div class="metric-item">
             <div class="metric-value">Zero</div>
             <div class="metric-label">Infrastructure Replacement Needed</div>
           </div>
-          <div class="metric-item reveal-child">
+          <div class="metric-item">
             <div class="metric-value">Unified</div>
             <div class="metric-label">Financial Control Environment</div>
           </div>
@@ -625,16 +603,16 @@
     </footer>
   </div>
 
-  <!-- Animation & Scroll Choreography Script -->
+  <!-- Precision Sequence Script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const introStage = document.getElementById('introStage');
       const logo = document.getElementById('brandLogo');
       const tagline = document.getElementById('brandTagline');
-      const heroBrandInner = document.getElementById('heroBrandInner');
       
       const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-      // 1. Initial Boot Sequence
+      // 1. Initial Opening Animation
       async function runOpeningSequence() {
         await delay(700);
         logo.classList.add('is-visible');
@@ -645,57 +623,65 @@
         await delay(1200 + 600);
         document.body.classList.add('is-initialized');
 
-        // Enable scroll listener after initialization finishes
-        initScrollEffects();
+        initScrollEngine();
       }
 
-      // 2. Dynamic Scroll Disappearance for Logo & Tagline
-      function initScrollEffects() {
-        const fadeThreshold = 350; // Distance in pixels over which the logo disappears
+      // 2. High-Precision Fade-Out Motion on Scroll
+      function initScrollEngine() {
+        let ticking = false;
 
         window.addEventListener('scroll', () => {
-          const scrollY = window.scrollY || window.pageYOffset;
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              const scrollY = window.scrollY;
+              
+              // Transition completes early (within first 350px of scrolling)
+              const maxScroll = 350;
+              const progress = Math.min(scrollY / maxScroll, 1);
+              
+              // Calculate precision dissolution parameters
+              const opacity = 1 - progress;
+              const blur = progress * 16;
+              const scale = 1 - (progress * 0.08);
 
-          if (scrollY <= 0) {
-            heroBrandInner.style.opacity = '1';
-            heroBrandInner.style.transform = 'scale(1) translateY(0px)';
-            heroBrandInner.style.filter = 'blur(0px)';
-            return;
+              // Apply inline style transitions
+              introStage.style.opacity = opacity.toFixed(3);
+              introStage.style.filter = `blur(${blur.toFixed(1)}px)`;
+              introStage.style.transform = `translateY(${-80 - (scrollY * 0.3)}px) scale(${scale.toFixed(3)})`;
+
+              // Prevent pointer-events when transparent
+              if (opacity <= 0) {
+                introStage.style.visibility = 'hidden';
+              } else {
+                introStage.style.visibility = 'visible';
+              }
+
+              ticking = false;
+            });
+            ticking = true;
           }
-
-          // Calculate progress from 0 to 1
-          const progress = Math.min(scrollY / fadeThreshold, 1);
-          
-          // Smooth math curves
-          const opacity = 1 - progress;
-          const scale = 1 - (progress * 0.08); // Subtle scale down
-          const blur = progress * 16;          // Subtle blur away
-          const translateY = progress * -20;  // Slight drift upward
-
-          heroBrandInner.style.opacity = opacity.toFixed(3);
-          heroBrandInner.style.transform = `scale(${scale.toFixed(3)}) translateY(${translateY.toFixed(1)}px)`;
-          heroBrandInner.style.filter = `blur(${blur.toFixed(1)}px)`;
         }, { passive: true });
-      }
 
-      // 3. IntersectionObserver for Premium Section Scroll Reveals
-      const observerOptions = {
-        root: null,
-        rootMargin: '0px 0px -80px 0px',
-        threshold: 0.12
-      };
+        // 3. Scroll Reveal for Content Blocks
+        const observerOptions = {
+          root: null,
+          rootMargin: '0px 0px -60px 0px',
+          threshold: 0.1
+        };
 
-      const scrollObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-revealed');
-          }
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+          revealObserver.observe(el);
         });
-      }, observerOptions);
-
-      document.querySelectorAll('.reveal-on-scroll').forEach(el => {
-        scrollObserver.observe(el);
-      });
+      }
 
       runOpeningSequence();
     });
