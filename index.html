@@ -515,19 +515,6 @@
       100% { transform: scale(1.3) translate(50px, 30px); opacity: 0.35; }
     }
 
-    .advert-frame-container .app-logo-watermark {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 3;
-      width: clamp(200px, 32vw, 480px);
-      opacity: 0.2;
-      pointer-events: none;
-      filter: drop-shadow(0 0 35px rgba(216, 61, 194, 0.3));
-      transition: transform 0.8s ease-out;
-    }
-
     .advert-frame-container .director-ui {
       position: absolute;
       inset: 0;
@@ -888,8 +875,6 @@
             <div class="ambient-glow glow-1"></div>
             <div class="ambient-glow glow-2"></div>
 
-            <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="app-logo-watermark" id="brandWatermark" alt="KOMNI Logo">
-
             <div class="director-ui">
               <div class="scene-container">
                 <!-- Scene 1 -->
@@ -1114,7 +1099,6 @@
       const ctx = canvas.getContext('2d');
       const container = canvas.parentElement;
       const scenes = container.querySelectorAll('.scene-content');
-      const watermark = container.querySelector('#brandWatermark');
       const finaleStage = container.querySelector('#finaleStage');
 
       let width, height, currentScene = 0, frame = 0;
@@ -1175,7 +1159,6 @@
           
           finaleStage.classList.add('active');
           
-          gsap.to(watermark, { scale: 1.3, opacity: 0.4, duration: 1.2, ease: "power2.out" });
           gsap.to({ speed: 12 }, { 
             speed: 45, 
             duration: 1.5, 
@@ -1183,7 +1166,6 @@
             onComplete: () => {
               setTimeout(() => {
                 finaleStage.classList.remove('active');
-                gsap.to(watermark, { scale: 1, opacity: 0.2, duration: 1.5 });
                 gsap.to({ speed: 45 }, { 
                   speed: 12, 
                   duration: 1.5, 
@@ -1204,13 +1186,6 @@
             setTimeout(() => prev.classList.remove('exit'), 1000);
           }
           scenes[currentScene].classList.add('active');
-
-          gsap.to(watermark, {
-            scale: 0.95 + Math.random() * 0.1,
-            rotate: (Math.random() - 0.5) * 4,
-            duration: 2,
-            ease: "power1.out"
-          });
         }
       }
 
