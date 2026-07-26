@@ -1,309 +1,442 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>KOMNI</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-
-<style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html{
-    scroll-behavior:smooth;
-}
-
-body{
-
-    background:#000;
-    color:white;
-
-    font-family:Inter,sans-serif;
-
-    overflow-x:hidden;
-
-}
-
-/* ---------------- NAVBAR ---------------- */
-
-nav{
-
-    position:fixed;
-
-    top:0;
-    left:0;
-    right:0;
-
-    height:82px;
-
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    padding:0 70px;
-
-    z-index:100;
-
-    background:rgba(0,0,0,.88);
-
-    backdrop-filter:blur(18px);
-
-}
-
-.logo{
-
-    font-size:34px;
-
-    font-weight:800;
-
-    letter-spacing:8px;
-
-    background:linear-gradient(to right,#6036E1,#D83DC2);
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-
-    opacity:0;
-
-    transform:translateY(50px) scale(.9);
-
-    animation:logoReveal 2s cubic-bezier(.16,1,.3,1) forwards;
-
-}
-
-/* ---------------- HERO ---------------- */
-
-.hero{
-
-    min-height:100vh;
-
-    display:flex;
-
-    justify-content:center;
-    align-items:center;
-
-    flex-direction:column;
-
-    text-align:center;
-
-    padding:120px 30px;
-
-}
-
-.hero h1{
-
-    font-size:82px;
-
-    font-weight:800;
-
-    line-height:1;
-
-    letter-spacing:-3px;
-
-    max-width:1100px;
-
-    opacity:0;
-
-    transform:translateY(70px);
-
-    animation:fadeUp 1.8s .8s forwards;
-
-}
-
-.hero p{
-
-    margin-top:35px;
-
-    color:#8d8d8d;
-
-    font-size:20px;
-
-    line-height:1.8;
-
-    max-width:760px;
-
-    opacity:0;
-
-    transform:translateY(40px);
-
-    animation:fadeUp 1.6s 1.4s forwards;
-
-}
-
-/* ---------------- Divider ---------------- */
-
-.line{
-
-    width:1px;
-
-    height:140px;
-
-    background:#222;
-
-    margin-top:90px;
-
-    opacity:0;
-
-    animation:fadeIn 1s 2.2s forwards;
-
-}
-
-/* ---------------- Scroll Indicator ---------------- */
-
-.scroll{
-
-    margin-top:35px;
-
-    color:#555;
-
-    letter-spacing:5px;
-
-    font-size:12px;
-
-    opacity:0;
-
-    animation:fadeIn 1s 2.5s forwards;
-
-}
-
-/* ---------------- Animations ---------------- */
-
-@keyframes logoReveal{
-
-    0%{
-
-        opacity:0;
-
-        transform:
-        translateY(50px)
-        scale(.92);
-
-        filter:blur(12px);
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOMNI — Enterprise Financial Intelligence</title>
+  
+  <!-- Inter Font Load -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. VARIABLES & BASE STYLES
+       ========================================================================== */
+    :root {
+      --bg-color: #000000;
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8A8A;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      
+      --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
+      --tagline-gradient: linear-gradient(135deg, #5A8CFF, #AEE7FF);
+      
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    55%{
-
-        opacity:1;
-
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    100%{
-
-        opacity:1;
-
-        transform:
-        translateY(0)
-        scale(1);
-
-        filter:blur(0);
-
+    html, body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      overflow-x: hidden;
+      width: 100%;
+      height: 100%;
     }
 
-}
-
-@keyframes fadeUp{
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(0);
-
+    /* ==========================================================================
+       2. HERO & INITIALIZATION ANIMATION CONTAINER
+       ========================================================================== */
+    .intro-stage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      pointer-events: none;
+      transition: transform 1.8s var(--ease-expensive);
     }
 
-}
-
-@keyframes fadeIn{
-
-    to{
-
-        opacity:1;
-
+    /* Target state when hero shifts upward */
+    body.is-initialized .intro-stage {
+      transform: translateY(-140px);
     }
 
-}
+    /* --- Logo Element --- */
+    .brand-logo {
+      font-size: clamp(68px, 10vw, 130px);
+      font-weight: 800;
+      letter-spacing: clamp(6px, 1.2vw, 12px);
+      line-height: 1;
+      background: var(--logo-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      
+      /* Initial cinematic state */
+      opacity: 0;
+      filter: blur(24px);
+      transform: scale(0.95);
+      transition: 
+        opacity 1.6s var(--ease-expensive),
+        filter 1.6s var(--ease-expensive),
+        transform 1.6s var(--ease-expensive);
+      
+      user-select: none;
+    }
 
-/* ---------------- Responsive ---------------- */
+    .brand-logo.is-visible {
+      opacity: 1;
+      filter: blur(0px);
+      transform: scale(1);
+    }
 
-@media(max-width:900px){
+    /* --- Tagline Element --- */
+    .brand-tagline {
+      margin-top: 24px;
+      font-size: clamp(14px, 1.8vw, 20px);
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      background: var(--tagline-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      
+      /* Initial state */
+      opacity: 0;
+      transform: translateY(20px);
+      transition: 
+        opacity 1.2s var(--ease-expensive),
+        transform 1.2s var(--ease-expensive);
+      
+      user-select: none;
+    }
 
-.hero h1{
+    .brand-tagline.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-    font-size:54px;
+    /* ==========================================================================
+       3. ENTERPRISE LANDING PAGE CONTENT
+       ========================================================================== */
+    .site-wrapper {
+      opacity: 0;
+      transition: opacity 1.6s var(--ease-expensive);
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-}
+    body.is-initialized .site-wrapper {
+      opacity: 1;
+    }
 
-.logo{
+    /* --- Navigation --- */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 40px 60px;
+      z-index: 200;
+    }
 
-    font-size:28px;
+    .nav-brand {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 3px;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
 
-}
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
 
-nav{
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      transition: color 0.3s ease;
+    }
 
-    padding:0 30px;
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
 
-}
+    /* --- Main Layout --- */
+    main {
+      flex: 1;
+      padding-top: calc(50vh + 80px); /* Alignment offset relative to moved logo */
+      padding-bottom: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-.hero p{
+    .hero-content {
+      max-width: 900px;
+      width: 90%;
+      text-align: center;
+      margin-bottom: 160px;
+    }
 
-    font-size:18px;
+    .hero-heading {
+      font-size: clamp(32px, 4.5vw, 56px);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 32px;
+    }
 
-}
+    .hero-description {
+      max-width: 650px;
+      margin: 0 auto;
+      font-size: clamp(16px, 1.2vw, 19px);
+      font-weight: 300;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
 
-}
+    /* --- Enterprise Metrics Grid --- */
+    .metrics-section {
+      width: 100%;
+      max-width: 1100px;
+      padding: 0 40px;
+      margin-bottom: 160px;
+    }
 
-</style>
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
 
+    .metric-item {
+      padding: 48px 32px;
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .metric-item:last-child {
+      border-right: none;
+    }
+
+    .metric-value {
+      font-size: 32px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    /* --- Structural Information Section --- */
+    .architecture-section {
+      max-width: 900px;
+      width: 90%;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 120px;
+    }
+
+    .architecture-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+    }
+
+    .arch-column h3 {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .arch-column p {
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    /* --- Minimal Footer --- */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 40px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+    }
+
+    /* ==========================================================================
+       4. RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 868px) {
+      nav {
+        padding: 30px 30px;
+      }
+
+      .nav-links {
+        gap: 20px;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-item {
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      .metric-item:last-child {
+        border-bottom: none;
+      }
+
+      .architecture-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      footer {
+        padding: 30px 30px;
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
-<nav>
+  <!-- Operating System Boot / Logo Stage -->
+  <div class="intro-stage" id="introStage">
+    <div class="brand-logo" id="brandLogo">KOMNI</div>
+    <div class="brand-tagline" id="brandTagline">Enterprise Financial Intelligence</div>
+  </div>
 
-<div class="logo">
+  <!-- Landing Infrastructure -->
+  <div class="site-wrapper">
+    <nav>
+      <div class="nav-brand">KOMNI</div>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#enterprise">Enterprise</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
 
-KOMNI
+    <main>
+      <section class="hero-content">
+        <h1 class="hero-heading">
+          Enterprise Financial Infrastructure.<br> Built for Modern Institutions.
+        </h1>
+        <p class="hero-description">
+          KOMNI provides sovereign digital asset governance, deterministic settlement engines, and real-time liquidity intelligence engineered explicitly for global tier-one banking networks and institutional clearers.
+        </p>
+      </section>
 
-</div>
+      <section class="metrics-section">
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <div class="metric-value">&lt; 1.2ms</div>
+            <div class="metric-label">Deterministic Latency</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">99.999%</div>
+            <div class="metric-label">System Availability</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">ISO 27001</div>
+            <div class="metric-label">Certified Framework</div>
+          </div>
+        </div>
+      </section>
 
-</nav>
+      <section class="architecture-section">
+        <div class="architecture-grid">
+          <div class="arch-column">
+            <h3>Institutional Grade Architecture</h3>
+            <p>
+              Designed to operate seamlessly alongside legacy ledger infrastructure without structural compromise. Complete multi-region isolation, programmatic compliance checks, and zero-knowledge ledger state verification.
+            </p>
+          </div>
+          <div class="arch-column">
+            <h3>Sovereign Compliance</h3>
+            <p>
+              Embedded regulatory policy execution directly at the transaction layer. Dynamic policy adaptation supports evolving cross-border requirements across major institutional jurisdictions.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
 
-<section class="hero">
+    <footer>
+      <div>&copy; 2026 KOMNI Infrastructure Technologies Inc. All rights reserved.</div>
+      <div>Restricted Access — Institutional Framework</div>
+    </footer>
+  </div>
 
-<h1>
+  <!-- Precision Sequence Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const logo = document.getElementById('brandLogo');
+      const tagline = document.getElementById('brandTagline');
+      
+      // Delay helper returning Promises for precise choreography
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-Enterprise Intelligence.<br>
-Reimagined.
+      async function runOpeningSequence() {
+        // Step 1: 700ms of complete architectural silence
+        await delay(700);
 
-</h1>
+        // Step 2: Reveal Brand Logo (Blur -> Focus / Scale Up / Fade In)
+        logo.classList.add('is-visible');
 
-<p>
+        // Step 3: Wait 700ms after logo focus finishes
+        await delay(1600 + 700);
 
-The next generation of enterprise financial infrastructure built around trust,
-security, operational resilience, and intelligent payment orchestration.
+        // Step 4: Smoothly elevate Tagline
+        tagline.classList.add('is-visible');
 
-</p>
+        // Step 5: Pause to let full identity set in
+        await delay(1200 + 600);
 
-<div class="line"></div>
+        // Step 6: Shift stage upward 140px and fade in platform content
+        document.body.classList.add('is-initialized');
+      }
 
-<div class="scroll">
-
-SCROLL
-
-</div>
-
-</section>
-
+      runOpeningSequence();
+    });
+  </script>
 </body>
-
 </html>
