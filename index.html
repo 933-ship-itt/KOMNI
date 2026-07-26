@@ -22,6 +22,7 @@
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-strong: rgba(255, 255, 255, 0.18);
       
+      --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
       --tagline-gradient: linear-gradient(135deg, #5A8CFF, #AEE7FF);
       
       --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -45,7 +46,67 @@
     }
 
     /* ==========================================================================
-       2. HERO BRANDING STAGE (IMAGE LOGO INTEGRATION)
+       2. FIXED BACKGROUND LOGO (DIM HEARTBEAT PULSE)
+       ========================================================================== */
+    .bg-heartbeat-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: clamp(280px, 45vw, 600px);
+      height: clamp(280px, 45vw, 600px);
+      z-index: 1;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .bg-heartbeat-logo {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      opacity: 0.08;
+      filter: drop-shadow(0 0 15px rgba(96, 54, 225, 0.25));
+      animation: komni-heartbeat 4.5s ease-in-out infinite;
+      will-change: transform, opacity, filter;
+    }
+
+    @keyframes komni-heartbeat {
+      0% {
+        transform: scale(1);
+        opacity: 0.06;
+        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
+      }
+      14% {
+        transform: scale(1.03);
+        opacity: 0.11;
+        filter: drop-shadow(0 0 25px rgba(216, 61, 194, 0.35));
+      }
+      28% {
+        transform: scale(1.01);
+        opacity: 0.08;
+        filter: drop-shadow(0 0 15px rgba(96, 54, 225, 0.2));
+      }
+      42% {
+        transform: scale(1.04);
+        opacity: 0.13;
+        filter: drop-shadow(0 0 30px rgba(96, 54, 225, 0.4));
+      }
+      70% {
+        transform: scale(1);
+        opacity: 0.06;
+        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.06;
+        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
+      }
+    }
+
+    /* ==========================================================================
+       3. HERO BRANDING STAGE (TEXT LOGO RESTORED)
        ========================================================================== */
     .intro-stage {
       position: fixed;
@@ -62,16 +123,19 @@
       will-change: transform, opacity, filter;
     }
 
-    /* --- Brand Logo Image --- */
-    .brand-logo-img {
-      width: clamp(180px, 25vw, 320px);
-      height: auto;
-      object-fit: contain;
+    /* --- Text Brand Logo --- */
+    .brand-logo {
+      font-size: clamp(68px, 10vw, 130px);
+      font-weight: 800;
+      letter-spacing: clamp(6px, 1.2vw, 12px);
+      line-height: 1;
+      background: var(--logo-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       
-      /* Initial cinematic state */
       opacity: 0;
       filter: blur(24px);
-      transform: scale(0.92);
+      transform: scale(0.95);
       transition: 
         opacity 1.6s var(--ease-expensive),
         filter 1.6s var(--ease-expensive),
@@ -80,7 +144,7 @@
       user-select: none;
     }
 
-    .brand-logo-img.is-visible {
+    .brand-logo.is-visible {
       opacity: 1;
       filter: blur(0px);
       transform: scale(1);
@@ -130,7 +194,7 @@
     }
 
     /* ==========================================================================
-       3. ENTERPRISE LANDING PAGE CONTENT
+       4. ENTERPRISE LANDING PAGE CONTENT
        ========================================================================== */
     .site-wrapper {
       position: relative;
@@ -150,7 +214,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 60px;
+      padding: 28px 60px;
       z-index: 200;
       border-bottom: 1px solid var(--border-subtle);
       background-color: rgba(0, 0, 0, 0.85);
@@ -170,10 +234,14 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 3px;
+      color: var(--text-primary);
     }
 
     .nav-brand img {
-      height: 32px;
+      height: 24px;
       width: auto;
     }
 
@@ -401,13 +469,15 @@
     }
 
     /* ==========================================================================
-       4. COMPREHENSIVE ENTERPRISE FOOTER
+       5. COMPREHENSIVE ENTERPRISE FOOTER
        ========================================================================== */
     footer {
       border-top: 1px solid var(--border-subtle);
-      background-color: rgba(5, 5, 5, 0.6);
+      background-color: rgba(0, 0, 0, 0.7);
       padding: 100px 60px 48px;
       width: 100%;
+      position: relative;
+      z-index: 20;
     }
 
     .footer-container {
@@ -425,17 +495,31 @@
       gap: 20px;
     }
 
-    .footer-brand-col img {
-      height: 38px;
+    .footer-brand-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .footer-brand-header img {
+      height: 32px;
       width: auto;
-      align-self: flex-start;
+    }
+
+    .footer-brand-name {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      background: var(--logo-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .footer-brand-desc {
       font-size: 13px;
       line-height: 1.6;
       color: var(--text-secondary);
-      max-width: 300px;
+      max-width: 320px;
       font-weight: 300;
     }
 
@@ -503,7 +587,7 @@
     }
 
     /* ==========================================================================
-       5. RESPONSIVE BREAKPOINTS
+       6. RESPONSIVE BREAKPOINTS
        ========================================================================== */
     @media (max-width: 900px) {
       nav {
@@ -571,9 +655,14 @@
 </head>
 <body>
 
+  <!-- Ambient Heartbeat Background Logo -->
+  <div class="bg-heartbeat-container">
+    <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Ambient Emblem" class="bg-heartbeat-logo">
+  </div>
+
   <!-- Operating System Boot / Centered Hero Stage -->
   <div class="intro-stage" id="introStage">
-    <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Brand Logo" class="brand-logo-img" id="brandLogo">
+    <div class="brand-logo" id="brandLogo">KOMNI</div>
     <div class="brand-tagline" id="brandTagline">Self-Orchestrating Infrastructure for Enterprise Financial Continuity</div>
     <div class="scroll-hint" id="scrollHint">Scroll to Explore</div>
   </div>
@@ -583,6 +672,7 @@
     <nav>
       <div class="nav-brand">
         <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Logo">
+        <span>KOMNI</span>
       </div>
       <ul class="nav-links">
         <li><a href="#about">About</a></li>
@@ -691,7 +781,10 @@
     <footer>
       <div class="footer-container">
         <div class="footer-brand-col">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Institutional Logo">
+          <div class="footer-brand-header">
+            <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Brand Logo">
+            <span class="footer-brand-name">KOMNI</span>
+          </div>
           <p class="footer-brand-desc">
             Self-orchestrating financial operations infrastructure designed for institutional continuity, observable governance, and resilient asset execution.
           </p>
