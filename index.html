@@ -22,7 +22,6 @@
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-strong: rgba(255, 255, 255, 0.18);
       
-      --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
       --tagline-gradient: linear-gradient(135deg, #5A8CFF, #AEE7FF);
       
       --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -46,7 +45,7 @@
     }
 
     /* ==========================================================================
-       2. HERO BRANDING STAGE (STAYS EXACTLY AT CENTER)
+       2. HERO BRANDING STAGE (IMAGE LOGO INTEGRATION)
        ========================================================================== */
     .intro-stage {
       position: fixed;
@@ -63,20 +62,16 @@
       will-change: transform, opacity, filter;
     }
 
-    /* --- Logo Element --- */
-    .brand-logo {
-      font-size: clamp(68px, 10vw, 130px);
-      font-weight: 800;
-      letter-spacing: clamp(6px, 1.2vw, 12px);
-      line-height: 1;
-      background: var(--logo-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    /* --- Brand Logo Image --- */
+    .brand-logo-img {
+      width: clamp(180px, 25vw, 320px);
+      height: auto;
+      object-fit: contain;
       
       /* Initial cinematic state */
       opacity: 0;
       filter: blur(24px);
-      transform: scale(0.95);
+      transform: scale(0.92);
       transition: 
         opacity 1.6s var(--ease-expensive),
         filter 1.6s var(--ease-expensive),
@@ -85,7 +80,7 @@
       user-select: none;
     }
 
-    .brand-logo.is-visible {
+    .brand-logo-img.is-visible {
       opacity: 1;
       filter: blur(0px);
       transform: scale(1);
@@ -104,7 +99,6 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       
-      /* Initial state */
       opacity: 0;
       transform: translateY(20px);
       transition: 
@@ -136,7 +130,7 @@
     }
 
     /* ==========================================================================
-       3. ENTERPRISE LANDING PAGE CONTENT (APPEARS ON SCROLL ONLY)
+       3. ENTERPRISE LANDING PAGE CONTENT
        ========================================================================== */
     .site-wrapper {
       position: relative;
@@ -156,7 +150,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 36px 60px;
+      padding: 24px 60px;
       z-index: 200;
       border-bottom: 1px solid var(--border-subtle);
       background-color: rgba(0, 0, 0, 0.85);
@@ -173,11 +167,14 @@
     }
 
     .nav-brand {
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 3px;
-      color: var(--text-primary);
-      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-brand img {
+      height: 32px;
+      width: auto;
     }
 
     .nav-links {
@@ -202,8 +199,8 @@
     /* --- Main Content Flow --- */
     main {
       flex: 1;
-      padding-top: 100vh; /* Keeps main content off-screen until initial scroll */
-      padding-bottom: 160px;
+      padding-top: 100vh;
+      padding-bottom: 120px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -403,22 +400,54 @@
       color: var(--text-secondary);
     }
 
-    /* --- Footer --- */
+    /* ==========================================================================
+       4. COMPREHENSIVE ENTERPRISE FOOTER
+       ========================================================================== */
     footer {
       border-top: 1px solid var(--border-subtle);
-      padding: 48px 60px;
+      background-color: rgba(5, 5, 5, 0.6);
+      padding: 100px 60px 48px;
+      width: 100%;
+    }
+
+    .footer-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: 60px;
+      margin-bottom: 80px;
+    }
+
+    .footer-brand-col {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .footer-brand-col img {
+      height: 38px;
+      width: auto;
+      align-self: flex-start;
+    }
+
+    .footer-brand-desc {
+      font-size: 13px;
+      line-height: 1.6;
       color: var(--text-secondary);
-      letter-spacing: 0.5px;
+      max-width: 300px;
+      font-weight: 300;
     }
 
     .footer-status {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 10px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-top: 8px;
     }
 
     .status-dot {
@@ -428,12 +457,57 @@
       border-radius: 50%;
     }
 
+    .footer-col h5 {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .footer-col a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 300;
+      transition: color 0.3s ease;
+    }
+
+    .footer-col a:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-bottom {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding-top: 36px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .footer-meta {
+      display: flex;
+      gap: 24px;
+    }
+
     /* ==========================================================================
-       4. RESPONSIVE BREAKPOINTS
+       5. RESPONSIVE BREAKPOINTS
        ========================================================================== */
     @media (max-width: 900px) {
       nav {
-        padding: 24px 30px;
+        padding: 20px 30px;
       }
 
       .nav-links {
@@ -478,9 +552,18 @@
       }
 
       footer {
-        padding: 36px 30px;
+        padding: 60px 30px 36px;
+      }
+
+      .footer-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        margin-bottom: 48px;
+      }
+
+      .footer-bottom {
         flex-direction: column;
-        gap: 20px;
+        gap: 16px;
         align-items: flex-start;
       }
     }
@@ -490,7 +573,7 @@
 
   <!-- Operating System Boot / Centered Hero Stage -->
   <div class="intro-stage" id="introStage">
-    <div class="brand-logo" id="brandLogo">KOMNI</div>
+    <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Brand Logo" class="brand-logo-img" id="brandLogo">
     <div class="brand-tagline" id="brandTagline">Self-Orchestrating Infrastructure for Enterprise Financial Continuity</div>
     <div class="scroll-hint" id="scrollHint">Scroll to Explore</div>
   </div>
@@ -498,7 +581,9 @@
   <!-- Landing Infrastructure -->
   <div class="site-wrapper">
     <nav>
-      <div class="nav-brand">KOMNI</div>
+      <div class="nav-brand">
+        <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Logo">
+      </div>
       <ul class="nav-links">
         <li><a href="#about">About</a></li>
         <li><a href="#architecture">Architecture</a></li>
@@ -604,10 +689,61 @@
 
     <!-- Footer -->
     <footer>
-      <div>&copy; 2026 KOMNI Infrastructure Technologies Inc. All rights reserved.</div>
-      <div class="footer-status">
-        <span class="status-dot"></span>
-        <span>Systems Operational — Enterprise Framework</span>
+      <div class="footer-container">
+        <div class="footer-brand-col">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Institutional Logo">
+          <p class="footer-brand-desc">
+            Self-orchestrating financial operations infrastructure designed for institutional continuity, observable governance, and resilient asset execution.
+          </p>
+          <div class="footer-status">
+            <span class="status-dot"></span>
+            <span>Systems Operational — Enterprise Framework</span>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-col">
+          <h5>Products & Resources</h5>
+          <ul>
+            <li><a href="#about">Platform Overview</a></li>
+            <li><a href="#architecture">Infrastructure Coexistence</a></li>
+            <li><a href="#governance">Governance Controls</a></li>
+            <li><a href="#enterprise">Enterprise Solutions</a></li>
+            <li><a href="#">API Documentation</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal Navigation -->
+        <div class="footer-col">
+          <h5>Legal & Policy</h5>
+          <ul>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Security Policy</a></li>
+            <li><a href="#">Compliance Statement</a></li>
+            <li><a href="#">Cookie Preferences</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact & Social Links -->
+        <div class="footer-col">
+          <h5>Connect & Support</h5>
+          <ul>
+            <li><a href="mailto:support@komni.io">Enterprise Inquiries</a></li>
+            <li><a href="#">X / Twitter</a></li>
+            <li><a href="#">LinkedIn</a></li>
+            <li><a href="#">GitHub Repository</a></li>
+            <li><a href="#">Developer Discord</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 KOMNI Infrastructure Technologies Inc. All rights reserved.</div>
+        <div class="footer-meta">
+          <span>US-EAST-1</span>
+          <span>SOC-2 TYPE II COMPLIANT</span>
+        </div>
       </div>
     </footer>
   </div>
@@ -624,19 +760,19 @@
 
       // 1. Initial Frame Boot Sequence
       async function runOpeningSequence() {
-        await delay(700);
+        await delay(500);
         logo.classList.add('is-visible');
 
-        await delay(1600 + 700);
+        await delay(1200 + 400);
         tagline.classList.add('is-visible');
 
-        await delay(1200 + 400);
+        await delay(1000 + 300);
         hint.classList.add('is-visible');
 
         initScrollEngine();
       }
 
-      // 2. High-Precision Centered Dissolve Engine
+      // 2. Centered Dissolve Engine on Scroll
       function initScrollEngine() {
         let ticking = false;
 
@@ -645,13 +781,12 @@
             window.requestAnimationFrame(() => {
               const scrollY = window.scrollY;
               
-              // Smooth dissolve completes within first 400px of scroll
-              const maxScroll = 400;
+              const maxScroll = 380;
               const progress = Math.min(scrollY / maxScroll, 1);
               
               const opacity = 1 - progress;
               const blur = progress * 24;
-              const scale = 1 - (progress * 0.12);
+              const scale = 1 - (progress * 0.1);
               const translateY = -progress * 60;
 
               introStage.style.opacity = opacity.toFixed(3);
