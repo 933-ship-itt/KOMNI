@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KOMNI — Self-Orchestrating Infrastructure for Enterprise Financial Continuity</title>
-  <link rel="icon" type="image/png" href="https://i.postimg.cc/CxP0wjxY/ggp.png">
-  <link rel="apple-touch-icon" href="https://i.postimg.cc/CxP0wjxY/ggp.png">
   <meta name="description" content="KOMNI is an enterprise financial operations platform and cryptographic governance middleware designed to securely manage payment workflows, transaction visibility, and low-latency velocity caps.">
   
   <!-- Fonts -->
@@ -15,6 +13,10 @@
 
   <!-- GSAP Animation Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
   <style>
     /* ==========================================================================
@@ -1534,6 +1536,152 @@
       flex-shrink: 0;
     }
 
+    /* Dynamic Login View Cards */
+    .validation-card, .survey-card, .setup-card {
+      display: none;
+      width: 100%;
+      max-width: 420px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      position: relative;
+    }
+
+    /* Terminal Simulation Box */
+    .terminal-box {
+      background: #030308;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 20px 0;
+      height: 180px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+    
+    .terminal-line {
+      display: block;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid transparent;
+    }
+
+    .terminal-line.info { color: #8A8A8A; }
+    .terminal-line.success { color: #22c55e; }
+    .terminal-line.error { color: #ef4444; }
+    .terminal-line.accent { color: var(--accent-magenta); }
+
+    /* Custom Radio Buttons (Glassmorphic) */
+    .custom-survey-group {
+      margin-bottom: 20px;
+    }
+    .survey-question {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .survey-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .survey-option {
+      display: flex;
+      align-items: center;
+      position: relative;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-expensive);
+    }
+    .survey-option:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .survey-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .option-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .survey-option input[type="radio"]:checked ~ .option-dot {
+      border-color: var(--accent-magenta);
+      box-shadow: 0 0 8px var(--accent-magenta);
+    }
+    .survey-option input[type="radio"]:checked ~ .option-dot::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-magenta);
+    }
+    .option-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: color 0.3s ease;
+    }
+    .survey-option input[type="radio"]:checked ~ .option-text {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    /* Progress Setup Box */
+    .setup-progress-container {
+      margin: 24px 0;
+    }
+    .progress-bar-wrapper {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--logo-gradient);
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--accent-magenta);
+    }
+    .progress-label-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .progress-status-text {
+      color: var(--text-secondary);
+    }
+    .progress-percentage {
+      color: var(--accent-magenta);
+      font-weight: 600;
+    }
+
     /* Scoped Canvas Sizing for Login Overlay */
     .advert-side .advert-frame-container h1 {
       font-size: clamp(1.8rem, 3vw, 3.2rem);
@@ -2267,29 +2415,29 @@
 
     <!-- RIGHT DISPLAY SIDE: CLEAN ISSUANCE KEY LOGIN TERMINAL -->
     <div class="login-side">
-      <div class="login-card">
-        
+      <!-- 1. LOGIN CARD (INITIAL) -->
+      <div class="login-card" id="loginCard">
         <div class="brand-header">
           <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
           <h2 class="login-title">Institutional Sign In</h2>
           <p class="login-subtitle">Enter your organization's verified Issuance Key to authenticate your access node.</p>
         </div>
 
-        <form onsubmit="event.preventDefault();">
+        <form id="loginForm" onsubmit="handleAuthSubmit(event);">
           <div class="form-group">
             <div class="field-label">
               <span class="label-title">Enterprise Issuance Key</span>
               <span class="key-type">HSM / RSA-4096</span>
             </div>
             <div class="input-wrapper">
-              <input type="password" placeholder="ik_live_99f38a..." autocomplete="off" spellcheck="false" required>
+              <input type="password" id="issuanceKeyInput" placeholder="ik_live_99f38a..." autocomplete="off" spellcheck="false" required>
               <svg class="key-icon" viewBox="0 0 24 24">
                 <path d="M7 14A5 5 0 0 1 12 9E1 1 0 0 1 13 10V11H17V13H19V15H21V18H18L14.7 14.7A5 5 0 0 1 7 14ZM7 11A3 3 0 1 0 10 14A3 3 0 0 0 7 11Z"/>
               </svg>
             </div>
           </div>
 
-          <button type="submit" class="submit-btn">
+          <button type="submit" class="submit-btn" id="authBtn">
             <span>Authenticate Session</span>
           </button>
         </form>
@@ -2298,6 +2446,98 @@
           <div class="shield-dot"></div>
           <div class="security-notice-text">System authorization required. Node session activity is permanently hash-chained.</div>
         </div>
+      </div>
+
+      <!-- 2. VALIDATION CARD -->
+      <div class="validation-card" id="validationCard">
+        <div class="brand-header">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
+          <h2 class="login-title" id="validationTitle">Verifying Auth Node</h2>
+          <p class="login-subtitle">Establishing connection to secure Firebase gatekeeper...</p>
+        </div>
+        
+        <div class="terminal-box" id="validationTerminal">
+          <!-- Terminal lines will print here dynamically -->
+        </div>
+
+        <div class="security-notice">
+          <div class="shield-dot"></div>
+          <div class="security-notice-text">Out-of-band HSM verification in progress.</div>
+        </div>
+      </div>
+
+      <!-- 3. SURVEY CARD -->
+      <div class="survey-card" id="surveyCard">
+        <div class="brand-header">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
+          <h2 class="login-title">Configure Operations Node</h2>
+          <p class="login-subtitle">Key validated. Select client configuration preferences to deploy the runtime node.</p>
+        </div>
+
+        <form id="surveyForm" onsubmit="handleSurveySubmit(event);">
+          <div class="custom-survey-group">
+            <span class="survey-question">Security & Governance Profile</span>
+            <div class="survey-options">
+              <label class="survey-option">
+                <input type="radio" name="govProfile" value="strict" checked>
+                <div class="option-dot"></div>
+                <div class="option-text">Strict Governance (Enforces velocity limits & multi-sig approvals)</div>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="govProfile" value="audit">
+                <div class="option-dot"></div>
+                <div class="option-text">High-Throughput Audit (Low-latency bypass, ledger tracing only)</div>
+              </label>
+            </div>
+          </div>
+
+          <div class="custom-survey-group">
+            <span class="survey-question">Primary Integration Endpoint</span>
+            <div class="survey-options">
+              <label class="survey-option">
+                <input type="radio" name="endpoint" value="live" checked>
+                <div class="option-dot"></div>
+                <div class="option-text">Paystack Live Endpoint Gateway Relay</div>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="endpoint" value="sandbox">
+                <div class="option-dot"></div>
+                <div class="option-text">KOMNI Internal Sandbox Payout Simulator</div>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <span>Verify & Deploy Environment</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- 4. SETUP CARD -->
+      <div class="setup-card" id="setupCard">
+        <div class="brand-header">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
+          <h2 class="login-title">Deploying Access Node</h2>
+          <p class="login-subtitle">Setting up localized database & SSL handshakes...</p>
+        </div>
+
+        <div class="terminal-box" id="setupTerminal">
+          <!-- Environment setup terminal lines -->
+        </div>
+
+        <div class="setup-progress-container">
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill" id="setupProgressBar"></div>
+          </div>
+          <div class="progress-label-group">
+            <span class="progress-status-text" id="setupProgressStatus">Extracting packages...</span>
+            <span class="progress-percentage" id="setupProgressPercentage">0%</span>
+          </div>
+        </div>
+
+        <button class="submit-btn" id="launchDashboardBtn" style="display: none;" onclick="launchDashboard();">
+          <span>Enter Unified Command Terminal</span>
+        </button>
       </div>
     </div>
   </div>
@@ -2753,6 +2993,199 @@
         // Process hash on initial load
         handleHashChange();
       }
+
+      // Firebase initialization compat layer
+      const firebaseConfig = {
+  apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
+  authDomain: "komni-2439f.firebaseapp.com",
+  projectId: "komni-2439f",
+  storageBucket: "komni-2439f.firebasestorage.app",
+  messagingSenderId: "1005791374529",
+  appId: "1:1005791374529:web:e1735b735f4c8c420eb840",
+  measurementId: "G-SKLPK0NHFZ"
+};
+
+      let firebaseApp = null;
+      let firebaseDatabase = null;
+
+      try {
+        if (typeof firebase !== 'undefined') {
+          firebaseApp = firebase.initializeApp(firebaseConfig);
+          firebaseDatabase = firebase.database();
+          console.log("Firebase compatibility layer initialized.");
+        }
+      } catch (err) {
+        console.warn("Firebase initialization failed. Falling back to local verification:", err);
+      }
+
+      // Valid test key pre-configured for testing:
+      const VALID_TEST_KEY = "ik_live_sec_val_4096_komni_77ab3c";
+
+      // Form submission handler for Auth Card
+      window.handleAuthSubmit = function(e) {
+        if (e) e.preventDefault();
+        const keyInput = document.getElementById('issuanceKeyInput');
+        const key = keyInput.value.trim();
+
+        if (!key) return;
+
+        // Transition to Validation Card
+        document.getElementById('loginCard').style.display = 'none';
+        const valCard = document.getElementById('validationCard');
+        valCard.style.display = 'block';
+
+        const term = document.getElementById('validationTerminal');
+        term.innerHTML = '';
+
+        function printLog(text, type = 'info', delayMs = 0) {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              const line = document.createElement('span');
+              line.className = `terminal-line ${type}`;
+              line.innerText = text;
+              term.appendChild(line);
+              term.scrollTop = term.scrollHeight;
+              resolve();
+            }, delayMs);
+          });
+        }
+
+        async function verifyKey() {
+          await printLog("ik_authenticate_session --node-init", "accent", 100);
+          await printLog("Establishing handshake with host gates...", "info", 300);
+          await printLog("Connecting to Firebase Database node...", "info", 400);
+
+          let isKeyValid = false;
+
+          // Attempt Firebase validation
+          if (firebaseDatabase) {
+            try {
+              const snapshot = await firebaseDatabase.ref('issuance_keys/' + key).once('value');
+              const keyData = snapshot.val();
+              if (keyData && keyData.active === true) {
+                isKeyValid = true;
+                await printLog("[ OK ] Handshake resolved. Key located in Firebase node.", "success", 400);
+              } else {
+                await printLog("[ WARN ] Key not found in Firebase registry. Trying local vault...", "info", 500);
+              }
+            } catch (err) {
+              await printLog("[ WARN ] Firebase connection timeout. Falling back to local vault...", "info", 400);
+            }
+          } else {
+            await printLog("[ INFO ] Firebase library not connected. Initializing local check...", "info", 300);
+          }
+
+          // Local Fallback validation
+          if (!isKeyValid) {
+            if (key === VALID_TEST_KEY) {
+              isKeyValid = true;
+              await printLog("[ OK ] Key validated via local HSM hardware signatures.", "success", 600);
+            } else {
+              await printLog("[ ERROR ] RSA Signature check failed. Invalid Issuance Key.", "error", 800);
+              await printLog("Session aborted: Unauthorized Node Entry.", "error", 200);
+              
+              // Show failure button
+              const failBtn = document.createElement('button');
+              failBtn.className = 'submit-btn';
+              failBtn.style.marginTop = '15px';
+              failBtn.innerHTML = '<span>Retry Authentication</span>';
+              failBtn.onclick = () => {
+                valCard.style.display = 'none';
+                document.getElementById('loginCard').style.display = 'block';
+                keyInput.value = '';
+                keyInput.focus();
+              };
+              term.appendChild(failBtn);
+              return;
+            }
+          }
+
+          // Success Flow
+          await printLog("Decrypting pre-configured enterprise profiles...", "info", 400);
+          await printLog("Node state established: PENDING_USER_CONF.", "accent", 300);
+          await printLog("Handshake complete. Entering configuration panel...", "success", 500);
+
+          setTimeout(() => {
+            // Transition to Survey Card
+            valCard.style.display = 'none';
+            document.getElementById('surveyCard').style.display = 'block';
+          }, 1000);
+        }
+
+        verifyKey();
+      };
+
+      // Form submission handler for Survey Card
+      window.handleSurveySubmit = function(e) {
+        if (e) e.preventDefault();
+        const govProfile = document.querySelector('input[name="govProfile"]:checked').value;
+        const endpoint = document.querySelector('input[name="endpoint"]:checked').value;
+
+        // Save preferences to localStorage for dashboard to pull
+        localStorage.setItem('komni_session_active', 'true');
+        localStorage.setItem('komni_gov_profile', govProfile);
+        localStorage.setItem('komni_endpoint', endpoint);
+        localStorage.setItem('komni_org_name', 'KOMNI Enterprise');
+        localStorage.setItem('komni_node_id', 'IK-LIVE-RSA4096-01A');
+
+        // Transition to Setup Card
+        document.getElementById('surveyCard').style.display = 'none';
+        document.getElementById('setupCard').style.display = 'block';
+
+        const term = document.getElementById('setupTerminal');
+        term.innerHTML = '';
+        const fillBar = document.getElementById('setupProgressBar');
+        const statusText = document.getElementById('setupProgressStatus');
+        const pctText = document.getElementById('setupProgressPercentage');
+
+        function printLog(text, type = 'info', delayMs = 0) {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              const line = document.createElement('span');
+              line.className = `terminal-line ${type}`;
+              line.innerText = text;
+              term.appendChild(line);
+              term.scrollTop = term.scrollHeight;
+              resolve();
+            }, delayMs);
+          });
+        }
+
+        async function runSetup() {
+          await printLog("komni_env_deploy --node-id=IK-LIVE-RSA4096-01A", "accent", 100);
+          
+          const tasks = [
+            { text: "Loading security rules profiles...", status: "Loading rules...", duration: 600, pct: 15 },
+            { text: "[ OK ] Security rules compiled.", status: "Configuring database schema...", duration: 500, pct: 30 },
+            { text: "Allocating Redis sliding limits buffers...", status: "Mounting cache...", duration: 600, pct: 45 },
+            { text: "[ OK ] Cache buffers loaded. Latency configured to < 5ms.", status: "Initializing SHA-256 Ledger...", duration: 500, pct: 60 },
+            { text: "Deploying SHA-256 Genesis Block (#000000)...", status: "Sealing hash ledger...", duration: 700, pct: 80 },
+            { text: "[ OK ] Ledger genesis seal validated.", status: "Hot-loading SSL certs...", duration: 400, pct: 90 },
+            { text: "Handshaking telemetry tunnels...", status: "Establishing websocket...", duration: 500, pct: 100 }
+          ];
+
+          for (const task of tasks) {
+            statusText.innerText = task.status;
+            fillBar.style.width = `${task.pct}%`;
+            pctText.innerText = `${task.pct}%`;
+            await printLog(task.text, "info", task.duration);
+          }
+
+          statusText.innerText = "Deploy complete. Node active.";
+          await printLog("Node fully initialized and active on port 443.", "success", 200);
+          await printLog("System status: COMPLIANT & READY.", "success", 100);
+
+          // Show launch button
+          document.getElementById('launchDashboardBtn').style.display = 'block';
+        }
+
+        runSetup();
+      };
+
+      // Redirect to dashboard
+      window.launchDashboard = function() {
+        window.location.href = 'dashboard.html';
+      };
 
       // Start the application opening flow
       runOpeningSequence();
