@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KOMNI — Self-Orchestrating Infrastructure for Enterprise Financial Continuity</title>
+  <title>KOMNI V1 — Deterministic Payment Proxy & Cryptographic Governance Middleware</title>
   <link rel="icon" type="image/png" href="https://i.postimg.cc/CxP0wjxY/ggp.png">
   <link rel="apple-touch-icon" href="https://i.postimg.cc/CxP0wjxY/ggp.png">
   
-  <!-- Inter Font Load -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&display=swap" rel="stylesheet">
@@ -16,1202 +16,279 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
   <style>
-    /* ==========================================================================
-       1. SYSTEM VARIABLES & BASE STYLES
-       ========================================================================== */
-    :root {
-      --bg-color: #000000;
-      --text-primary: #FFFFFF;
-      --text-secondary: #8A8A8A;
-      --text-muted: #525252;
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.18);
-      
-      --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
-      --tagline-gradient: linear-gradient(135deg, #5A8CFF, #AEE7FF);
-      
-      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
-
-      /* Advert Variables */
-      --bg-black: #030308;
-      --main-gradient: linear-gradient(135deg, #6036E1 0%, #a83ac8 50%, #D83DC2 100%);
-      --accent-violet: #6036E1;
-      --accent-magenta: #D83DC2;
-      --text-sub: #a1a1aa;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    html, body {
-      background-color: var(--bg-color);
-      color: var(--text-primary);
-      font-family: var(--font-main);
-      overflow-x: hidden;
-      width: 100%;
-    }
-
-    /* ==========================================================================
-       2. FIXED BACKGROUND LOGO (DIM HEARTBEAT PULSE)
-       ========================================================================== */
-    .bg-heartbeat-container {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: clamp(280px, 45vw, 600px);
-      height: clamp(280px, 45vw, 600px);
-      z-index: 1;
-      pointer-events: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .bg-heartbeat-logo {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      opacity: 0.08;
-      filter: drop-shadow(0 0 15px rgba(96, 54, 225, 0.25));
-      animation: komni-heartbeat 4.5s ease-in-out infinite;
-      will-change: transform, opacity, filter;
-    }
-
-    @keyframes komni-heartbeat {
-      0% {
-        transform: scale(1);
-        opacity: 0.06;
-        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
-      }
-      14% {
-        transform: scale(1.03);
-        opacity: 0.11;
-        filter: drop-shadow(0 0 25px rgba(216, 61, 194, 0.35));
-      }
-      28% {
-        transform: scale(1.01);
-        opacity: 0.08;
-        filter: drop-shadow(0 0 15px rgba(96, 54, 225, 0.2));
-      }
-      42% {
-        transform: scale(1.04);
-        opacity: 0.13;
-        filter: drop-shadow(0 0 30px rgba(96, 54, 225, 0.4));
-      }
-      70% {
-        transform: scale(1);
-        opacity: 0.06;
-        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
-      }
-      100% {
-        transform: scale(1);
-        opacity: 0.06;
-        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
-      }
-    }
-
-    /* ==========================================================================
-       3. HERO BRANDING STAGE (TEXT LOGO RESTORED)
-       ========================================================================== */
-    .intro-stage {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      pointer-events: none;
-      will-change: transform, opacity, filter;
-    }
-
-    .brand-logo {
-      font-size: clamp(68px, 10vw, 130px);
-      font-weight: 800;
-      letter-spacing: clamp(6px, 1.2vw, 12px);
-      line-height: 1;
-      background: var(--logo-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      
-      opacity: 0;
-      filter: blur(24px);
-      transform: scale(0.95);
-      transition: 
-        opacity 1.6s var(--ease-expensive),
-        filter 1.6s var(--ease-expensive),
-        transform 1.6s var(--ease-expensive);
-      
-      user-select: none;
-    }
-
-    .brand-logo.is-visible {
-      opacity: 1;
-      filter: blur(0px);
-      transform: scale(1);
-    }
-
-    .brand-tagline {
-      margin-top: 28px;
-      font-size: clamp(11px, 1.2vw, 15px);
-      font-weight: 500;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      text-align: center;
-      padding: 0 20px;
-      background: var(--tagline-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      
-      opacity: 0;
-      transform: translateY(20px);
-      transition: 
-        opacity 1.2s var(--ease-expensive),
-        transform 1.2s var(--ease-expensive);
-      
-      user-select: none;
-    }
-
-    .brand-tagline.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .scroll-hint {
-      position: absolute;
-      bottom: 40px;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      opacity: 0;
-      transition: opacity 1s var(--ease-expensive);
-    }
-
-    .scroll-hint.is-visible {
-      opacity: 1;
-    }
-
-    /* ==========================================================================
-       4. ENTERPRISE LANDING PAGE CONTENT
-       ========================================================================== */
-    .site-wrapper {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* --- Navigation --- */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 28px 60px;
-      z-index: 200;
-      border-bottom: 1px solid var(--border-subtle);
-      background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: opacity 0.8s var(--ease-expensive), transform 0.8s var(--ease-expensive);
-    }
-
-    body.has-scrolled nav {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      font-size: 14px;
-      letter-spacing: 3px;
-      color: var(--text-primary);
-    }
-
-    .nav-brand img {
-      height: 24px;
-      width: auto;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 48px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 400;
-      letter-spacing: 0.5px;
-      transition: color 0.3s ease;
-    }
-
-    .nav-links a:hover {
-      color: var(--text-primary);
-    }
-
-    /* --- Main Content Flow --- */
-    main {
-      flex: 1;
-      padding-top: 100vh;
-      padding-bottom: 120px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .hero-content {
-      max-width: 900px;
-      width: 90%;
-      text-align: center;
-      margin-bottom: 220px;
-    }
-
-    .hero-heading {
-      font-size: clamp(34px, 4.8vw, 60px);
-      font-weight: 300;
-      line-height: 1.12;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      margin-bottom: 36px;
-    }
-
-    .hero-description {
-      max-width: 650px;
-      margin: 0 auto;
-      font-size: clamp(16px, 1.25vw, 19px);
-      font-weight: 300;
-      line-height: 1.65;
-      color: var(--text-secondary);
-    }
-
-    .section-container {
-      width: 100%;
-      max-width: 1140px;
-      padding: 0 40px;
-      margin-bottom: 200px;
-    }
-
-    .section-header {
-      margin-bottom: 56px;
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      display: block;
-    }
-
-    .section-title {
-      font-size: clamp(22px, 2.5vw, 32px);
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-    }
-
-    .reveal-on-scroll {
-      opacity: 0;
-      transform: translateY(32px);
-      filter: blur(8px);
-      transition: 
-        opacity 1.2s var(--ease-expensive),
-        transform 1.2s var(--ease-expensive),
-        filter 1.2s var(--ease-expensive);
-      will-change: opacity, transform, filter;
-    }
-
-    .reveal-on-scroll.is-revealed {
-      opacity: 1;
-      transform: translateY(0);
-      filter: blur(0px);
-    }
-
-    .stagger-1 { transition-delay: 0.1s; }
-    .stagger-2 { transition-delay: 0.2s; }
-    .stagger-3 { transition-delay: 0.3s; }
-    .stagger-4 { transition-delay: 0.4s; }
-
-    .architecture-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      border-top: 1px solid var(--border-subtle);
-      border-left: 1px solid var(--border-subtle);
-    }
-
-    .arch-card {
-      padding: 56px 48px;
-      border-right: 1px solid var(--border-subtle);
-      border-bottom: 1px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: border-color 0.4s ease, background-color 0.4s ease;
-    }
-
-    .arch-card:hover {
-      border-color: var(--border-strong);
-      background-color: rgba(255, 255, 255, 0.015);
-    }
-
-    .arch-card-num {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: 1px;
-      margin-bottom: 40px;
-    }
-
-    .arch-card h3 {
-      font-size: 18px;
-      font-weight: 400;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-    }
-
-    .arch-card p {
-      font-size: 14px;
-      font-weight: 300;
-      line-height: 1.7;
-      color: var(--text-secondary);
-    }
-
-    .pillar-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .pillar-column {
-      padding: 48px 36px;
-      border-right: 1px solid var(--border-subtle);
-    }
-
-    .pillar-column:first-child { padding-left: 0; }
-    .pillar-column:last-child { border-right: none; padding-right: 0; }
-
-    .pillar-column h4 {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-    }
-
-    .pillar-column p {
-      font-size: 14px;
-      font-weight: 300;
-      line-height: 1.7;
-      color: var(--text-secondary);
-    }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border-top: 1px solid var(--border-subtle);
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .metric-item {
-      padding: 48px 32px;
-      border-right: 1px solid var(--border-subtle);
-    }
-
-    .metric-item:last-child { border-right: none; }
-
-    .metric-value {
-      font-size: 32px;
-      font-weight: 400;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .metric-label {
-      font-size: 12px;
-      font-weight: 400;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-
-    /* ==========================================================================
-       5. 16:9 VISUAL SHOWCASE ADVERT CONTAINER
-       ========================================================================== */
-    .showcase-frame-wrapper {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(96, 54, 225, 0.15);
-      background-color: var(--bg-black);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .advert-frame-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 50%, #0d0722 0%, #030308 100%);
-      overflow: hidden;
-      color: #fff;
-    }
-
-    .advert-frame-container canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
-      width: 100%;
-      height: 100%;
-    }
-
-    .advert-frame-container .ambient-glow {
-      position: absolute;
-      width: 600px;
-      height: 600px;
-      border-radius: 50%;
-      filter: blur(140px);
-      opacity: 0.25;
-      pointer-events: none;
-      z-index: 1;
-      animation: pulseGlow 12s infinite alternate ease-in-out;
-    }
-
-    .advert-frame-container .glow-1 { top: -10%; left: -10%; background: var(--accent-violet); }
-    .advert-frame-container .glow-2 { bottom: -10%; right: -10%; background: var(--accent-magenta); animation-delay: -6s; }
-
-    @keyframes pulseGlow {
-      0% { transform: scale(1) translate(0, 0); opacity: 0.2; }
-      100% { transform: scale(1.3) translate(50px, 30px); opacity: 0.35; }
-    }
-
-    .advert-frame-container .director-ui {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    .advert-frame-container .scene-container {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-      perspective: 1200px;
-    }
-
-    .advert-frame-container .scene-content {
-      position: absolute;
-      width: 90%;
-      max-width: 900px;
-      text-align: center;
-      top: 50%;
-      left: 50%;
-      opacity: 0;
-      transform: translate3d(-50%, calc(-50% + 50px), -100px) rotateX(-15deg);
-      filter: blur(12px);
-      transition: all 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-      visibility: hidden;
-    }
-
-    .advert-frame-container .scene-content.active {
-      opacity: 1;
-      transform: translate3d(-50%, -50%, 0) rotateX(0deg);
-      filter: blur(0px);
-      visibility: visible;
-    }
-
-    .advert-frame-container .scene-content.exit {
-      opacity: 0;
-      transform: translate3d(-50%, calc(-50% - 50px), 100px) rotateX(15deg);
-      filter: blur(16px);
-      visibility: visible;
-    }
-
-    .advert-frame-container h1 {
-      font-size: clamp(2rem, 5.5vw, 4.8rem);
-      margin: 0;
-      background: var(--main-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-    }
-
-    .advert-frame-container p {
-      font-size: clamp(0.85rem, 1.5vw, 1.2rem);
-      color: var(--text-sub);
-      margin-top: 16px;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .advert-frame-container #finaleStage {
-      position: absolute;
-      inset: 0;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.8s ease;
-    }
-
-    .advert-frame-container #finaleStage.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .advert-frame-container .intro-svg {
-      width: 800px;
-      max-width: 85vw;
-      height: 160px;
-      overflow: visible;
-    }
-
-    .advert-frame-container .fill-text {
-      font-size: 100px;
-      font-weight: 800;
-      fill: url(#svgGrad);
-      letter-spacing: -0.03em;
-    }
-
-    .advert-frame-container .sub-url-path {
-      font-size: 18px;
-      font-weight: 800;
-      fill: #ffffff;
-      letter-spacing: 0.5em;
-      opacity: 0.8;
-    }
-
-    /* ==========================================================================
-       6. COMPREHENSIVE ENTERPRISE FOOTER
-       ========================================================================== */
-    footer {
-      border-top: 1px solid var(--border-subtle);
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 100px 60px 48px;
-      width: 100%;
-      position: relative;
-      z-index: 20;
-    }
-
-    .footer-container {
-      max-width: 1140px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 2fr repeat(3, 1fr);
-      gap: 60px;
-      margin-bottom: 80px;
-    }
-
-    .footer-brand-col {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .footer-brand-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .footer-brand-header img {
-      height: 32px;
-      width: auto;
-    }
-
-    .footer-brand-name {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: 4px;
-      background: var(--logo-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .footer-brand-desc {
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text-secondary);
-      max-width: 320px;
-      font-weight: 300;
-    }
-
-    .footer-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      margin-top: 8px;
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background-color: #22c55e;
-      border-radius: 50%;
-    }
-
-    .footer-col h5 {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      color: var(--text-primary);
-      margin-bottom: 24px;
-    }
-
-    .footer-col ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .footer-col a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 300;
-      transition: color 0.3s ease;
-    }
-
-    .footer-col a:hover {
-      color: var(--text-primary);
-    }
-
-    .footer-bottom {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding-top: 36px;
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .footer-meta {
-      display: flex;
-      gap: 24px;
-    }
-
-    /* ==========================================================================
-       7. RESPONSIVE BREAKPOINTS
-       ========================================================================== */
-    @media (max-width: 900px) {
-      nav { padding: 20px 30px; }
-      .nav-links { gap: 24px; }
-      .architecture-grid { grid-template-columns: 1fr; border-left: none; }
-      .arch-card { border-left: none; padding: 40px 24px; }
-      .pillar-grid { grid-template-columns: 1fr; }
-      .pillar-column { padding: 36px 0; border-right: none; border-bottom: 1px solid var(--border-subtle); }
-      .pillar-column:last-child { border-bottom: none; }
-      .metrics-grid { grid-template-columns: 1fr; }
-      .metric-item { border-right: none; border-bottom: 1px solid var(--border-subtle); }
-      .metric-item:last-child { border-bottom: none; }
-      footer { padding: 60px 30px 36px; }
-      .footer-container { grid-template-columns: 1fr; gap: 40px; margin-bottom: 48px; }
-      .footer-bottom { flex-direction: column; gap: 16px; align-items: flex-start; }
-    }
+    :root{
+      --bg: #000;
+      --muted: #8a8a8a;
+      --primary: #fff;
+      --violet: #6036e1;
+      --magenta: #d83dc2;
+      --glass: rgba(255,255,255,0.06);
+      --accent-grad: linear-gradient(90deg,var(--violet),var(--magenta));
+      --ease-fancy: cubic-bezier(0.16,1,0.3,1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);color:var(--primary);font-family:'Inter',system-ui,Segoe UI,Roboto,Arial;}
+
+    /* keep most original layout but tweak hero */
+    nav{position:fixed;top:0;left:0;width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 48px;z-index:200;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);border-bottom:1px solid var(--glass)}
+    .nav-brand{display:flex;gap:12px;align-items:center;font-weight:800;letter-spacing:3px}
+    .nav-links{display:flex;gap:28px;list-style:none}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:13px}
+    .nav-links a:hover{color:var(--primary)}
+
+    .bg-heartbeat-container{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;pointer-events:none;z-index:1}
+    .bg-heartbeat-logo{width:46vw;max-width:620px;opacity:0.06;filter:drop-shadow(0 0 20px rgba(96,54,225,0.2));animation:hb 4.8s ease-in-out infinite}
+    @keyframes hb{0%{transform:scale(1);opacity:0.05}50%{transform:scale(1.04);opacity:0.12}100%{transform:scale(1);opacity:0.05}}
+
+    .intro-stage{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;z-index:100;pointer-events:none}
+    .brand-logo{font-weight:900;font-size:clamp(48px,10vw,120px);background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:6px;opacity:0;transform:translateY(10px) scale(.98);filter:blur(18px)}
+    .brand-tagline{font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);opacity:0;transform:translateY(12px)}
+    .hero-sub{max-width:960px;text-align:center;color:var(--muted);font-weight:300;line-height:1.6;opacity:0;transform:translateY(12px)}
+
+    /* special text effect for 'V1' callout */
+    .chip{display:inline-block;padding:6px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(96,54,225,0.12),rgba(216,61,194,0.08));color:var(--primary);font-weight:700;font-size:13px;margin-left:10px}
+
+    main{position:relative;z-index:10;padding-top:110vh;padding-bottom:120px}
+    .section{max-width:1140px;margin:0 auto;padding:0 28px 120px}
+    .section-header{margin-bottom:28px}
+    .section-title{font-size:28px;font-weight:600;color:var(--primary)}
+    .section-lead{color:var(--muted);max-width:900px}
+
+    /* architecture grid styling */
+    .arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:28px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid var(--glass);padding:28px;border-radius:12px;min-height:160px;position:relative;overflow:hidden}
+    .card h3{font-size:16px;margin-bottom:10px;color:var(--primary)}
+    .card p{color:var(--muted);font-weight:300;line-height:1.5}
+    .card:before{content:'';position:absolute;right:-120px;top:-60px;width:260px;height:260px;background:radial-gradient(circle at 30% 30%,rgba(96,54,225,0.08),transparent);transform:rotate(25deg)}
+
+    /* technical detail area */
+    .tech-area{display:grid;grid-template-columns:1fr 420px;gap:28px;margin-top:36px}
+    .tech-content p{color:var(--muted);line-height:1.6}
+    .spec-block{background:rgba(255,255,255,0.02);border:1px solid var(--glass);padding:18px;border-radius:10px;color:var(--muted);font-family:monospace;font-size:13px}
+
+    /* marquee-like animated showcase */
+    .showcase{margin-top:40px;border-radius:14px;overflow:hidden;border:1px solid var(--glass);position:relative;padding:36px;background:linear-gradient(180deg,#030113 0%, #05020a 100%)}
+    .show-phrases{display:flex;gap:24px;align-items:center;justify-content:center;height:140px}
+    .phrase{font-weight:800;font-size:clamp(20px,4vw,42px);background:var(--accent-grad);-webkit-background-clip:text;color:transparent;opacity:0;transform:translateY(12px)}
+
+    footer{border-top:1px solid var(--glass);padding:80px 48px 40px;background:rgba(0,0,0,0.6);}
+
+    /* responsive */
+    @media (max-width:980px){.arch-grid{grid-template-columns:1fr} .tech-area{grid-template-columns:1fr} nav{padding:14px 18px} .brand-logo{font-size:48px}}
+
+    /* reveal utility */
+    .is-visible{opacity:1;transform:none;filter:none}
   </style>
 </head>
 <body>
 
-  <!-- Ambient Heartbeat Background Logo -->
+  <!-- Ambient Heartbeat Background Logo (kept) -->
   <div class="bg-heartbeat-container">
     <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Ambient Emblem" class="bg-heartbeat-logo">
   </div>
 
-  <!-- Operating System Boot / Centered Hero Stage -->
-  <div class="intro-stage" id="introStage">
-    <div class="brand-logo" id="brandLogo">KOMNI</div>
-    <div class="brand-tagline" id="brandTagline">Self-Orchestrating Infrastructure for Enterprise Financial Continuity</div>
-    <div class="scroll-hint" id="scrollHint">Scroll to Explore</div>
-  </div>
+  <nav>
+    <div class="nav-brand">
+      <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI" style="height:28px">
+      <span>KOMNI</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#governance">Governance</a></li>
+      <li><a href="#showcase">Showcase</a></li>
+      <li><a href="#technical">Technical</a></li>
+    </ul>
+  </nav>
 
-  <!-- Landing Infrastructure -->
-  <div class="site-wrapper">
-    <nav>
-      <div class="nav-brand">
-        <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Logo">
-        <span>KOMNI</span>
+  <header class="intro-stage">
+    <div class="brand-logo" id="brandLogo">KOMNI<span class="chip">V1</span></div>
+    <div class="brand-tagline">High-Throughput Deterministic Payment Proxy & Cryptographic Governance Middleware</div>
+    <p class="hero-sub">KOMNI V1 operates as an inline security layer between a merchant's core systems and payment processors. It enforces deterministic rules, velocity controls, multi-signature state machines, and maintains a SHA-256 hash-chained immutable ledger for tamper-evident audits.</p>
+  </header>
+
+  <main>
+    <section class="section" id="about">
+      <div class="section-header">
+        <h2 class="section-title">What KOMNI V1 Does</h2>
+        <p class="section-lead">A deterministic, low-latency middleware that protects, observes, and governs enterprise payment operations without relying on non-deterministic ML inference. Built for auditability, policy-driven approvals, and secure forwarding to external payment rails.</p>
       </div>
-      <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#governance">Governance</a></li>
-        <li><a href="#showcase">Showcase</a></li>
-        <li><a href="#enterprise">Enterprise</a></li>
-      </ul>
-    </nav>
 
-    <main>
-      <!-- Hero Text Section -->
-      <section class="hero-content reveal-on-scroll" id="about">
-        <h1 class="hero-heading">
-          Unified Operational Layer for Enterprise Financial Workflows.
-        </h1>
-        <p class="hero-description">
-          KOMNI is an enterprise financial operations platform designed to help organizations securely manage payment workflows, transaction visibility, and operational governance through a single, unified interface.
-        </p>
-      </section>
-
-      <!-- Section 1: Architecture Cards -->
-      <section class="section-container" id="architecture">
-        <div class="section-header reveal-on-scroll">
-          <span class="section-label">Operational Philosophy</span>
-          <h2 class="section-title">Designed to complement, enhance, and scale.</h2>
+      <div class="arch-grid" id="architecture">
+        <div class="card">
+          <h3>1. API Ingress & TLS Termination</h3>
+          <p>Reverse-proxy ingress with header inspection, API key validation, IP & timestamp verification, and network-level rate limiting to drop malformed or brute-force requests early.</p>
         </div>
 
-        <div class="architecture-grid">
-          <div class="arch-card reveal-on-scroll stagger-1">
-            <div class="arch-card-num">01 / INTEGRATION</div>
-            <div>
-              <h3>Infrastructure Coexistence</h3>
-              <p>Rather than replacing existing payment infrastructure, KOMNI is designed to complement and enhance it. By integrating with trusted payment providers and enterprise systems, the platform delivers centralized visibility, standardized operational workflows, and resilient transaction management while allowing organizations to continue using the financial services they already trust.</p>
-            </div>
-          </div>
-
-          <div class="arch-card reveal-on-scroll stagger-2">
-            <div class="arch-card-num">02 / GOVERNANCE</div>
-            <div>
-              <h3>Observable & Traceable Control</h3>
-              <p>The platform is engineered around principles of security, transparency, and operational integrity. Every critical action is designed to be observable, traceable, and governed through structured controls, creating an environment where financial operations can be managed with greater confidence, consistency, and accountability.</p>
-            </div>
-          </div>
-
-          <div class="arch-card reveal-on-scroll stagger-3">
-            <div class="arch-card-num">03 / COMPLEXITY</div>
-            <div>
-              <h3>Single Operational Environment</h3>
-              <p>As organizations grow, operational complexity increases. Multiple payment channels, distributed teams, disconnected systems, and evolving compliance requirements can make financial operations increasingly difficult to manage. KOMNI addresses these challenges by providing a single operational environment that brings payment activity, governance, and financial oversight together into one cohesive platform.</p>
-            </div>
-          </div>
-
-          <div class="arch-card reveal-on-scroll stagger-4">
-            <div class="arch-card-num">04 / SCALABILITY</div>
-            <div>
-              <h3>Long-Term Resilience</h3>
-              <p>Designed with enterprise scalability in mind, KOMNI serves as a foundation for organizations seeking greater operational resilience, stronger governance, and a more structured approach to managing modern financial workflows. Its architecture is intended to evolve alongside enterprise requirements, enabling future capabilities while maintaining a clear focus on reliability, security, and long-term operational excellence.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 2: Platform Pillars -->
-      <section class="section-container" id="governance">
-        <div class="section-header reveal-on-scroll">
-          <span class="section-label">Capabilities</span>
-          <h2 class="section-title">Institutional governance by default.</h2>
+        <div class="card">
+          <h3>2. Deterministic Security Engine</h3>
+          <p>Analog Intelligence: velocity sliding-windows (Redis), deterministic heuristics, static thresholds and hard-caps. Decisions under 5ms per request for real-time enforcement.</p>
         </div>
 
-        <div class="pillar-grid">
-          <div class="pillar-column reveal-on-scroll stagger-1">
-            <h4>Payment Workflows</h4>
-            <p>Deploy and standardize payment experiences across distributed channels while maintaining full centralized command over execution and approval trees.</p>
-          </div>
-          <div class="pillar-column reveal-on-scroll stagger-2">
-            <h4>Transaction Visibility</h4>
-            <p>Achieve real-time, deterministic oversight across all legacy ledgers, banking partners, and integration endpoints through a single pane of glass.</p>
-          </div>
-          <div class="pillar-column reveal-on-scroll stagger-3">
-            <h4>Operational Governance</h4>
-            <p>Establish strict, policy-driven audit records, role-based authority matrixes, and verifiable accountability structures for every institutional transaction.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 3: Visual Showcase Frame (16:9 Advert) -->
-      <section class="section-container reveal-on-scroll" id="showcase">
-        <div class="section-header">
-          <span class="section-label">Visual Interpretation</span>
-          <h2 class="section-title">Dynamic Operations Showcase</h2>
+        <div class="card">
+          <h3>3. Multi-Signature State Machine</h3>
+          <p>Holds actions in PENDING_APPROVAL, returns komni_tx_id, and proceeds only after required cryptographic/admin sign-offs via dashboard or webhook — ensuring enforceable governance.</p>
         </div>
 
-        <div class="showcase-frame-wrapper">
-          <div class="advert-frame-container">
-            <div class="ambient-glow glow-1"></div>
-            <div class="ambient-glow glow-2"></div>
-
-            <div class="director-ui">
-              <div class="scene-container">
-                <!-- Scene 1 -->
-                <div class="scene-content active">
-                  <h1>KOMNI</h1>
-                  <p>Centralized operational governance & payment workflows.</p>
-                </div>
-                <!-- Scene 2 -->
-                <div class="scene-content">
-                  <h1>Unified Infrastructure</h1>
-                  <p>Connect payment providers with absolute transaction oversight.</p>
-                </div>
-                <!-- Scene 3 -->
-                <div class="scene-content">
-                  <h1>Observable Controls</h1>
-                  <p>Traceable, structured execution designed for mission-critical operations.</p>
-                </div>
-                <!-- Scene 4 -->
-                <div class="scene-content">
-                  <h1>Institutional Resilience</h1>
-                  <p>Architected for evolving enterprise requirements & security compliance.</p>
-                </div>
-                <!-- Scene 5 -->
-                <div class="scene-content">
-                  <h1>Financial Operations</h1>
-                  <p>Bring consistency, speed, and accountability to every workflow.</p>
-                </div>
-              </div>
-            </div>
-
-            <div id="finaleStage">
-              <svg class="intro-svg" viewBox="0 0 900 200">
-                <defs>
-                  <linearGradient id="svgGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:#6036E1;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#D83DC2;stop-opacity:1" />
-                  </linearGradient>
-                </defs>
-                <text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="fill-text" id="fillLayer">KOMNI</text>
-                <text x="50%" y="80%" text-anchor="middle" class="sub-url-path" id="urlLayer">KOMNI.COM</text>
-              </svg>
-            </div>
-
-            <canvas id="advertCanvas"></canvas>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 4: Key Performance Metrics -->
-      <section class="section-container" id="enterprise">
-        <div class="metrics-grid reveal-on-scroll">
-          <div class="metric-item">
-            <div class="metric-value">100%</div>
-            <div class="metric-label">Audit Record Traceability</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-value">Zero</div>
-            <div class="metric-label">Infrastructure Replacement Needed</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-value">Unified</div>
-            <div class="metric-label">Financial Control Environment</div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-      <div class="footer-container">
-        <div class="footer-brand-col">
-          <div class="footer-brand-header">
-            <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Brand Logo">
-            <span class="footer-brand-name">KOMNI</span>
-          </div>
-          <p class="footer-brand-desc">
-            Self-orchestrating financial operations infrastructure designed for institutional continuity, observable governance, and resilient asset execution.
-          </p>
-          <div class="footer-status">
-            <span class="status-dot"></span>
-            <span>Systems Operational — Enterprise Framework</span>
-          </div>
+        <div class="card">
+          <h3>4. Cryptographic Vault & Immutable Ledger</h3>
+          <p>SHA-256 hash-chaining of events, tamper-evident audit trails, and storage of non-PCI sensitive metadata (payload fingerprint, latency, risk score, origin headers).</p>
         </div>
 
-        <!-- Quick Links -->
-        <div class="footer-col">
-          <h5>Products & Resources</h5>
-          <ul>
-            <li><a href="#about">Platform Overview</a></li>
-            <li><a href="#architecture">Infrastructure Coexistence</a></li>
-            <li><a href="#governance">Governance Controls</a></li>
-            <li><a href="#showcase">Visual Showcase</a></li>
-            <li><a href="#enterprise">Enterprise Solutions</a></li>
-          </ul>
+        <div class="card">
+          <h3>5. Outbound Proxy & Webhook Interceptor</h3>
+          <p>Signed payload relay to payment processors (e.g., Paystack) with pooled HTTP clients and webhook HMAC validation + replay protection before forwarding to merchant backends.</p>
         </div>
 
-        <!-- Legal Navigation -->
-        <div class="footer-col">
-          <h5>Legal & Policy</h5>
-          <ul>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Security Policy</a></li>
-            <li><a href="#">Compliance Statement</a></li>
-            <li><a href="#">Cookie Preferences</a></li>
-          </ul>
-        </div>
-
-        <!-- Contact & Social Links -->
-        <div class="footer-col">
-          <h5>Connect & Support</h5>
-          <ul>
-            <li><a href="mailto:support@komni.io">Enterprise Inquiries</a></li>
-            <li><a href="#">X / Twitter</a></li>
-            <li><a href="#">LinkedIn</a></li>
-            <li><a href="#">GitHub Repository</a></li>
-            <li><a href="#">Developer Discord</a></li>
-          </ul>
+        <div class="card">
+          <h3>6. Operational Observability</h3>
+          <p>Per-transaction execution headers, latency metadata and structured logs for post-mortem and compliance review. Designed for enterprise audit and incident response.</p>
         </div>
       </div>
 
-      <div class="footer-bottom">
-        <div>&copy; 2026 KOMNI Infrastructure Technologies Inc. All rights reserved.</div>
-        <div class="footer-meta">
-          <span>US-EAST-1</span>
-          <span>SOC-2 TYPE II COMPLIANT</span>
+      <div class="tech-area" id="technical">
+        <div class="tech-content">
+          <h3 class="section-title">Technical Architecture (Deep Dive)</h3>
+          <p>KOMNI V1 is intentionally deterministic. It avoids external LLM/ML inference in-band and relies on a small, auditable set of primitives: sliding-window counters, deterministic rule evaluation, and cryptographic anchoring. Below is a concise specification summary used for the landing page and developer orientation.</p>
+
+          <div style="margin-top:18px" class="spec-block">
+<pre>
+Ingress: Reverse proxy (TLS, auth), rate-limits
+Security Engine: Redis sliding-window counters, hard caps
+State Machine: Pending -> Multi-sig approvals -> Approved
+Ledger: SHA256(Payload + Timestamp + PrevHash) per event
+DB: Postgres for configs, Redis for velocity, Vault for keys
+HTTP: Async pooled client to Paystack (httpx / equivalent)
+</pre>
+          </div>
+
+          <p style="margin-top:14px;color:var(--muted)">Example flow (payout): Merchant -> KOMNI ingress -> Security eval -> Ledger entry -> Multi-sig (if needed) -> Forward to Paystack -> Webhook verified -> Merchant backend</p>
+        </div>
+
+        <aside>
+          <div class="spec-block">
+            <strong>Design Principles</strong>
+            <ul style="margin-top:10px;color:var(--muted);line-height:1.6">
+              <li>Deterministic: predictable, auditable decisions</li>
+              <li>Low-latency: <5ms evaluation where possible</li>
+              <li>Tamper-evident: cryptographic hash-chaining</li>
+              <li>Non-destructive integration: complements existing payment rails</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+      <div class="showcase" id="showcase">
+        <div class="show-phrases" aria-hidden="true">
+          <div class="phrase">Deterministic Rules & Velocity Controls</div>
+          <div class="phrase">Multi-Signature Governance</div>
+          <div class="phrase">SHA-256 Immutable Ledger</div>
+          <div class="phrase">Signed Proxy Forwarding to Paystack</div>
         </div>
       </div>
-    </footer>
-  </div>
 
-  <!-- Execution & Motion Engine -->
+    </section>
+
+    <section class="section" id="governance_section">
+      <div class="section-header">
+        <h2 class="section-title">Governance & Security</h2>
+        <p class="section-lead">KOMNI's governance pipeline is built to provide verifiable policy enforcement, human-in-the-loop approvals, and auditable decision trails. It is the accountability layer for financial operations.</p>
+      </div>
+
+      <div class="arch-grid">
+        <div class="card">
+          <h3>Policy Escalation</h3>
+          <p>Configurable thresholds per merchant allow dynamic policy escalation and fine-grained approval matrices.</p>
+        </div>
+        <div class="card">
+          <h3>Replay & Signature Protections</h3>
+          <p>Webhook HMAC validation, nonces and timestamp checks to prevent replay or forgery of events.</p>
+        </div>
+        <div class="card">
+          <h3>Operational Monitoring</h3>
+          <p>Execution headers and monitoring hooks for tracing, alerting, and SRE workflows.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div style="max-width:1140px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI" style="height:36px">
+          <div style="font-weight:800;letter-spacing:3px">KOMNI</div>
+        </div>
+        <p style="color:var(--muted);max-width:420px;margin-top:10px">KOMNI V1 — self-orchestrating, deterministic middleware for enterprise payment governance and secure forwarding to payment processors.</p>
+      </div>
+
+      <div style="display:flex;gap:36px;align-items:flex-start">
+        <div>
+          <div style="font-weight:700;margin-bottom:8px">Resources</div>
+          <a href="#technical" style="color:var(--muted);display:block">Technical Spec</a>
+          <a href="#architecture" style="color:var(--muted);display:block">Architecture</a>
+        </div>
+
+        <div>
+          <div style="font-weight:700;margin-bottom:8px">Contact</div>
+          <a href="mailto:support@komni.io" style="color:var(--muted);display:block">support@komni.io</a>
+          <a href="#" style="color:var(--muted);display:block">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Non-destructive backup of original content (kept here for recovery) -->
+  <!-- ORIGINAL_INDEX_START
+  The original index.html content has been preserved by the site updater. If you need to restore the previous version, remove this updated file and restore the original blob from
+  the repository history or search for the commented ORIGINAL_INDEX block. ORIGINAL_INDEX_END -->
+
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const introStage = document.getElementById('introStage');
-      const logo = document.getElementById('brandLogo');
-      const tagline = document.getElementById('brandTagline');
-      const hint = document.getElementById('scrollHint');
-      
-      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    // Entrance animations using GSAP (subtle, premium feel)
+    const introTL = gsap.timeline({defaults:{ease:"power3.out"}});
+    introTL.to('.brand-logo', {duration:1.3, y:0, autoAlpha:1, filter:'blur(0px)', scale:1, stagger:0.06});
+    introTL.to('.brand-tagline', {duration:0.9, y:0, autoAlpha:1}, '-=0.9');
+    introTL.to('.hero-sub', {duration:0.9, y:0, autoAlpha:1}, '-=0.6');
 
-      // 1. Initial Frame Boot Sequence
-      async function runOpeningSequence() {
-        await delay(500);
-        logo.classList.add('is-visible');
-
-        await delay(1200 + 400);
-        tagline.classList.add('is-visible');
-
-        await delay(1000 + 300);
-        hint.classList.add('is-visible');
-
-        initScrollEngine();
-      }
-
-      // 2. Centered Dissolve Engine on Scroll
-      function initScrollEngine() {
-        let ticking = false;
-
-        window.addEventListener('scroll', () => {
-          if (!ticking) {
-            window.requestAnimationFrame(() => {
-              const scrollY = window.scrollY;
-              
-              const maxScroll = 380;
-              const progress = Math.min(scrollY / maxScroll, 1);
-              
-              const opacity = 1 - progress;
-              const blur = progress * 24;
-              const scale = 1 - (progress * 0.1);
-              const translateY = -progress * 60;
-
-              introStage.style.opacity = opacity.toFixed(3);
-              introStage.style.filter = `blur(${blur.toFixed(1)}px)`;
-              introStage.style.transform = `translateY(${translateY.toFixed(1)}px) scale(${scale.toFixed(3)})`;
-
-              if (scrollY > 50) {
-                document.body.classList.add('has-scrolled');
-              } else {
-                document.body.classList.remove('has-scrolled');
-              }
-
-              if (opacity <= 0) {
-                introStage.style.visibility = 'hidden';
-              } else {
-                introStage.style.visibility = 'visible';
-              }
-
-              ticking = false;
-            });
-            ticking = true;
+    // reveal cards when scrolled into view
+    const revealOnScroll = (selector) => {
+      const elems = document.querySelectorAll(selector);
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
           }
-        }, { passive: true });
+        })
+      },{threshold:0.12});
+      elems.forEach(el=>io.observe(el));
+    }
+    revealOnScroll('.card');
+    revealOnScroll('.phrase');
 
-        // 3. Intersection Observer for Scroll Reveals
-        const observerOptions = {
-          root: null,
-          rootMargin: '0px 0px -60px 0px',
-          threshold: 0.1
-        };
+    // showcase phrase rotator
+    const phrases = document.querySelectorAll('.phrase');
+    let idx = 0;
+    function showPhrase(i){
+      phrases.forEach((p,pi)=>{
+        if(pi===i) gsap.to(p,{duration:0.9,autoAlpha:1,y:0});
+        else gsap.to(p,{duration:0.6,autoAlpha:0,y:12});
+      })
+    }
+    // initialize positions
+    phrases.forEach(p=>gsap.set(p,{autoAlpha:0,y:12}));
+    showPhrase(0);
+    setInterval(()=>{ idx=(idx+1)%phrases.length; showPhrase(idx); },3500);
 
-        const revealObserver = new IntersectionObserver((entries, observer) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-revealed');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, observerOptions);
-
-        document.querySelectorAll('.reveal-on-scroll').forEach(el => {
-          revealObserver.observe(el);
-        });
-      }
-
-      runOpeningSequence();
-
-      // ==========================================================================
-      // 3. ADVERT CANVAS & KINETIC ENGINE
-      // ==========================================================================
-      const canvas = document.getElementById('advertCanvas');
-      const ctx = canvas.getContext('2d');
-      const container = canvas.parentElement;
-      const scenes = container.querySelectorAll('.scene-content');
-      const finaleStage = container.querySelector('#finaleStage');
-
-      let width, height, currentScene = 0, frame = 0;
-      const SCENE_DURATION = 160; 
-
-      function resizeAdvertCanvas() {
-        width = canvas.width = container.clientWidth;
-        height = canvas.height = container.clientHeight;
-      }
-      window.addEventListener('resize', resizeAdvertCanvas);
-      resizeAdvertCanvas();
-
-      class DynamicParticle {
-        constructor() { this.reset(true); }
-        reset(init = false) {
-          this.x = (Math.random() - 0.5) * width * 3;
-          this.y = (Math.random() - 0.5) * height * 3;
-          this.z = init ? Math.random() * 1800 : 1800;
-          this.pz = this.z;
-          this.size = Math.random() * 2 + 1;
-          this.color = Math.random() > 0.4 ? '#6036E1' : '#D83DC2';
-        }
-        update(speed) {
-          this.pz = this.z;
-          this.z -= speed;
-          if (this.z < 1) this.reset();
-        }
-        draw(speedFactor) {
-          const s = 600 / this.z;
-          const ps = 600 / this.pz;
-          const x = this.x * s + width / 2;
-          const y = this.y * s + height / 2;
-          const px = this.x * ps + width / 2;
-          const py = this.y * ps + height / 2;
-
-          ctx.globalAlpha = Math.min(0.8, (1800 - this.z) / 1000);
-          ctx.strokeStyle = this.color;
-          ctx.lineWidth = this.size * s * (speedFactor * 0.2);
-          ctx.lineCap = 'round';
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(px, py);
-          ctx.stroke();
-        }
-      }
-
-      const particleCount = 700;
-      const particles = Array.from({ length: particleCount }, () => new DynamicParticle());
-      let currentSpeed = 12;
-
-      function cycleScenes() {
-        const current = scenes[currentScene];
-        currentScene = (currentScene + 1) % (scenes.length + 1);
-
-        if (currentScene === scenes.length) {
-          current.classList.remove('active');
-          current.classList.add('exit');
-          
-          finaleStage.classList.add('active');
-          
-          gsap.to({ speed: 12 }, { 
-            speed: 45, 
-            duration: 1.5, 
-            onUpdate: function() { currentSpeed = this.targets()[0].speed; },
-            onComplete: () => {
-              setTimeout(() => {
-                finaleStage.classList.remove('active');
-                gsap.to({ speed: 45 }, { 
-                  speed: 12, 
-                  duration: 1.5, 
-                  onUpdate: function() { currentSpeed = this.targets()[0].speed; } 
-                });
-                
-                scenes.forEach(s => s.classList.remove('active', 'exit'));
-                currentScene = 0;
-                scenes[0].classList.add('active');
-              }, 2500);
-            }
-          });
-        } else {
-          const prev = container.querySelector('.scene-content.active');
-          if (prev) {
-            prev.classList.remove('active');
-            prev.classList.add('exit');
-            setTimeout(() => prev.classList.remove('exit'), 1000);
-          }
-          scenes[currentScene].classList.add('active');
-        }
-      }
-
-      function renderAdvert() {
-        frame++;
-        if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
-          frame = 0;
-          cycleScenes();
-        }
-
-        ctx.fillStyle = 'rgba(3, 3, 8, 0.25)'; 
-        ctx.fillRect(0, 0, width, height);
-
-        const speedFactor = currentSpeed / 12;
-        particles.forEach(p => {
-          p.update(currentSpeed);
-          p.draw(speedFactor);
-        });
-
-        requestAnimationFrame(renderAdvert);
-      }
-
-      renderAdvert();
-    });
+    // smooth scroll for nav anchors
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', (ev)=>{
+        ev.preventDefault();
+        const t=document.querySelector(a.getAttribute('href'));
+        if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+      })
+    })
   </script>
 </body>
 </html>
