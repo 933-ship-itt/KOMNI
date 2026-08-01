@@ -17,6 +17,7 @@
   <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
     /* ==========================================================================
@@ -1267,6 +1268,24 @@
       background-color: var(--bg-color);
     }
 
+    #dashboard-host {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      display: none;
+      opacity: 0;
+      background: #000;
+      overflow: hidden;
+    }
+
+    #dashboard-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+
     .viewport-glow {
       position: absolute;
       width: 50vw;
@@ -1545,6 +1564,82 @@
       border: none;
       padding: 0;
       position: relative;
+    }
+
+    .login-card.is-hiding {
+      pointer-events: none;
+    }
+
+    .validation-card.is-active,
+    .survey-card.is-active,
+    .setup-card.is-active {
+      animation: cardLiftIn 0.5s var(--ease-expensive) both;
+    }
+
+    @keyframes cardLiftIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+        filter: blur(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes cardFadeOut {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.985);
+      }
+    }
+
+    .auth-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    .auth-status-pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-magenta);
+      box-shadow: 0 0 12px rgba(216, 61, 194, 0.85);
+    }
+
+    .auth-status-pill.is-success {
+      color: #fff;
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .auth-status-pill.is-success::before {
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.95);
+    }
+
+    .validation-card.is-success .terminal-box {
+      border-color: rgba(34, 197, 94, 0.25);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(34, 197, 94, 0.08);
     }
 
     /* Terminal Simulation Box */
@@ -2452,8 +2547,9 @@
       <div class="validation-card" id="validationCard">
         <div class="brand-header">
           <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title" id="validationTitle">Verifying Auth Node</h2>
-          <p class="login-subtitle">Establishing connection to secure Firebase gatekeeper...</p>
+          <h2 class="login-title" id="validationTitle">Verifying Issuance Registry</h2>
+          <p class="login-subtitle">Establishing connection to the secure Firebase gatekeeper...</p>
+          <div class="auth-status-pill" id="validationStatusPill">Awaiting registry handshake</div>
         </div>
         
         <div class="terminal-box" id="validationTerminal">
@@ -2470,45 +2566,46 @@
       <div class="survey-card" id="surveyCard">
         <div class="brand-header">
           <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title">Configure Operations Node</h2>
-          <p class="login-subtitle">Key validated. Select client configuration preferences to deploy the runtime node.</p>
+          <h2 class="login-title">Configure Client Preferences</h2>
+          <p class="login-subtitle">Key validated. Confirm the issued workspace preferences before the dashboard loads.</p>
+          <div class="auth-status-pill" id="surveyStatusPill">Preference profile required</div>
         </div>
 
         <form id="surveyForm" onsubmit="handleSurveySubmit(event);">
           <div class="custom-survey-group">
-            <span class="survey-question">Security & Governance Profile</span>
+            <span class="survey-question">Preferred Operating Posture</span>
             <div class="survey-options">
               <label class="survey-option">
                 <input type="radio" name="govProfile" value="strict" checked>
                 <div class="option-dot"></div>
-                <div class="option-text">Strict Governance (Enforces velocity limits & multi-sig approvals)</div>
+                <div class="option-text">Strict issuance controls</div>
               </label>
               <label class="survey-option">
-                <input type="radio" name="govProfile" value="audit">
+                <input type="radio" name="govProfile" value="balanced">
                 <div class="option-dot"></div>
-                <div class="option-text">High-Throughput Audit (Low-latency bypass, ledger tracing only)</div>
+                <div class="option-text">Balanced operations</div>
               </label>
             </div>
           </div>
 
           <div class="custom-survey-group">
-            <span class="survey-question">Primary Integration Endpoint</span>
+            <span class="survey-question">Notification Cadence</span>
             <div class="survey-options">
               <label class="survey-option">
-                <input type="radio" name="endpoint" value="live" checked>
+                <input type="radio" name="endpoint" value="email" checked>
                 <div class="option-dot"></div>
-                <div class="option-text">Paystack Live Endpoint Gateway Relay</div>
+                <div class="option-text">Email summaries</div>
               </label>
               <label class="survey-option">
-                <input type="radio" name="endpoint" value="sandbox">
+                <input type="radio" name="endpoint" value="console">
                 <div class="option-dot"></div>
-                <div class="option-text">KOMNI Internal Sandbox Payout Simulator</div>
+                <div class="option-text">Console-only updates</div>
               </label>
             </div>
           </div>
 
           <button type="submit" class="submit-btn">
-            <span>Verify & Deploy Environment</span>
+            <span>Finalize Preference Profile</span>
           </button>
         </form>
       </div>
@@ -2517,8 +2614,9 @@
       <div class="setup-card" id="setupCard">
         <div class="brand-header">
           <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title">Deploying Access Node</h2>
-          <p class="login-subtitle">Setting up localized database & SSL handshakes...</p>
+          <h2 class="login-title">Provisioning Issued Workspace</h2>
+          <p class="login-subtitle">Firebase registry verified. Preparing the dashboard shell and neutral telemetry.</p>
+          <div class="auth-status-pill" id="setupStatusPill">Building dashboard shell</div>
         </div>
 
         <div class="terminal-box" id="setupTerminal">
@@ -2536,10 +2634,14 @@
         </div>
 
         <button class="submit-btn" id="launchDashboardBtn" style="display: none;" onclick="launchDashboard();">
-          <span>Enter Unified Command Terminal</span>
+          <span>Enter Issued Dashboard</span>
         </button>
       </div>
     </div>
+  </div>
+
+  <div id="dashboard-host" aria-hidden="true">
+    <iframe id="dashboard-frame" title="KOMNI Dashboard" loading="eager"></iframe>
   </div>
 
   <!-- Execution & Motion Engine -->
@@ -2825,9 +2927,49 @@
       // ==========================================================================
       const landingPage = document.querySelector('.site-wrapper');
       const loginPage = document.getElementById('login-page-view');
+      const dashboardHost = document.getElementById('dashboard-host');
+      const dashboardFrame = document.getElementById('dashboard-frame');
+      let dashboardBooted = false;
+
+      function hideDashboardHost() {
+        if (!dashboardHost) return;
+        dashboardHost.style.opacity = '0';
+        dashboardHost.style.display = 'none';
+      }
+
+      function bootDashboardFrame() {
+        if (dashboardBooted || !dashboardFrame) return;
+        dashboardFrame.src = 'dashboard.html#issued';
+        dashboardBooted = true;
+      }
+
+      function showDashboardScreen() {
+        bootDashboardFrame();
+        document.body.style.overflow = 'hidden';
+        hideDashboardHost();
+        if (landingPage) {
+          landingPage.style.pointerEvents = 'none';
+          landingPage.style.opacity = '0';
+        }
+        if (introStage) {
+          introStage.style.opacity = '0';
+          introStage.style.visibility = 'hidden';
+        }
+        if (loginPage) {
+          loginPage.style.display = 'none';
+          loginPage.style.pointerEvents = 'none';
+        }
+        if (dashboardHost) {
+          dashboardHost.style.display = 'block';
+          dashboardHost.style.opacity = '1';
+        }
+        if (showcaseEngine) showcaseEngine.pause();
+        if (loginEngine) loginEngine.pause();
+      }
 
       function showLoginScreen() {
         document.body.style.overflow = 'hidden';
+        hideDashboardHost();
         loginPage.style.display = 'grid';
         
         const tl = gsap.timeline({
@@ -2901,6 +3043,7 @@
       }
 
       function hideLoginScreen() {
+        hideDashboardHost();
         const tl = gsap.timeline({
           defaults: { ease: 'power4.inOut', duration: 0.8 },
           onComplete: () => {
@@ -2971,7 +3114,26 @@
         function handleHashChange() {
           if (window.location.hash === '#login') {
             showLoginScreen();
+          } else if (window.location.hash === '#dashboard') {
+            if (localStorage.getItem('komni_session_active') === 'true') {
+              showDashboardScreen();
+            } else {
+              window.location.hash = '#login';
+              showLoginScreen();
+            }
           } else {
+            if (dashboardHost && dashboardHost.style.display === 'block') {
+              hideDashboardHost();
+              document.body.style.overflow = '';
+              if (landingPage) {
+                landingPage.style.opacity = '1';
+                landingPage.style.pointerEvents = 'auto';
+              }
+              if (introStage) {
+                introStage.style.visibility = 'visible';
+              }
+              if (showcaseEngine) showcaseEngine.play();
+            }
             if (loginPage.style.display === 'grid') {
               hideLoginScreen();
             }
@@ -2996,43 +3158,105 @@
 
       // Firebase initialization compat layer
       const firebaseConfig = {
-  apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
-  authDomain: "komni-2439f.firebaseapp.com",
-  projectId: "komni-2439f",
-  storageBucket: "komni-2439f.firebasestorage.app",
-  messagingSenderId: "1005791374529",
-  appId: "1:1005791374529:web:e1735b735f4c8c420eb840",
-  measurementId: "G-SKLPK0NHFZ"
-};
+        apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
+        authDomain: "komni-2439f.firebaseapp.com",
+        projectId: "komni-2439f",
+        storageBucket: "komni-2439f.firebasestorage.app",
+        messagingSenderId: "1005791374529",
+        appId: "1:1005791374529:web:e1735b735f4c8c420eb840",
+        measurementId: "G-SKLPK0NHFZ"
+      };
 
       let firebaseApp = null;
+      let firebaseFirestore = null;
       let firebaseDatabase = null;
 
       try {
         if (typeof firebase !== 'undefined') {
-          firebaseApp = firebase.initializeApp(firebaseConfig);
-          firebaseDatabase = firebase.database();
+          firebaseApp = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+          if (firebase.firestore) {
+            firebaseFirestore = firebase.firestore();
+          }
+          if (firebase.database && firebaseConfig.databaseURL) {
+            firebaseDatabase = firebase.database();
+          }
           console.log("Firebase compatibility layer initialized.");
         }
       } catch (err) {
         console.warn("Firebase initialization failed. Falling back to local verification:", err);
       }
 
-      // Valid test key pre-configured for testing:
-      const VALID_TEST_KEY = "ik_live_sec_val_4096_komni_77ab3c";
+      // Local test key for offline validation and demo-only flows.
+      const LOCAL_TEST_ISSUANCE_KEY = "IK-ENT-2026-08-01-7C9F4D";
+
+      function revealCard(card, y = 18) {
+        if (!card) return;
+        card.style.display = 'block';
+        card.classList.add('is-active');
+        if (typeof gsap !== 'undefined') {
+          gsap.fromTo(card, {
+            autoAlpha: 0,
+            y,
+            scale: 0.97
+          }, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.45,
+            ease: 'power3.out'
+          });
+        }
+      }
+
+      function hideCard(card, onComplete) {
+        if (!card) {
+          if (onComplete) onComplete();
+          return;
+        }
+        card.classList.remove('is-active');
+        if (typeof gsap !== 'undefined') {
+          gsap.to(card, {
+            autoAlpha: 0,
+            y: -10,
+            scale: 0.985,
+            duration: 0.22,
+            ease: 'power2.in',
+            onComplete: () => {
+              card.style.display = 'none';
+              if (onComplete) onComplete();
+            }
+          });
+        } else {
+          card.style.display = 'none';
+          if (onComplete) onComplete();
+        }
+      }
 
       // Form submission handler for Auth Card
-      window.handleAuthSubmit = function(e) {
+      window.handleAuthSubmit = async function(e) {
         if (e) e.preventDefault();
         const keyInput = document.getElementById('issuanceKeyInput');
         const key = keyInput.value.trim();
 
         if (!key) return;
 
-        // Transition to Validation Card
-        document.getElementById('loginCard').style.display = 'none';
+        const loginCard = document.getElementById('loginCard');
         const valCard = document.getElementById('validationCard');
-        valCard.style.display = 'block';
+        const authBtn = document.getElementById('authBtn');
+        const validationTitle = document.getElementById('validationTitle');
+        const validationPill = document.getElementById('validationStatusPill');
+        const originalBtnLabel = authBtn.innerHTML;
+
+        authBtn.disabled = true;
+        authBtn.innerHTML = '<span>Scanning Issuance Key...</span>';
+        if (validationTitle) validationTitle.textContent = 'Verifying Issuance Registry';
+        if (validationPill) {
+          validationPill.textContent = 'Consulting registry';
+          validationPill.classList.remove('is-success');
+        }
+
+        hideCard(loginCard);
+        revealCard(valCard);
 
         const term = document.getElementById('validationTerminal');
         term.innerHTML = '';
@@ -3053,66 +3277,105 @@
         async function verifyKey() {
           await printLog("ik_authenticate_session --node-init", "accent", 100);
           await printLog("Establishing handshake with host gates...", "info", 300);
-          await printLog("Connecting to Firebase Database node...", "info", 400);
+          await printLog("Connecting to Firebase Firestore gatekeeper...", "info", 400);
 
           let isKeyValid = false;
+          let keyRecord = null;
 
-          // Attempt Firebase validation
-          if (firebaseDatabase) {
+          if (firebaseFirestore) {
             try {
-              const snapshot = await firebaseDatabase.ref('issuance_keys/' + key).once('value');
-              const keyData = snapshot.val();
-              if (keyData && keyData.active === true) {
-                isKeyValid = true;
-                await printLog("[ OK ] Handshake resolved. Key located in Firebase node.", "success", 400);
+              const snapshot = await firebaseFirestore.collection('issuance_keys').doc(key).get();
+              if (snapshot.exists) {
+                keyRecord = snapshot.data() || {};
+                if (keyRecord.active !== false) {
+                  isKeyValid = true;
+                  const issuedLabel = keyRecord.label || keyRecord.issuedTo || 'formal issuance record';
+                  await printLog(`[ OK ] Registry match resolved for ${issuedLabel}.`, "success", 400);
+                } else {
+                  await printLog("[ WARN ] Issuance record found but marked inactive.", "info", 400);
+                }
               } else {
-                await printLog("[ WARN ] Key not found in Firebase registry. Trying local vault...", "info", 500);
+                await printLog("[ WARN ] Firestore registry entry missing. Checking local demo token...", "info", 500);
               }
             } catch (err) {
-              await printLog("[ WARN ] Firebase connection timeout. Falling back to local vault...", "info", 400);
+              await printLog("[ WARN ] Firestore gatekeeper unavailable. Checking local demo token...", "info", 400);
+            }
+          } else if (firebaseDatabase) {
+            try {
+              const snapshot = await firebaseDatabase.ref('issuance_keys/' + key).once('value');
+              keyRecord = snapshot.val();
+              if (keyRecord && keyRecord.active === true) {
+                isKeyValid = true;
+                await printLog("[ OK ] Legacy registry match resolved in Realtime Database.", "success", 400);
+              } else {
+                await printLog("[ WARN ] Realtime Database entry missing. Checking local demo token...", "info", 500);
+              }
+            } catch (err) {
+              await printLog("[ WARN ] Firebase database unavailable. Checking local demo token...", "info", 400);
             }
           } else {
-            await printLog("[ INFO ] Firebase library not connected. Initializing local check...", "info", 300);
+            await printLog("[ INFO ] Firebase registry unavailable. Checking local demo token...", "info", 300);
           }
 
-          // Local Fallback validation
           if (!isKeyValid) {
-            if (key === VALID_TEST_KEY) {
+            if (key === LOCAL_TEST_ISSUANCE_KEY) {
               isKeyValid = true;
-              await printLog("[ OK ] Key validated via local HSM hardware signatures.", "success", 600);
+              await printLog("[ OK ] Local test issuance key accepted.", "success", 500);
             } else {
-              await printLog("[ ERROR ] RSA Signature check failed. Invalid Issuance Key.", "error", 800);
-              await printLog("Session aborted: Unauthorized Node Entry.", "error", 200);
-              
-              // Show failure button
+              await printLog("[ ERROR ] Registry signature check failed. Invalid issuance key.", "error", 800);
+              await printLog("Session aborted: unauthorized node entry.", "error", 200);
+
+              authBtn.disabled = false;
+              authBtn.innerHTML = originalBtnLabel;
+              if (validationPill) {
+                validationPill.textContent = 'Registry rejected';
+                validationPill.classList.remove('is-success');
+              }
+
               const failBtn = document.createElement('button');
               failBtn.className = 'submit-btn';
               failBtn.style.marginTop = '15px';
               failBtn.innerHTML = '<span>Retry Authentication</span>';
               failBtn.onclick = () => {
-                valCard.style.display = 'none';
-                document.getElementById('loginCard').style.display = 'block';
+                hideCard(valCard, () => {
+                  revealCard(loginCard);
+                });
                 keyInput.value = '';
                 keyInput.focus();
+                authBtn.disabled = false;
+                authBtn.innerHTML = originalBtnLabel;
+                if (validationPill) {
+                  validationPill.textContent = 'Awaiting registry handshake';
+                  validationPill.classList.remove('is-success');
+                }
               };
               term.appendChild(failBtn);
               return;
             }
           }
 
-          // Success Flow
-          await printLog("Decrypting pre-configured enterprise profiles...", "info", 400);
+          if (validationPill) {
+            validationPill.textContent = 'Issuance key accepted';
+            validationPill.classList.add('is-success');
+          }
+          if (validationTitle) validationTitle.textContent = 'Issuance Key Accepted';
+          valCard.classList.add('is-success');
+
+          await printLog("Decrypting pre-configured enterprise preferences...", "info", 400);
           await printLog("Node state established: PENDING_USER_CONF.", "accent", 300);
           await printLog("Handshake complete. Entering configuration panel...", "success", 500);
 
           setTimeout(() => {
-            // Transition to Survey Card
-            valCard.style.display = 'none';
-            document.getElementById('surveyCard').style.display = 'block';
+            hideCard(valCard, () => {
+              const surveyCard = document.getElementById('surveyCard');
+              const surveyPill = document.getElementById('surveyStatusPill');
+              if (surveyPill) surveyPill.textContent = 'Preference profile required';
+              revealCard(surveyCard);
+            });
           }, 1000);
         }
 
-        verifyKey();
+        await verifyKey();
       };
 
       // Form submission handler for Survey Card
@@ -3123,20 +3386,33 @@
 
         // Save preferences to localStorage for dashboard to pull
         localStorage.setItem('komni_session_active', 'true');
+        localStorage.setItem('komni_client_profile', govProfile);
+        localStorage.setItem('komni_notification_cadence', endpoint);
         localStorage.setItem('komni_gov_profile', govProfile);
         localStorage.setItem('komni_endpoint', endpoint);
-        localStorage.setItem('komni_org_name', 'KOMNI Enterprise');
-        localStorage.setItem('komni_node_id', 'IK-LIVE-RSA4096-01A');
+        localStorage.setItem('komni_node_id', 'NODE-ISSUED-01');
+        localStorage.setItem('komni_session_label', 'ISSUED SESSION');
 
         // Transition to Setup Card
         document.getElementById('surveyCard').style.display = 'none';
-        document.getElementById('setupCard').style.display = 'block';
+        const setupCard = document.getElementById('setupCard');
+        revealCard(setupCard);
 
         const term = document.getElementById('setupTerminal');
         term.innerHTML = '';
         const fillBar = document.getElementById('setupProgressBar');
         const statusText = document.getElementById('setupProgressStatus');
         const pctText = document.getElementById('setupProgressPercentage');
+        const surveyPill = document.getElementById('surveyStatusPill');
+        const setupPill = document.getElementById('setupStatusPill');
+        if (surveyPill) {
+          surveyPill.textContent = 'Preference profile locked';
+          surveyPill.classList.add('is-success');
+        }
+        if (setupPill) {
+          setupPill.textContent = 'Building dashboard shell';
+          setupPill.classList.add('is-success');
+        }
 
         function printLog(text, type = 'info', delayMs = 0) {
           return new Promise(resolve => {
@@ -3152,16 +3428,16 @@
         }
 
         async function runSetup() {
-          await printLog("komni_env_deploy --node-id=IK-LIVE-RSA4096-01A", "accent", 100);
+          await printLog(`komni_env_deploy --node-id=${localStorage.getItem('komni_node_id') || 'NODE-ISSUED-01'}`, "accent", 100);
           
           const tasks = [
-            { text: "Loading security rules profiles...", status: "Loading rules...", duration: 600, pct: 15 },
-            { text: "[ OK ] Security rules compiled.", status: "Configuring database schema...", duration: 500, pct: 30 },
-            { text: "Allocating Redis sliding limits buffers...", status: "Mounting cache...", duration: 600, pct: 45 },
-            { text: "[ OK ] Cache buffers loaded. Latency configured to < 5ms.", status: "Initializing SHA-256 Ledger...", duration: 500, pct: 60 },
-            { text: "Deploying SHA-256 Genesis Block (#000000)...", status: "Sealing hash ledger...", duration: 700, pct: 80 },
-            { text: "[ OK ] Ledger genesis seal validated.", status: "Hot-loading SSL certs...", duration: 400, pct: 90 },
-            { text: "Handshaking telemetry tunnels...", status: "Establishing websocket...", duration: 500, pct: 100 }
+            { text: `Loading profile: ${govProfile.toUpperCase()}`, status: "Reading issuance record...", duration: 600, pct: 16 },
+            { text: `Binding notification cadence: ${endpoint.toUpperCase()}`, status: "Preparing workspace shell...", duration: 500, pct: 32 },
+            { text: "Zeroing mock telemetry panels...", status: "Clearing demo values...", duration: 600, pct: 48 },
+            { text: "[ OK ] Local session storage bound.", status: "Sealing preference state...", duration: 500, pct: 64 },
+            { text: "Checking Firebase registry cache...", status: "Verifying database access...", duration: 700, pct: 82 },
+            { text: "[ OK ] Dashboard shell compiled.", status: "Hot-loading terminal viewport...", duration: 400, pct: 92 },
+            { text: "Handoff ready. Launch button armed.", status: "Finalizing session...", duration: 500, pct: 100 }
           ];
 
           for (const task of tasks) {
@@ -3173,10 +3449,10 @@
 
           statusText.innerText = "Deploy complete. Node active.";
           await printLog("Node fully initialized and active on port 443.", "success", 200);
-          await printLog("System status: COMPLIANT & READY.", "success", 100);
+          await printLog("System status: SESSION READY.", "success", 100);
 
           // Show launch button
-          document.getElementById('launchDashboardBtn').style.display = 'block';
+          revealCard(document.getElementById('launchDashboardBtn'));
         }
 
         runSetup();
@@ -3184,7 +3460,8 @@
 
       // Redirect to dashboard
       window.launchDashboard = function() {
-        window.location.href = 'dashboard.html';
+        window.location.hash = '#dashboard';
+        showDashboardScreen();
       };
 
       // Start the application opening flow
