@@ -6,11 +6,12 @@
   <title>KOMNI — Self-Orchestrating Infrastructure for Enterprise Financial Continuity</title>
   <link rel="icon" type="image/png" href="https://i.postimg.cc/CxP0wjxY/ggp.png">
   <link rel="apple-touch-icon" href="https://i.postimg.cc/CxP0wjxY/ggp.png">
+  <meta name="description" content="KOMNI is an enterprise financial operations platform and cryptographic governance middleware designed to securely manage payment workflows, transaction visibility, and low-latency velocity caps.">
   
-  <!-- Inter Font Load -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <!-- GSAP Animation Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -31,14 +32,17 @@
       --tagline-gradient: linear-gradient(135deg, #5A8CFF, #AEE7FF);
       
       --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
       --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
 
-      /* Advert Variables */
+      /* Advert & Login Variables */
       --bg-black: #030308;
+      --panel-bg: rgba(8, 8, 12, 0.75);
       --main-gradient: linear-gradient(135deg, #6036E1 0%, #a83ac8 50%, #D83DC2 100%);
       --accent-violet: #6036E1;
       --accent-magenta: #D83DC2;
       --text-sub: #a1a1aa;
+      --blue-custom-gradient: linear-gradient(to bottom, #3F6D9F 0%, #5E92CE 100%);
     }
 
     * {
@@ -47,6 +51,29 @@
       box-sizing: border-box;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      scrollbar-width: thin;
+      scrollbar-color: #6036E1 #000000;
+    }
+
+    /* Style all webkit scrollbars with pink-purple gradient */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #000000;
+      border-left: 1px solid rgba(255, 255, 255, 0.03);
+      border-right: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #6036E1 0%, #D83DC2 100%);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #744beb 0%, #e258cf 100%);
     }
 
     html, body {
@@ -64,7 +91,7 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate3d(-50%, -50%, 0);
       width: clamp(280px, 45vw, 600px);
       height: clamp(280px, 45vw, 600px);
       z-index: 1;
@@ -79,46 +106,32 @@
       height: auto;
       object-fit: contain;
       opacity: 0.08;
-      filter: drop-shadow(0 0 15px rgba(96, 54, 225, 0.25));
+      filter: drop-shadow(0 0 20px rgba(96, 54, 225, 0.35));
       animation: komni-heartbeat 4.5s ease-in-out infinite;
-      will-change: transform, opacity, filter;
+      will-change: transform, opacity;
     }
 
     @keyframes komni-heartbeat {
-      0% {
-        transform: scale(1);
+      0%, 70%, 100% {
+        transform: scale(1) translateZ(0);
         opacity: 0.06;
-        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
       }
       14% {
-        transform: scale(1.03);
+        transform: scale(1.03) translateZ(0);
         opacity: 0.11;
-        filter: drop-shadow(0 0 25px rgba(216, 61, 194, 0.35));
       }
       28% {
-        transform: scale(1.01);
+        transform: scale(1.01) translateZ(0);
         opacity: 0.08;
-        filter: drop-shadow(0 0 15px rgba(96, 54, 225, 0.2));
       }
       42% {
-        transform: scale(1.04);
+        transform: scale(1.04) translateZ(0);
         opacity: 0.13;
-        filter: drop-shadow(0 0 30px rgba(96, 54, 225, 0.4));
-      }
-      70% {
-        transform: scale(1);
-        opacity: 0.06;
-        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
-      }
-      100% {
-        transform: scale(1);
-        opacity: 0.06;
-        filter: drop-shadow(0 0 10px rgba(96, 54, 225, 0.15));
       }
     }
 
     /* ==========================================================================
-       3. HERO BRANDING STAGE (TEXT LOGO RESTORED)
+       3. HERO BRANDING STAGE
        ========================================================================== */
     .intro-stage {
       position: fixed;
@@ -132,7 +145,7 @@
       align-items: center;
       z-index: 100;
       pointer-events: none;
-      will-change: transform, opacity, filter;
+      will-change: transform, opacity;
     }
 
     .brand-logo {
@@ -143,15 +156,10 @@
       background: var(--logo-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      
       opacity: 0;
       filter: blur(24px);
       transform: scale(0.95);
-      transition: 
-        opacity 1.6s var(--ease-expensive),
-        filter 1.6s var(--ease-expensive),
-        transform 1.6s var(--ease-expensive);
-      
+      transition: opacity 1.6s var(--ease-expensive), filter 1.6s var(--ease-expensive), transform 1.6s var(--ease-expensive);
       user-select: none;
     }
 
@@ -172,13 +180,9 @@
       background: var(--tagline-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      
       opacity: 0;
       transform: translateY(20px);
-      transition: 
-        opacity 1.2s var(--ease-expensive),
-        transform 1.2s var(--ease-expensive);
-      
+      transition: opacity 1.2s var(--ease-expensive), transform 1.2s var(--ease-expensive);
       user-select: none;
     }
 
@@ -214,7 +218,6 @@
       flex-direction: column;
     }
 
-    /* --- Navigation --- */
     nav {
       position: fixed;
       top: 0;
@@ -230,13 +233,14 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       opacity: 0;
-      transform: translateY(-20px);
+      transform: translateY(-20px) translateZ(0);
       transition: opacity 0.8s var(--ease-expensive), transform 0.8s var(--ease-expensive);
+      will-change: transform, opacity;
     }
 
     body.has-scrolled nav {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) translateZ(0);
     }
 
     .nav-brand {
@@ -256,7 +260,8 @@
 
     .nav-links {
       display: flex;
-      gap: 48px;
+      align-items: center;
+      gap: 40px;
       list-style: none;
     }
 
@@ -273,7 +278,21 @@
       color: var(--text-primary);
     }
 
-    /* --- Main Content Flow --- */
+    .nav-premium-btn {
+      background: var(--logo-gradient);
+      padding: 8px 18px !important;
+      border-radius: 8px;
+      color: var(--text-primary) !important;
+      font-weight: 600 !important;
+      transition: transform 0.3s var(--ease-expensive), box-shadow 0.3s var(--ease-expensive) !important;
+      box-shadow: 0 0 15px rgba(96, 54, 225, 0.4);
+    }
+
+    .nav-premium-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(216, 61, 194, 0.6);
+    }
+
     main {
       flex: 1;
       padding-top: 100vh;
@@ -308,6 +327,46 @@
       color: var(--text-secondary);
     }
 
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .hero-btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: all 0.3s var(--ease-expensive);
+    }
+
+    .hero-btn-premium {
+      background: var(--logo-gradient);
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(96, 54, 225, 0.3);
+    }
+
+    .hero-btn-premium:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(216, 61, 194, 0.6);
+    }
+
+    .hero-btn-secondary {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .hero-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
     .section-container {
       width: 100%;
       max-width: 1140px;
@@ -338,18 +397,15 @@
 
     .reveal-on-scroll {
       opacity: 0;
-      transform: translateY(32px);
-      filter: blur(8px);
-      transition: 
-        opacity 1.2s var(--ease-expensive),
-        transform 1.2s var(--ease-expensive),
-        filter 1.2s var(--ease-expensive);
+      transform: translate3d(0, 32px, 0);
+      filter: blur(4px);
+      transition: opacity 1.2s var(--ease-expensive), transform 1.2s var(--ease-expensive), filter 1.2s var(--ease-expensive);
       will-change: opacity, transform, filter;
     }
 
     .reveal-on-scroll.is-revealed {
       opacity: 1;
-      transform: translateY(0);
+      transform: translate3d(0, 0, 0);
       filter: blur(0px);
     }
 
@@ -433,38 +489,460 @@
       color: var(--text-secondary);
     }
 
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border-top: 1px solid var(--border-subtle);
+    /* ==========================================================================
+       5. TECHNICAL SPECIFICATION SECTION STYLING (NEW TABBED PORTAL)
+       ========================================================================== */
+    .tech-spec-container {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 40px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .spec-tabs {
+      display: flex;
       border-bottom: 1px solid var(--border-subtle);
+      background: rgba(0, 0, 0, 0.4);
     }
 
-    .metric-item {
-      padding: 48px 32px;
-      border-right: 1px solid var(--border-subtle);
+    .spec-tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      padding: 18px 24px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: var(--font-main);
+      border-bottom: 2px solid transparent;
+      outline: none;
     }
 
-    .metric-item:last-child { border-right: none; }
+    .spec-tab-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.02);
+    }
 
-    .metric-value {
-      font-size: 32px;
-      font-weight: 400;
-      letter-spacing: -0.01em;
+    .spec-tab-btn.active {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom-color: var(--accent-violet);
+      font-weight: 700;
+    }
+
+    .spec-content-wrapper {
+      padding: 48px;
+    }
+
+    .spec-tab-content {
+      display: none;
+    }
+
+    .spec-tab-content.active {
+      display: block;
+      animation: fadeInSpec 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeInSpec {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Immersive Topology Styles */
+    .topology-visualization {
+      width: 100%;
+      margin: 20px 0;
+    }
+
+    .topo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .topo-level {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .level-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .level-client, .level-processor {
+      padding: 10px 0;
+    }
+
+    .level-middleware {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(96, 54, 225, 0.15);
+      border-radius: 16px;
+      padding: 36px 40px;
+      box-shadow: 0 0 40px rgba(96, 54, 225, 0.03), inset 0 0 20px rgba(255, 255, 255, 0.01);
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: border-color 0.4s ease;
+    }
+
+    .level-middleware:hover {
+      border-color: rgba(216, 61, 194, 0.3);
+    }
+
+    .middleware-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .middleware-lower {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .lower-nodes {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .topo-node {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 20px 16px;
+      width: 180px;
+      text-align: center;
+      transition: all 0.3s var(--ease-expensive);
+      z-index: 5;
+    }
+
+    .topo-node:hover {
+      border-color: var(--accent-violet);
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(96, 54, 225, 0.15);
+    }
+
+    .node-client { border-color: rgba(255, 255, 255, 0.1); width: 220px; }
+    .node-processor { border-color: rgba(255, 255, 255, 0.1); width: 220px; }
+
+    .node-svg {
+      color: var(--accent-violet);
+      margin-bottom: 12px;
+      transition: color 0.3s ease;
+    }
+    .topo-node:hover .node-svg {
+      color: var(--accent-magenta);
+    }
+
+    .node-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .node-desc {
+      font-size: 10px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .topo-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 60px;
+      justify-content: center;
+    }
+
+    .inner-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-grow: 1;
+    }
+
+    .inner-connector-horizontal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100px;
+    }
+
+    .inner-connector-down {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 40px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .flow-line {
+      position: relative;
+    }
+
+    .flow-line.vertical-line {
+      width: 2px;
+      height: 50px;
+      background: linear-gradient(180deg, var(--border-subtle) 30%, var(--accent-violet) 50%, var(--accent-magenta) 70%, var(--border-subtle) 90%);
+      background-size: auto 200%;
+      animation: topoFlowVert 3s infinite linear;
+    }
+
+    .flow-line.horizontal-line {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--border-subtle) 30%, var(--accent-violet) 50%, var(--accent-magenta) 70%, var(--border-subtle) 90%);
+      background-size: 200% auto;
+      animation: topoFlowHoriz 3s infinite linear;
+    }
+
+    @keyframes topoFlowVert {
+      0% { background-position: 0 200%; }
+      100% { background-position: 0 -200%; }
+    }
+
+    @keyframes topoFlowHoriz {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .flow-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .horizontal-line ~ .flow-label {
+      margin-top: 6px;
+    }
+
+    /* Core Modules */
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .comp-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 32px 28px;
+      transition: all 0.3s ease;
+    }
+
+    .comp-card:hover {
+      border-color: var(--border-strong);
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateY(-2px);
+    }
+
+    .comp-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-magenta);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .comp-card h3 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 14px;
+      color: var(--text-primary);
+    }
+
+    .comp-card p {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .comp-features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .comp-features li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .comp-features li::before {
+      content: "→";
+      color: var(--accent-violet);
+      font-weight: bold;
+    }
+
+    /* Timeline execution flow */
+    .flow-timeline {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
+
+    .flow-timeline::before {
+      content: '';
+      position: absolute;
+      left: 31px;
+      top: 0;
+      height: 100%;
+      width: 2px;
+      background: var(--border-subtle);
+    }
+
+    .flow-step {
+      position: relative;
+      margin-bottom: 40px;
+      padding-left: 80px;
+    }
+
+    .flow-step:last-child {
+      margin-bottom: 0;
+    }
+
+    .flow-step-num {
+      position: absolute;
+      left: 12px;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-color);
+      border: 2px solid var(--accent-violet);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      z-index: 2;
+      box-shadow: 0 0 10px rgba(96, 54, 225, 0.3);
+    }
+
+    .flow-step-content {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .flow-step:hover .flow-step-content {
+      border-color: var(--border-strong);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .flow-step-content h4 {
+      font-size: 15px;
+      font-weight: 600;
       color: var(--text-primary);
       margin-bottom: 8px;
     }
 
-    .metric-label {
-      font-size: 12px;
-      font-weight: 400;
-      letter-spacing: 1px;
+    .flow-step-content p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .flow-step-meta {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-magenta);
       text-transform: uppercase;
+    }
+
+    /* Tech Stack Table */
+    .stack-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .stack-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .stack-table th {
+      border-bottom: 2px solid var(--border-subtle);
+      padding: 16px 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-primary);
+    }
+
+    .stack-table td {
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 20px;
+      font-size: 14px;
       color: var(--text-secondary);
     }
 
+    .stack-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+      color: var(--text-primary);
+    }
+
+    .stack-component {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .stack-tech {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent-violet);
+    }
+
     /* ==========================================================================
-       5. 16:9 VISUAL SHOWCASE ADVERT CONTAINER
+       6. 16:9 VISUAL SHOWCASE ADVERT CONTAINER
        ========================================================================== */
     .showcase-frame-wrapper {
       position: relative;
@@ -562,7 +1040,7 @@
     .advert-frame-container h1 {
       font-size: clamp(2rem, 5.5vw, 4.8rem);
       margin: 0;
-      background: var(--main-gradient);
+      background: var(--logo-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       line-height: 1.05;
@@ -581,7 +1059,7 @@
       margin-right: auto;
     }
 
-    .advert-frame-container #finaleStage {
+    .advert-frame-container .finale-stage {
       position: absolute;
       inset: 0;
       z-index: 20;
@@ -594,7 +1072,7 @@
       transition: opacity 0.8s ease;
     }
 
-    .advert-frame-container #finaleStage.active {
+    .advert-frame-container .finale-stage.active {
       opacity: 1;
       pointer-events: auto;
     }
@@ -609,8 +1087,11 @@
     .advert-frame-container .fill-text {
       font-size: 100px;
       font-weight: 800;
-      fill: url(#svgGrad);
       letter-spacing: -0.03em;
+    }
+
+    .showcase-frame-wrapper .fill-text {
+      fill: url(#svgGradShowcase);
     }
 
     .advert-frame-container .sub-url-path {
@@ -621,8 +1102,38 @@
       opacity: 0.8;
     }
 
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .metric-item {
+      padding: 48px 32px;
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .metric-item:last-child { border-right: none; }
+
+    .metric-value {
+      font-size: 32px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
     /* ==========================================================================
-       6. COMPREHENSIVE ENTERPRISE FOOTER
+       7. COMPREHENSIVE ENTERPRISE FOOTER
        ========================================================================== */
     footer {
       border-top: 1px solid var(--border-subtle);
@@ -740,9 +1251,331 @@
     }
 
     /* ==========================================================================
-       7. RESPONSIVE BREAKPOINTS
+       8. SEAMLESS SPA PORTAL OVERLAY (LOGIN VIEWPORT)
        ========================================================================== */
-    @media (max-width: 900px) {
+    #login-page-view {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      pointer-events: none;
+      background-color: var(--bg-color);
+    }
+
+    .viewport-glow {
+      position: absolute;
+      width: 50vw;
+      height: 50vw;
+      border-radius: 50%;
+      filter: blur(160px);
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-left { top: -20%; left: -10%; background: var(--accent-violet); }
+
+    .app-viewport {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    .advert-side {
+      position: relative;
+      background: radial-gradient(circle at 50% 50%, #0a0618 0%, #020205 100%);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      overflow: hidden;
+    }
+
+    .advert-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 100px;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-pill img {
+      height: 18px;
+      width: auto;
+    }
+
+    .brand-pill span {
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 3px;
+    }
+
+    .sys-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .stage-wrapper {
+      position: relative;
+      flex: 1;
+      margin: 40px 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .advert-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .nav-back-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .nav-back-link:hover {
+      color: var(--text-primary);
+    }
+
+    .login-side {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      background: #020205;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .brand-header {
+      margin-bottom: 36px;
+      text-align: left;
+    }
+
+    .main-logo-icon {
+      height: 32px;
+      width: auto;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 8px rgba(96, 54, 225, 0.25));
+    }
+
+    .login-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .field-label .label-title {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .field-label .key-type {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      padding: 0 44px 0 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #fff;
+      outline: none;
+      transition: all 0.3s var(--ease-expensive);
+    }
+
+    .input-wrapper input::placeholder {
+      color: var(--text-muted);
+      font-family: var(--font-main);
+    }
+
+    .input-wrapper input:focus {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .key-icon {
+      position: absolute;
+      right: 14px;
+      width: 16px;
+      height: 16px;
+      fill: rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+      transition: fill 0.3s ease;
+    }
+
+    .input-wrapper input:focus ~ .key-icon {
+      fill: rgba(255, 255, 255, 0.5);
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 48px;
+      background: #FFFFFF;
+      border: none;
+      border-radius: 6px;
+      color: #000000;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s var(--ease-expensive);
+    }
+
+    .submit-btn:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .submit-btn:active {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .security-notice {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+    }
+
+    .security-notice-text {
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .shield-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Scoped Canvas Sizing for Login Overlay */
+    .advert-side .advert-frame-container h1 {
+      font-size: clamp(1.8rem, 3vw, 3.2rem);
+    }
+
+    .advert-side .advert-frame-container p {
+      font-size: clamp(0.85rem, 1vw, 1.05rem);
+    }
+
+    .advert-side .advert-frame-container .intro-svg {
+      width: 80%;
+      height: auto;
+    }
+
+    .advert-side .advert-frame-container .fill-text {
+      font-size: 80px;
+    }
+
+    .advert-side .fill-text {
+      fill: url(#svgGradLogin);
+    }
+
+    .advert-side .advert-frame-container .sub-url-path {
+      font-size: 14px;
+    }
+
+    .advert-side .advert-frame-container .scene-content {
+      transform: translate3d(-50%, calc(-50% + 40px), -100px) rotateX(-15deg);
+    }
+
+    .advert-side .advert-frame-container .scene-content.active {
+      transform: translate3d(-50%, -50%, 0) rotateX(0deg);
+    }
+
+    .advert-side .advert-frame-container .scene-content.exit {
+      transform: translate3d(-50%, calc(-50% - 40px), 100px) rotateX(15deg);
+    }
+
+    /* ==========================================================================
+       9. RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 1024px) {
       nav { padding: 20px 30px; }
       .nav-links { gap: 24px; }
       .architecture-grid { grid-template-columns: 1fr; border-left: none; }
@@ -756,6 +1589,30 @@
       footer { padding: 60px 30px 36px; }
       .footer-container { grid-template-columns: 1fr; gap: 40px; margin-bottom: 48px; }
       .footer-bottom { flex-direction: column; gap: 16px; align-items: flex-start; }
+
+      #login-page-view.app-viewport { grid-template-columns: 1fr; overflow-y: auto; }
+      #login-page-view .advert-side { display: none; }
+      #login-page-view .login-side { height: 100vh; padding: 30px; }
+      
+      .topology-diagram {
+        flex-direction: column;
+        align-items: center;
+      }
+      .topo-connector {
+        height: 40px;
+        width: 2px;
+        margin: 10px 0;
+      }
+      .flow-line {
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--border-subtle) 30%, var(--accent-violet) 50%, var(--accent-magenta) 70%, var(--border-subtle) 90%);
+        background-size: auto 200%;
+      }
+      @keyframes topoFlow {
+        0% { background-position: 0 200%; }
+        100% { background-position: 0 -200%; }
+      }
     }
   </style>
 </head>
@@ -784,8 +1641,10 @@
         <li><a href="#about">About</a></li>
         <li><a href="#architecture">Architecture</a></li>
         <li><a href="#governance">Governance</a></li>
+        <li><a href="#tech-spec">Technical Spec</a></li>
         <li><a href="#showcase">Showcase</a></li>
         <li><a href="#enterprise">Enterprise</a></li>
+        <li><a href="#login" class="nav-premium-btn">Premium Access</a></li>
       </ul>
     </nav>
 
@@ -796,8 +1655,12 @@
           Unified Operational Layer for Enterprise Financial Workflows.
         </h1>
         <p class="hero-description">
-          KOMNI is an enterprise financial operations proxy platform designed to help organizations securely manage payment workflows, transaction visibility, and operational governance through a single, unified interface.
+          KOMNI is an enterprise financial operations platform designed to help organizations securely manage payment workflows, transaction visibility, and operational governance through a single, unified interface.
         </p>
+        <div class="hero-actions">
+          <a href="#login" class="hero-btn hero-btn-premium">Access Premium Terminal</a>
+          <a href="#architecture" class="hero-btn hero-btn-secondary">Explore Architecture</a>
+        </div>
       </section>
 
       <!-- Section 1: Architecture Cards -->
@@ -812,7 +1675,7 @@
             <div class="arch-card-num">01 / INTEGRATION</div>
             <div>
               <h3>Infrastructure Coexistence</h3>
-              <p>Rather than replacing existing payment infrastructure, KOMNI is designed to complement and enhance it as a proxy. By integrating with trusted payment providers and enterprise systems, the platform delivers centralized visibility, standardized operational workflows, and resilient transaction management while allowing organizations to continue using the financial services they already trust.</p>
+              <p>Rather than replacing existing payment infrastructure, KOMNI is designed to complement and enhance it. By integrating with trusted payment providers and enterprise systems, the platform delivers centralized visibility, standardized operational workflows, and resilient transaction management while allowing organizations to continue using the financial services they already trust.</p>
             </div>
           </div>
 
@@ -865,7 +1728,330 @@
         </div>
       </section>
 
-      <!-- Section 3: Visual Showcase Frame (16:9 Advert) -->
+      <!-- Section 3: Developer Specification (Integrated from context) -->
+      <section class="section-container" id="tech-spec">
+        <div class="section-header reveal-on-scroll">
+          <span class="section-label">Developer Specification</span>
+          <h2 class="section-title">Under the Hood: Low-Latency Middleware & Governance</h2>
+        </div>
+
+        <div class="tech-spec-container reveal-on-scroll">
+          <!-- Tab Headers -->
+          <div class="spec-tabs">
+            <button class="spec-tab-btn active" data-tab="topology">System Topology</button>
+            <button class="spec-tab-btn" data-tab="components">Core Components</button>
+            <button class="spec-tab-btn" data-tab="flow">Execution Flow</button>
+            <button class="spec-tab-btn" data-tab="stack">Technology Stack</button>
+          </div>
+
+          <!-- Tab Contents -->
+          <div class="spec-content-wrapper">
+            
+            <!-- Topology Tab -->
+            <div class="spec-tab-content active" id="tab-topology">
+              <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; max-width: 800px;">
+                KOMNI V1 functions as a high-throughput payment proxy and cryptographic middleware, intercepting API calls before reaching payment gateways. The diagram below traces the deterministic request pipeline:
+              </p>
+              <div class="topology-visualization">
+                <div class="topo-container">
+                  
+                  <!-- LEVEL 1: CLIENT BOUNDARY -->
+                  <div class="topo-level level-client">
+                    <div class="level-label">Client Boundary</div>
+                    <div class="topo-node node-client">
+                      <svg class="node-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                        <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                        <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                      </svg>
+                      <div class="node-title">Merchant Core System</div>
+                      <div class="node-desc">API Client / Payout Initiator</div>
+                    </div>
+                  </div>
+                  
+                  <!-- CONNECTOR DOWN -->
+                  <div class="topo-connector connector-main">
+                    <div class="flow-line vertical-line"></div>
+                    <span class="flow-label">HTTPS POST Request</span>
+                  </div>
+                  
+                  <!-- LEVEL 2: KOMNI V1 ENGINE BOUNDARY -->
+                  <div class="topo-level level-middleware">
+                    <div class="level-label">KOMNI V1 Middleware Security Boundary</div>
+                    
+                    <div class="middleware-grid">
+                      <!-- 1. Ingress Proxy -->
+                      <div class="topo-node node-ingress">
+                        <svg class="node-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        <div class="node-title">1. Ingress Proxy</div>
+                        <div class="node-desc">TLS, Inspection & IP Rate Limits</div>
+                      </div>
+
+                      <!-- Flow line horizontal -->
+                      <div class="inner-connector">
+                        <div class="flow-line horizontal-line"></div>
+                        <span class="flow-label">Clean Payload</span>
+                      </div>
+
+                      <!-- 2. Redis Velocity Engine -->
+                      <div class="topo-node node-redis">
+                        <svg class="node-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        <div class="node-title">2. Velocity Engine</div>
+                        <div class="node-desc">Redis Sliding Limits (&lt;5ms)</div>
+                      </div>
+
+                      <!-- Flow line horizontal -->
+                      <div class="inner-connector">
+                        <div class="flow-line horizontal-line"></div>
+                        <span class="flow-label">Hold if Flagged</span>
+                      </div>
+
+                      <!-- 3. Governance State Machine -->
+                      <div class="topo-node node-multisig">
+                        <svg class="node-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                        </svg>
+                        <div class="node-title">3. Policy & Multi-Sig</div>
+                        <div class="node-desc">Out-of-band Approvals</div>
+                      </div>
+                    </div>
+                    
+                    <div class="middleware-lower">
+                      <div class="inner-connector-down">
+                        <div class="flow-line vertical-line"></div>
+                        <span class="flow-label">Approved State</span>
+                      </div>
+                      
+                      <div class="lower-nodes">
+                        <!-- 4. Hash-Chain Ledger -->
+                        <div class="topo-node node-ledger">
+                          <svg class="node-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                          </svg>
+                          <div class="node-title">4. Hash-Chain Ledger</div>
+                          <div class="node-desc">SHA-256 Tamper Detection</div>
+                        </div>
+                        
+                        <div class="inner-connector-horizontal">
+                          <div class="flow-line horizontal-line"></div>
+                          <span class="flow-label">Forward Payload</span>
+                        </div>
+
+                        <!-- 5. Egress Forwarder -->
+                        <div class="topo-node node-egress">
+                          <svg class="node-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                          </svg>
+                          <div class="node-title">5. Outbound Dispatch</div>
+                          <div class="node-desc">Pooled Relaying & Webhooks</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- CONNECTOR DOWN -->
+                  <div class="topo-connector connector-main">
+                    <div class="flow-line vertical-line"></div>
+                    <span class="flow-label">HTTPS Signed Payload</span>
+                  </div>
+                  
+                  <!-- LEVEL 3: EXTERNAL PROCESSOR -->
+                  <div class="topo-level level-processor">
+                    <div class="level-label">External Boundary</div>
+                    <div class="topo-node node-processor">
+                      <svg class="node-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="2" y1="10" x2="22" y2="10"></line>
+                      </svg>
+                      <div class="node-title">Paystack API / Sandbox</div>
+                      <div class="node-desc">Final Clearing & Rails</div>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+
+            <!-- Components Tab -->
+            <div class="spec-tab-content" id="tab-components">
+              <div class="components-grid">
+                <div class="comp-card">
+                  <span class="comp-badge">Module 01</span>
+                  <h3>Ingress Proxy & Auth</h3>
+                  <p>Operates as a high-security reverse proxy endpoint protecting core gateway paths, performing raw inspection on ingress traffic before routing.</p>
+                  <ul class="comp-features">
+                    <li>URL routing via <code>/v1/</code> endpoints</li>
+                    <li>Header signature extraction (Bearer tokens, IP origin)</li>
+                    <li>Rate limiting drops brute-force payloads at ingress</li>
+                  </ul>
+                </div>
+
+                <div class="comp-card">
+                  <span class="comp-badge">Module 02</span>
+                  <h3>Velocity & Rules Engine</h3>
+                  <p>Executes ultra-low latency sliding-window heuristics to verify transaction velocity against strict static merchant parameters.</p>
+                  <ul class="comp-features">
+                    <li>Redis sliding window tracking (&lt; 5ms check latency)</li>
+                    <li>Rule A: Amount caps (e.g., &gt;$5k triggers 2FA)</li>
+                    <li>Rule B: Frequency filters (e.g., &gt;20 requests/min freezes keys)</li>
+                    <li>Rule C: Account cooling period rules (e.g., new accounts held for 24h)</li>
+                  </ul>
+                </div>
+
+                <div class="comp-card">
+                  <span class="comp-badge">Module 03</span>
+                  <h3>Governance & Multi-Sig</h3>
+                  <p>A policy-driven state machine that intercepts anomalous requests and places transaction states in a temporary custody hold.</p>
+                  <ul class="comp-features">
+                    <li>Yields immediate HTTP 202 Accepted status</li>
+                    <li>Attaches tracking IDs (<code>komni_tx_id</code>)</li>
+                    <li>Out-of-band administrator dashboard signatures flip state to approved</li>
+                  </ul>
+                </div>
+
+                <div class="comp-card">
+                  <span class="comp-badge">Module 04</span>
+                  <h3>Immutable Vault & Ledger</h3>
+                  <p>Maintains absolute cryptographic verification of payment actions by linking metadata payloads in a chronological blockchain-style ledger.</p>
+                  <ul class="comp-features">
+                    <li>SHA-256 Hash Chain connecting <code>Hash_n</code> to <code>Hash_n-1</code></li>
+                    <li>Instant alert trigger upon data tampering detection</li>
+                    <li>PCI-DSS compliant metadata storage (no card numbers stored)</li>
+                  </ul>
+                </div>
+
+                <div class="comp-card">
+                  <span class="comp-badge">Module 05</span>
+                  <h3>Egress Forwarder & Webhooks</h3>
+                  <p>Handles secure dispatch to external payment processors and acts as a firewall for incoming transaction callbacks.</p>
+                  <ul class="comp-features">
+                    <li>Httpx connection-pooled API relaying</li>
+                    <li>HMAC signature verification (<code>x-paystack-signature</code>)</li>
+                    <li>Timestamp nonces prevent webhook replay attacks</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Flow Tab -->
+            <div class="spec-tab-content" id="tab-flow">
+              <div class="flow-timeline">
+                <div class="flow-step">
+                  <div class="flow-step-num">1</div>
+                  <div class="flow-step-content">
+                    <h4>Merchant Client Request</h4>
+                    <p>Merchant backend targets <code>POST https://proxy.komni.io/v1/transfer</code> passing transaction parameters (e.g. <code>amount: 250000 kobo</code>, <code>recipient: RCP_123456</code>).</p>
+                    <span class="flow-step-meta">Ingress Phase</span>
+                  </div>
+                </div>
+
+                <div class="flow-step">
+                  <div class="flow-step-num">2</div>
+                  <div class="flow-step-content">
+                    <h4>Ingress Authentication</h4>
+                    <p>KOMNI verifies API key credentials, extracts timestamp headers, and registers request context to audit tables.</p>
+                    <span class="flow-step-meta">Security Validation</span>
+                  </div>
+                </div>
+
+                <div class="flow-step">
+                  <div class="flow-step-num">3</div>
+                  <div class="flow-step-content">
+                    <h4>Velocity Check Heuristics</h4>
+                    <p>Rules engine queries Redis sliding counters. The amount ($2,500 equivalent) is below rule caps ($10,000) and cumulative frequency is nominal. Evaluation takes &lt;5ms.</p>
+                    <span class="flow-step-meta">Analog Intelligence Engine</span>
+                  </div>
+                </div>
+
+                <div class="flow-step">
+                  <div class="flow-step-num">4</div>
+                  <div class="flow-step-content">
+                    <h4>SHA-256 Ledger Hashing</h4>
+                    <p>KOMNI generates a SHA-256 block linking this payment payload directly to the previous transaction hash, solidifying the audit trail.</p>
+                    <span class="flow-step-meta">Cryptographic Vaulting</span>
+                  </div>
+                </div>
+
+                <div class="flow-step">
+                  <div class="flow-step-num">5</div>
+                  <div class="flow-step-content">
+                    <h4>Outbound Dispatch to Gateway</h4>
+                    <p>KOMNI extracts the encrypted merchant API secret key and relays the payload to <code>https://api.paystack.co/transfer</code> via async pooled connections.</p>
+                    <span class="flow-step-meta">Egress Relay</span>
+                  </div>
+                </div>
+
+                <div class="flow-step">
+                  <div class="flow-step-num">6</div>
+                  <div class="flow-step-content">
+                    <h4>Response Verification & Relay</h4>
+                    <p>Paystack replies with HTTP 200 OK. KOMNI writes receipt metadata to Postgres, appends operational tracing headers (e.g. <code>X-KOMNI-Trust-State: PASSED</code>, <code>X-KOMNI-Latency-MS: 4</code>), and forwards the response payload back to the merchant.</p>
+                    <span class="flow-step-meta">Session Complete</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stack Tab -->
+            <div class="spec-tab-content" id="tab-stack">
+              <div class="stack-table-wrapper">
+                <table class="stack-table">
+                  <thead>
+                    <tr>
+                      <th>Component</th>
+                      <th>Technology / Tool</th>
+                      <th>Operational Purpose</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="stack-component">API Proxy Framework</td>
+                      <td class="stack-tech">FastAPI & Starlette (Python) / Go</td>
+                      <td>Asynchronous, ultra-low latency routing and ingress middleware termination.</td>
+                    </tr>
+                    <tr>
+                      <td class="stack-component">In-Memory Cache</td>
+                      <td class="stack-tech">Redis</td>
+                      <td>Sliding-window counters, rate limits, and caching rule velocity checks.</td>
+                    </tr>
+                    <tr>
+                      <td class="stack-component">Primary Database</td>
+                      <td class="stack-tech">PostgreSQL (Relational DB)</td>
+                      <td>Multi-tenant merchant configurations, state machines, and historical audit stores.</td>
+                    </tr>
+                    <tr>
+                      <td class="stack-component">Cryptographic Vault</td>
+                      <td class="stack-tech">Python Standard Library (hashlib / hmac)</td>
+                      <td>Generating SHA-256 hash chains, HMAC verifications, and webhook verification nonces.</td>
+                    </tr>
+                    <tr>
+                      <td class="stack-component">HTTP Client Pool</td>
+                      <td class="stack-tech">httpx (Async Client)</td>
+                      <td>Connection-pooled secure forwarding to outbound API targets.</td>
+                    </tr>
+                    <tr>
+                      <td class="stack-component">Sandbox Rails</td>
+                      <td class="stack-tech">Paystack Sandbox APIs</td>
+                      <td>Simulating card issuance, mobile money (M-Pesa), and bank transfer rails in dev.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Visual Showcase Frame (16:9 Advert) -->
       <section class="section-container reveal-on-scroll" id="showcase">
         <div class="section-header">
           <span class="section-label">Visual Interpretation</span>
@@ -907,10 +2093,10 @@
               </div>
             </div>
 
-            <div id="finaleStage">
+            <div class="finale-stage">
               <svg class="intro-svg" viewBox="0 0 900 200">
                 <defs>
-                  <linearGradient id="svgGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <linearGradient id="svgGradShowcase" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" style="stop-color:#6036E1;stop-opacity:1" />
                     <stop offset="100%" style="stop-color:#D83DC2;stop-opacity:1" />
                   </linearGradient>
@@ -925,7 +2111,7 @@
         </div>
       </section>
 
-      <!-- Section 4: Key Performance Metrics -->
+      <!-- Section 5: Key Performance Metrics -->
       <section class="section-container" id="enterprise">
         <div class="metrics-grid reveal-on-scroll">
           <div class="metric-item">
@@ -961,19 +2147,17 @@
           </div>
         </div>
 
-        <!-- Quick Links -->
         <div class="footer-col">
           <h5>Products & Resources</h5>
           <ul>
             <li><a href="#about">Platform Overview</a></li>
             <li><a href="#architecture">Infrastructure Coexistence</a></li>
             <li><a href="#governance">Governance Controls</a></li>
+            <li><a href="#tech-spec">Technical Spec</a></li>
             <li><a href="#showcase">Visual Showcase</a></li>
-            <li><a href="#enterprise">Enterprise Solutions</a></li>
           </ul>
         </div>
 
-        <!-- Legal Navigation -->
         <div class="footer-col">
           <h5>Legal & Policy</h5>
           <ul>
@@ -981,19 +2165,16 @@
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="#">Security Policy</a></li>
             <li><a href="#">Compliance Statement</a></li>
-            <li><a href="#">Cookie Preferences</a></li>
           </ul>
         </div>
 
-        <!-- Contact & Social Links -->
         <div class="footer-col">
           <h5>Connect & Support</h5>
           <ul>
+            <li><a href="#login" style="color: var(--accent-magenta);">Premium Terminal Access</a></li>
             <li><a href="mailto:support@komni.io">Enterprise Inquiries</a></li>
-            <li><a href="#">X / Twitter</a></li>
             <li><a href="#">LinkedIn</a></li>
             <li><a href="#">GitHub Repository</a></li>
-            <li><a href="#">Developer Discord</a></li>
           </ul>
         </div>
       </div>
@@ -1006,6 +2187,119 @@
         </div>
       </div>
     </footer>
+  </div>
+
+  <!-- Login Page Overlay View (Seamless SPA Portal) -->
+  <div id="login-page-view" class="app-viewport">
+    <div class="viewport-glow glow-left"></div>
+    
+    <!-- LEFT DISPLAY SIDE: LIVE KINETIC ADVERT STAGE -->
+    <div class="advert-side">
+      <div class="advert-header">
+        <div class="brand-pill">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Emblem">
+          <span>KOMNI</span>
+        </div>
+        <div class="sys-badge">NODE // LIVE-TERMINAL</div>
+      </div>
+
+      <!-- Live 16:9 Kinetic Engine Canvas -->
+      <div class="stage-wrapper">
+        <div class="advert-frame-container">
+          <div class="director-ui">
+            <div class="scene-container">
+              <!-- Scene 1 -->
+              <div class="scene-content active">
+                <h1>KOMNI</h1>
+                <p>Centralized operational governance & payment workflows.</p>
+              </div>
+              <!-- Scene 2 -->
+              <div class="scene-content">
+                <h1>Unified Infrastructure</h1>
+                <p>Connect payment providers with absolute transaction oversight.</p>
+              </div>
+              <!-- Scene 3 -->
+              <div class="scene-content">
+                <h1>Observable Controls</h1>
+                <p>Traceable, structured execution designed for mission-critical operations.</p>
+              </div>
+              <!-- Scene 4 -->
+              <div class="scene-content">
+                <h1>Institutional Resilience</h1>
+                <p>Architected for evolving enterprise requirements & security compliance.</p>
+              </div>
+              <!-- Scene 5 -->
+              <div class="scene-content">
+                <h1>Financial Operations</h1>
+                <p>Bring consistency, speed, and accountability to every workflow.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="finale-stage">
+            <svg class="intro-svg" viewBox="0 0 900 200">
+              <defs>
+                <linearGradient id="svgGradLogin" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#6036E1;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#D83DC2;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="fill-text">KOMNI</text>
+              <text x="50%" y="80%" text-anchor="middle" class="sub-url-path">KOMNI.COM</text>
+            </svg>
+          </div>
+
+          <canvas id="loginAdvertCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="advert-footer">
+        <a href="#" class="nav-back-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Main Platform
+        </a>
+        <span>SOC-2 TYPE II ENCRYPTED</span>
+      </div>
+    </div>
+
+    <!-- RIGHT DISPLAY SIDE: CLEAN ISSUANCE KEY LOGIN TERMINAL -->
+    <div class="login-side">
+      <div class="login-card">
+        
+        <div class="brand-header">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
+          <h2 class="login-title">Institutional Sign In</h2>
+          <p class="login-subtitle">Enter your organization's verified Issuance Key to authenticate your access node.</p>
+        </div>
+
+        <form onsubmit="event.preventDefault();">
+          <div class="form-group">
+            <div class="field-label">
+              <span class="label-title">Enterprise Issuance Key</span>
+              <span class="key-type">HSM / RSA-4096</span>
+            </div>
+            <div class="input-wrapper">
+              <input type="password" placeholder="ik_live_99f38a..." autocomplete="off" spellcheck="false" required>
+              <svg class="key-icon" viewBox="0 0 24 24">
+                <path d="M7 14A5 5 0 0 1 12 9E1 1 0 0 1 13 10V11H17V13H19V15H21V18H18L14.7 14.7A5 5 0 0 1 7 14ZM7 11A3 3 0 1 0 10 14A3 3 0 0 0 7 11Z"/>
+              </svg>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <span>Authenticate Session</span>
+          </button>
+        </form>
+
+        <div class="security-notice">
+          <div class="shield-dot"></div>
+          <div class="security-notice-text">System authorization required. Node session activity is permanently hash-chained.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Execution & Motion Engine -->
@@ -1021,57 +2315,65 @@
       // 1. Initial Frame Boot Sequence
       async function runOpeningSequence() {
         await delay(500);
-        logo.classList.add('is-visible');
+        if (logo) logo.classList.add('is-visible');
 
         await delay(1200 + 400);
-        tagline.classList.add('is-visible');
+        if (tagline) tagline.classList.add('is-visible');
 
         await delay(1000 + 300);
-        hint.classList.add('is-visible');
+        if (hint) hint.classList.add('is-visible');
 
         initScrollEngine();
+        initSpecTabs();
+        initHashRouter();
       }
 
       // 2. Centered Dissolve Engine on Scroll
+      function updateScroll() {
+        const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+        
+        const maxScroll = 380;
+        const progress = Math.min(scrollY / maxScroll, 1);
+        
+        const opacity = 1 - progress;
+        const scale = 1 - (progress * 0.1);
+        const translateY = -progress * 60;
+
+        if (introStage) {
+          introStage.style.opacity = opacity.toFixed(3);
+          introStage.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+
+          if (opacity <= 0) {
+            introStage.style.visibility = 'hidden';
+          } else {
+            introStage.style.visibility = 'visible';
+          }
+        }
+
+        if (scrollY > 50) {
+          document.body.classList.add('has-scrolled');
+        } else if (scrollY <= 5) {
+          document.body.classList.remove('has-scrolled');
+        }
+      }
+
       function initScrollEngine() {
         let ticking = false;
 
         window.addEventListener('scroll', () => {
           if (!ticking) {
             window.requestAnimationFrame(() => {
-              const scrollY = window.scrollY;
-              
-              const maxScroll = 380;
-              const progress = Math.min(scrollY / maxScroll, 1);
-              
-              const opacity = 1 - progress;
-              const blur = progress * 24;
-              const scale = 1 - (progress * 0.1);
-              const translateY = -progress * 60;
-
-              introStage.style.opacity = opacity.toFixed(3);
-              introStage.style.filter = `blur(${blur.toFixed(1)}px)`;
-              introStage.style.transform = `translateY(${translateY.toFixed(1)}px) scale(${scale.toFixed(3)})`;
-
-              if (scrollY > 50) {
-                document.body.classList.add('has-scrolled');
-              } else {
-                document.body.classList.remove('has-scrolled');
-              }
-
-              if (opacity <= 0) {
-                introStage.style.visibility = 'hidden';
-              } else {
-                introStage.style.visibility = 'visible';
-              }
-
+              updateScroll();
               ticking = false;
             });
             ticking = true;
           }
         }, { passive: true });
 
-        // 3. Intersection Observer for Scroll Reveals
+        // Run once initially
+        updateScroll();
+
+        // Intersection Observer for Scroll Reveals
         const observerOptions = {
           root: null,
           rootMargin: '0px 0px -60px 0px',
@@ -1092,32 +2394,38 @@
         });
       }
 
-      runOpeningSequence();
+      // 3. Tab Switching Logic for Developer Specification
+      function initSpecTabs() {
+        const tabButtons = document.querySelectorAll('.spec-tab-btn');
+        const tabContents = document.querySelectorAll('.spec-tab-content');
 
-      // ==========================================================================
-      // 3. ADVERT CANVAS & KINETIC ENGINE
-      // ==========================================================================
-      const canvas = document.getElementById('advertCanvas');
-      const ctx = canvas.getContext('2d');
-      const container = canvas.parentElement;
-      const scenes = container.querySelectorAll('.scene-content');
-      const finaleStage = container.querySelector('#finaleStage');
-
-      let width, height, currentScene = 0, frame = 0;
-      const SCENE_DURATION = 160; 
-
-      function resizeAdvertCanvas() {
-        width = canvas.width = container.clientWidth;
-        height = canvas.height = container.clientHeight;
+        tabButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+            
+            tabButtons.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            const targetContent = document.getElementById(`tab-${tabId}`);
+            if (targetContent) targetContent.classList.add('active');
+          });
+        });
       }
-      window.addEventListener('resize', resizeAdvertCanvas);
-      resizeAdvertCanvas();
 
+      // ==========================================================================
+      // 4. KINETIC ADVERT CANVAS SCRIPT ENGINE
+      // ==========================================================================
       class DynamicParticle {
-        constructor() { this.reset(true); }
+        constructor(canvasRef) { 
+          this.canvas = canvasRef;
+          this.reset(true); 
+        }
         reset(init = false) {
-          this.x = (Math.random() - 0.5) * width * 3;
-          this.y = (Math.random() - 0.5) * height * 3;
+          const w = this.canvas.width || 800;
+          const h = this.canvas.height || 450;
+          this.x = (Math.random() - 0.5) * w * 3;
+          this.y = (Math.random() - 0.5) * h * 3;
           this.z = init ? Math.random() * 1800 : 1800;
           this.pz = this.z;
           this.size = Math.random() * 2 + 1;
@@ -1128,18 +2436,20 @@
           this.z -= speed;
           if (this.z < 1) this.reset();
         }
-        draw(speedFactor) {
+        draw(ctx, speedFactor) {
+          const w = this.canvas.width || 800;
+          const h = this.canvas.height || 450;
           const s = 600 / this.z;
           const ps = 600 / this.pz;
-          const x = this.x * s + width / 2;
-          const y = this.y * s + height / 2;
-          const px = this.x * ps + width / 2;
-          const py = this.y * ps + height / 2;
+          const x = this.x * s + w / 2;
+          const y = this.y * s + h / 2;
+          const px = this.x * ps + w / 2;
+          const py = this.y * ps + h / 2;
 
-          ctx.globalAlpha = Math.min(0.8, (1800 - this.z) / 1000);
-          ctx.strokeStyle = this.color;
+          const alpha = Math.min(0.8, (1800 - this.z) / 1000);
+          if (alpha <= 0.01) return;
+          ctx.strokeStyle = this.color === '#6036E1' ? `rgba(96, 54, 225, ${alpha})` : `rgba(216, 61, 194, ${alpha})`;
           ctx.lineWidth = this.size * s * (speedFactor * 0.2);
-          ctx.lineCap = 'round';
           ctx.beginPath();
           ctx.moveTo(x, y);
           ctx.lineTo(px, py);
@@ -1147,70 +2457,305 @@
         }
       }
 
-      const particleCount = 700;
-      const particles = Array.from({ length: particleCount }, () => new DynamicParticle());
-      let currentSpeed = 12;
+      function initAdvertEngine(canvasId, containerSelector) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        
+        const ctx = canvas.getContext('2d');
+        const container = canvas.closest(containerSelector);
+        const scenes = container.querySelectorAll('.scene-content');
+        const finaleStage = container.querySelector('.finale-stage');
+        
+        let width = 0, height = 0, currentScene = 0, frame = 0;
+        const SCENE_DURATION = 160; 
+        let isActive = false;
+        let currentSpeed = 12;
 
-      function cycleScenes() {
-        const current = scenes[currentScene];
-        currentScene = (currentScene + 1) % (scenes.length + 1);
+        let particles = null;
 
-        if (currentScene === scenes.length) {
-          current.classList.remove('active');
-          current.classList.add('exit');
-          
-          finaleStage.classList.add('active');
-          
-          gsap.to({ speed: 12 }, { 
-            speed: 45, 
-            duration: 1.5, 
-            onUpdate: function() { currentSpeed = this.targets()[0].speed; },
-            onComplete: () => {
-              setTimeout(() => {
-                finaleStage.classList.remove('active');
-                gsap.to({ speed: 45 }, { 
-                  speed: 12, 
-                  duration: 1.5, 
-                  onUpdate: function() { currentSpeed = this.targets()[0].speed; } 
-                });
-                
-                scenes.forEach(s => s.classList.remove('active', 'exit'));
-                currentScene = 0;
-                scenes[0].classList.add('active');
-              }, 2500);
+        function resize() {
+          const oldW = width;
+          const oldH = height;
+          width = canvas.width = container.clientWidth;
+          height = canvas.height = container.clientHeight;
+          if ((oldW === 0 || oldH === 0) && width > 0 && height > 0) {
+            if (particles) {
+              particles.forEach(p => p.reset(true));
             }
-          });
-        } else {
-          const prev = container.querySelector('.scene-content.active');
-          if (prev) {
-            prev.classList.remove('active');
-            prev.classList.add('exit');
-            setTimeout(() => prev.classList.remove('exit'), 1000);
           }
-          scenes[currentScene].classList.add('active');
         }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const particleCount = 350; // Optimized from 700 to 350 particles
+        particles = Array.from({ length: particleCount }, () => new DynamicParticle(canvas));
+
+        function cycleScenes() {
+          if (!isActive) return;
+          const current = scenes[currentScene];
+          currentScene = (currentScene + 1) % (scenes.length + 1);
+
+          if (currentScene === scenes.length) {
+            current.classList.remove('active');
+            current.classList.add('exit');
+            finaleStage.classList.add('active');
+            
+            gsap.to({ speed: 12 }, { 
+              speed: 45, 
+              duration: 1.5, 
+              onUpdate: function() { currentSpeed = this.targets()[0].speed; },
+              onComplete: () => {
+                setTimeout(() => {
+                  if (!isActive) return;
+                  finaleStage.classList.remove('active');
+                  gsap.to({ speed: 45 }, { 
+                    speed: 12, 
+                    duration: 1.5, 
+                    onUpdate: function() { currentSpeed = this.targets()[0].speed; } 
+                  });
+                  
+                  scenes.forEach(s => s.classList.remove('active', 'exit'));
+                  currentScene = 0;
+                  scenes[0].classList.add('active');
+                }, 2500);
+              }
+            });
+          } else {
+            const prev = container.querySelector('.scene-content.active');
+            if (prev) {
+              prev.classList.remove('active');
+              prev.classList.add('exit');
+              setTimeout(() => prev.classList.remove('exit'), 1000);
+            }
+            scenes[currentScene].classList.add('active');
+          }
+        }
+
+        function render() {
+          if (!isActive) return; // Do not call requestAnimationFrame when inactive
+          
+          if (width === 0 || height === 0) {
+            resize();
+            if (width === 0 || height === 0) {
+              requestAnimationFrame(render);
+              return;
+            }
+          }
+
+          frame++;
+          if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
+            frame = 0;
+            cycleScenes();
+          }
+
+          ctx.fillStyle = 'rgba(3, 3, 8, 0.25)'; 
+          ctx.fillRect(0, 0, width, height);
+
+          ctx.lineCap = 'round'; // Set once per frame
+          const speedFactor = currentSpeed / 12;
+          particles.forEach(p => {
+            p.update(currentSpeed);
+            p.draw(ctx, speedFactor);
+          });
+
+          requestAnimationFrame(render);
+        }
+
+        return {
+          play: () => { 
+            if (!isActive) {
+              isActive = true; 
+              resize(); 
+              render(); 
+            }
+          },
+          pause: () => { isActive = false; },
+          resize: resize
+        };
       }
 
-      function renderAdvert() {
-        frame++;
-        if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
-          frame = 0;
-          cycleScenes();
-        }
+      // Initialize the engines
+      const showcaseEngine = initAdvertEngine('advertCanvas', '.showcase-frame-wrapper');
+      const loginEngine = initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
+      
+      if (showcaseEngine) showcaseEngine.play();
 
-        ctx.fillStyle = 'rgba(3, 3, 8, 0.25)'; 
-        ctx.fillRect(0, 0, width, height);
+      // ==========================================================================
+      // 5. SEAMLESS SPA TRANSITION ROUTING
+      // ==========================================================================
+      const landingPage = document.querySelector('.site-wrapper');
+      const loginPage = document.getElementById('login-page-view');
 
-        const speedFactor = currentSpeed / 12;
-        particles.forEach(p => {
-          p.update(currentSpeed);
-          p.draw(speedFactor);
+      function showLoginScreen() {
+        document.body.style.overflow = 'hidden';
+        loginPage.style.display = 'grid';
+        
+        const tl = gsap.timeline({
+          defaults: { ease: 'power4.out', duration: 1 }
         });
-
-        requestAnimationFrame(renderAdvert);
+        
+        // Hide landing page
+        tl.to(landingPage, {
+          opacity: 0,
+          y: -50,
+          filter: 'blur(10px)',
+          pointerEvents: 'none',
+          duration: 0.8
+        });
+        
+        tl.to(introStage, {
+          opacity: 0,
+          duration: 0.5
+        }, 0);
+        
+        // Show login view
+        tl.fromTo(loginPage, {
+          opacity: 0
+        }, {
+          opacity: 1,
+          pointerEvents: 'auto',
+          duration: 0.8
+        }, '-=0.6');
+        
+        // Slide left side panel in
+        tl.fromTo(loginPage.querySelector('.advert-side'), {
+          xPercent: -100
+        }, {
+          xPercent: 0,
+          duration: 1.2
+        }, '-=0.8');
+        
+        // Slide right side panel in
+        tl.fromTo(loginPage.querySelector('.login-side'), {
+          xPercent: 100
+        }, {
+          xPercent: 0,
+          duration: 1.2
+        }, '-=1.2');
+        
+        // Scale and fade in login card
+        tl.fromTo(loginPage.querySelector('.login-card'), {
+          scale: 0.95,
+          opacity: 0
+        }, {
+          scale: 1,
+          opacity: 1,
+          duration: 1
+        }, '-=0.6');
+        
+        // Stagger card children
+        const cardChildren = loginPage.querySelectorAll('.brand-header, .form-group, .submit-btn, .security-notice');
+        tl.fromTo(cardChildren, {
+          y: 20,
+          opacity: 0
+        }, {
+          y: 0,
+          opacity: 1,
+          stagger: 0.1,
+          duration: 0.8
+        }, '-=0.6');
+        
+        // Swap particle loops
+        if (showcaseEngine) showcaseEngine.pause();
+        if (loginEngine) loginEngine.play();
       }
 
-      renderAdvert();
+      function hideLoginScreen() {
+        const tl = gsap.timeline({
+          defaults: { ease: 'power4.inOut', duration: 0.8 },
+          onComplete: () => {
+            loginPage.style.display = 'none';
+            loginPage.style.pointerEvents = 'none';
+            document.body.style.overflow = '';
+            if (loginEngine) loginEngine.pause();
+            
+            // CRITICAL FIX: Clear GSAP properties on landingPage to ensure fixed navbar is positioned relative to viewport
+            gsap.set(landingPage, { clearProps: "all" });
+            
+            // Restore scroll-based styles for introStage
+            updateScroll();
+          }
+        });
+        
+        // Slide panels out
+        tl.to(loginPage.querySelector('.advert-side'), {
+          xPercent: -100,
+          duration: 0.8
+        });
+        
+        tl.to(loginPage.querySelector('.login-side'), {
+          xPercent: 100,
+          duration: 0.8
+        }, 0);
+        
+        tl.to(loginPage, {
+          opacity: 0,
+          duration: 0.6
+        }, '-=0.4');
+        
+        // Restore landing page
+        tl.fromTo(landingPage, {
+          opacity: 0,
+          y: -50,
+          filter: 'blur(10px)'
+        }, {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          pointerEvents: 'auto',
+          duration: 0.8
+        }, '-=0.4');
+        
+        // Restore introStage based on scroll position
+        const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+        if (scrollY < 380) {
+          const progress = scrollY / 380;
+          const targetOpacity = 1 - progress;
+          const targetScale = 1 - (progress * 0.1);
+          const targetTranslateY = -progress * 60;
+          
+          tl.fromTo(introStage, {
+            opacity: 0
+          }, {
+            opacity: targetOpacity,
+            scale: targetScale,
+            y: targetTranslateY,
+            duration: 0.8
+          }, '-=0.4');
+        }
+        
+        if (showcaseEngine) showcaseEngine.play();
+      }
+
+      function initHashRouter() {
+        function handleHashChange() {
+          if (window.location.hash === '#login') {
+            showLoginScreen();
+          } else {
+            if (loginPage.style.display === 'grid') {
+              hideLoginScreen();
+            }
+          }
+        }
+
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // Set up click handlers on back link
+        const backLink = loginPage.querySelector('.nav-back-link');
+        if (backLink) {
+          backLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Clear hash natively to trigger handleHashChange
+            window.location.hash = '';
+          });
+        }
+
+        // Process hash on initial load
+        handleHashChange();
+      }
+
+      // Start the application opening flow
+      runOpeningSequence();
     });
   </script>
 </body>
