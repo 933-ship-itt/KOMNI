@@ -400,6 +400,21 @@
       fill: url(#chartGradient);
     }
 
+    .chart-empty {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
     /* Real-Time Live Stream Feed (Terminal Style) */
     .log-stream {
       display: flex;
@@ -575,8 +590,8 @@
 
         <div class="top-actions">
           <div class="system-health">
-            <span class="pulse-dot"></span>
-            <span>Middleware Mesh Operational</span>
+            <span class="pulse-dot" style="background-color: var(--text-muted); box-shadow: none;"></span>
+            <span>Awaiting interception feed</span>
           </div>
         </div>
       </header>
@@ -590,37 +605,37 @@
           <div class="kpi-card">
             <div class="kpi-title">Middleware Request Volume</div>
             <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-requests">2,849,120</span>
-              <span class="kpi-trend positive">+14.2%</span>
+              <span class="kpi-value" id="kpi-requests">0</span>
+              <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
             </div>
-            <div class="kpi-subtext">Intercepted via API proxies</div>
+            <div class="kpi-subtext">Awaiting interception feed</div>
           </div>
 
           <div class="kpi-card">
             <div class="kpi-title">Evaluated Transaction Value</div>
             <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-volume">$14.82M</span>
-              <span class="kpi-trend positive">+8.6%</span>
+              <span class="kpi-value" id="kpi-volume">$0</span>
+              <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
             </div>
-            <div class="kpi-subtext">Passed through intelligence layer</div>
+            <div class="kpi-subtext">Pending live integration</div>
           </div>
 
           <div class="kpi-card">
             <div class="kpi-title">P99 Gateway Latency Overhead</div>
             <div class="kpi-value-row">
-              <span class="kpi-value" style="color: #60a5fa;">3.4ms</span>
-              <span class="kpi-trend" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;">Optimal</span>
+              <span class="kpi-value" style="color: var(--text-muted);">0ms</span>
+              <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">N/A</span>
             </div>
-            <div class="kpi-subtext">KOMNI execution latency</div>
+            <div class="kpi-subtext">No telemetry available yet</div>
           </div>
 
           <div class="kpi-card">
             <div class="kpi-title">Policy Interceptions</div>
             <div class="kpi-value-row">
-              <span class="kpi-value" style="color: var(--status-danger);">1,429</span>
-              <span class="kpi-trend" style="background: var(--status-danger-bg); color: var(--status-danger);">0.05%</span>
+              <span class="kpi-value" style="color: var(--text-muted);">0</span>
+              <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
             </div>
-            <div class="kpi-subtext">Fraud/Compliance blocks</div>
+            <div class="kpi-subtext">No blocks recorded yet</div>
           </div>
 
         </section>
@@ -632,20 +647,11 @@
           <div class="panel">
             <div class="panel-header">
               <span class="panel-title">Throughput & Middleware Traffic Analysis (RPS)</span>
-              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Avg: 1,240 req/sec</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Avg: 0 req/sec</span>
             </div>
             <div class="panel-body">
               <div class="chart-container">
-                <svg class="traffic-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#D83DC2" stop-opacity="0.3"/>
-                      <stop offset="100%" stop-color="#6036E1" stop-opacity="0.0"/>
-                    </linearGradient>
-                  </defs>
-                  <path class="chart-area" d="M 0 150 L 0 100 Q 60 40 120 80 T 240 60 T 360 90 T 500 30 L 500 150 Z"></path>
-                  <path class="chart-line" d="M 0 100 Q 60 40 120 80 T 240 60 T 360 90 T 500 30"></path>
-                </svg>
+                <div class="chart-empty">Awaiting interception data</div>
               </div>
             </div>
           </div>
@@ -654,11 +660,15 @@
           <div class="panel">
             <div class="panel-header">
               <span class="panel-title">Real-Time Request Stream</span>
-              <span style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Streaming</span>
+              <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase;">● Idle</span>
             </div>
             <div class="panel-body" style="padding: 16px;">
               <div class="log-stream" id="log-stream-container">
-                <!-- Log rows inserted via JavaScript -->
+                <div class="log-row">
+                  <span class="log-method method-get">N/A</span>
+                  <span class="log-path">No interception events yet</span>
+                  <span class="log-latency" style="color: var(--text-muted);">0 | 0ms</span>
+                </div>
               </div>
             </div>
           </div>
@@ -684,28 +694,28 @@
             </thead>
             <tbody>
               <tr>
-                <td><strong>/v1/checkout/intent</strong></td>
-                <td style="font-family: var(--font-mono); color: var(--accent-magenta);">stripe_primary_gw</td>
-                <td><span style="color: var(--text-secondary);">AML_Compliance_v4</span></td>
-                <td style="font-family: var(--font-mono); color: var(--text-primary);">$8,420,190.00</td>
-                <td style="font-family: var(--font-mono);">2.8ms</td>
-                <td><span class="badge-status active">Operational</span></td>
+                <td><strong>—</strong></td>
+                <td style="font-family: var(--font-mono); color: var(--text-muted);">—</td>
+                <td><span style="color: var(--text-secondary);">Pending</span></td>
+                <td style="font-family: var(--font-mono); color: var(--text-primary);">$0</td>
+                <td style="font-family: var(--font-mono);">0ms</td>
+                <td><span class="badge-status" style="background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08);">Waiting</span></td>
               </tr>
               <tr>
-                <td><strong>/v1/settlements/direct</strong></td>
-                <td style="font-family: var(--font-mono); color: var(--accent-magenta);">ach_network_bridge</td>
-                <td><span style="color: var(--text-secondary);">Velocity_Limits_v2</span></td>
-                <td style="font-family: var(--font-mono); color: var(--text-primary);">$4,102,000.00</td>
-                <td style="font-family: var(--font-mono);">4.1ms</td>
-                <td><span class="badge-status active">Operational</span></td>
+                <td><strong>—</strong></td>
+                <td style="font-family: var(--font-mono); color: var(--text-muted);">—</td>
+                <td><span style="color: var(--text-secondary);">Pending</span></td>
+                <td style="font-family: var(--font-mono); color: var(--text-primary);">$0</td>
+                <td style="font-family: var(--font-mono);">0ms</td>
+                <td><span class="badge-status" style="background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08);">Waiting</span></td>
               </tr>
               <tr>
-                <td><strong>/v1/payouts/crypto</strong></td>
-                <td style="font-family: var(--font-mono); color: var(--accent-magenta);">polygon_usdc_node</td>
-                <td><span style="color: var(--text-secondary);">NonCustodial_Sanctions</span></td>
-                <td style="font-family: var(--font-mono); color: var(--text-primary);">$2,298,930.00</td>
-                <td style="font-family: var(--font-mono);">5.8ms</td>
-                <td><span class="badge-status degraded">High Load</span></td>
+                <td><strong>—</strong></td>
+                <td style="font-family: var(--font-mono); color: var(--text-muted);">—</td>
+                <td><span style="color: var(--text-secondary);">Pending</span></td>
+                <td style="font-family: var(--font-mono); color: var(--text-primary);">$0</td>
+                <td style="font-family: var(--font-mono);">0ms</td>
+                <td><span class="badge-status" style="background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08);">Waiting</span></td>
               </tr>
             </tbody>
           </table>
@@ -717,44 +727,18 @@
   </div>
 
   <script>
-    // Real-Time Log Simulation Engine
-    const routes = [
-      { method: 'POST', path: '/v1/checkout/intent', status: 200 },
-      { method: 'POST', path: '/v1/settlements/direct', status: 200 },
-      { method: 'GET', path: '/v1/policy/evaluate', status: 200 },
-      { method: 'POST', path: '/v1/payouts/crypto', status: 201 },
-      { method: 'POST', path: '/v1/checkout/intent', status: 403 }
-    ];
-
+    // Placeholder stream until interception scripts are wired in.
     const container = document.getElementById('log-stream-container');
 
-    function appendLog() {
-      const route = routes[Math.floor(Math.random() * routes.length)];
-      const latency = (Math.random() * 4 + 1.2).toFixed(1);
-      
-      const row = document.createElement('div');
-      row.className = 'log-row';
-      
-      const methodClass = route.method === 'POST' ? 'method-post' : 'method-get';
-      const statusColor = route.status === 403 ? '#ef4444' : '#8A8A8A';
-
-      row.innerHTML = `
-        <span class="log-method ${methodClass}">${route.method}</span>
-        <span class="log-path">${route.path}</span>
-        <span class="log-latency" style="color:${statusColor}">${route.status} | ${latency}ms</span>
+    if (container) {
+      container.innerHTML = `
+        <div class="log-row">
+          <span class="log-method method-get">N/A</span>
+          <span class="log-path">No interception events yet</span>
+          <span class="log-latency" style="color: var(--text-muted);">0 | 0ms</span>
+        </div>
       `;
-
-      container.insertBefore(row, container.firstChild);
-
-      if (container.children.length > 6) {
-        container.removeChild(container.lastChild);
-      }
     }
-
-    setInterval(appendLog, 1400);
-    appendLog();
-    appendLog();
-    appendLog();
   </script>
 </body>
 </html>
