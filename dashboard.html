@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOMNI — Financial Intelligence & Middleware Console</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. ENTERPRISE DESIGN SYSTEM VARIABLES
+       ========================================================================== */
+    :root {
+      --bg-root: #000000;
+      --bg-surface: #030308;
+      --bg-panel: rgba(255, 255, 255, 0.02);
+      --bg-element: rgba(255, 255, 255, 0.04);
+      --bg-hover: rgba(255, 255, 255, 0.06);
+
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      --border-focus: rgba(96, 54, 225, 0.6);
+
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8A8A;
+      --text-muted: #525252;
+
+      --accent-violet: #6036E1;
+      --accent-magenta: #D83DC2;
+      --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
+      --accent-violet-glow: rgba(96, 54, 225, 0.15);
+      
+      --status-success: #22c55e;
+      --status-success-bg: rgba(34, 197, 94, 0.15);
+      --status-warning: #facc15;
+      --status-warning-bg: rgba(250, 204, 21, 0.15);
+      --status-danger: #ef4444;
+      --status-danger-bg: rgba(239, 68, 68, 0.15);
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-violet) #000000;
+    }
+
+    /* Custom Webkit Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #000000;
+      border-left: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--accent-violet) 0%, var(--accent-magenta) 100%);
+      border-radius: 4px;
+    }
+
+    body {
+      background-color: var(--bg-root);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* ==========================================================================
+       2. APP LAYOUT STRUCTURE
+       ========================================================================== */
+    .app-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    aside.sidebar {
+      width: 240px;
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 200;
+    }
+
+    .brand-header {
+      padding: 24px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      background: var(--logo-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-version {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-magenta);
+      background: rgba(216, 61, 194, 0.1);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(216, 61, 194, 0.2);
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      padding: 24px 24px 12px;
+    }
+
+    .nav-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 12px;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s var(--ease-expensive);
+    }
+
+    .nav-item a:hover {
+      background-color: var(--bg-element);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active a {
+      background-color: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 2px 0 0 var(--accent-violet);
+    }
+
+    /* Main Workspace */
+    main.workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 0%, #0d0722 0%, #030308 60%);
+    }
+
+    /* Top Utility Header */
+    header.top-bar {
+      height: 60px;
+      background-color: rgba(3, 3, 8, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+
+    .context-selector {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .badge-env {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .badge-env.production {
+      background-color: var(--status-success-bg);
+      color: var(--status-success);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    .select-input {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .select-input:hover, .select-input:focus {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      background-color: var(--bg-element);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .system-health {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--status-success);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--status-success);
+    }
+
+    /* Dashboard View Area */
+    .dashboard-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ==========================================================================
+       3. METRICS AND TELEMETRY PANELS
+       ========================================================================== */
+    .metrics-header-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .kpi-card {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.3s var(--ease-expensive);
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-strong);
+      background-color: var(--bg-element);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .kpi-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .kpi-value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-trend {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .kpi-trend.positive {
+      color: var(--status-success);
+      background: var(--status-success-bg);
+    }
+
+    .kpi-subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Analytics Chart & Real-Time Stream Split */
+    .telemetry-split {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .panel:hover {
+      border-color: var(--border-strong);
+      background-color: rgba(255, 255, 255, 0.025);
+    }
+
+    .panel-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-body {
+      padding: 24px;
+      flex: 1;
+    }
+
+    /* Chart Simulation Area */
+    .chart-container {
+      width: 100%;
+      height: 220px;
+      position: relative;
+    }
+
+    svg.traffic-chart {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .chart-line {
+      fill: none;
+      stroke: var(--accent-magenta);
+      stroke-width: 2.5;
+    }
+
+    .chart-area {
+      fill: url(#chartGradient);
+    }
+
+    /* Real-Time Live Stream Feed (Terminal Style) */
+    .log-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .log-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: #030308;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .log-method {
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+
+    .method-post { background: rgba(96, 54, 225, 0.2); color: #a78bfa; }
+    .method-get { background: var(--status-success-bg); color: var(--status-success); }
+
+    .log-path {
+      color: var(--text-secondary);
+      flex: 1;
+      margin: 0 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .log-latency {
+      color: var(--text-muted);
+    }
+
+    /* Data Table Section */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .data-table th {
+      padding: 16px 24px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      border-bottom: 2px solid var(--border-color);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .data-table td {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+    
+    .data-table td strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .data-table tr:hover td {
+      background-color: var(--bg-element);
+      color: var(--text-primary);
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+
+    .badge-status.active {
+      background-color: var(--status-success-bg);
+      color: var(--status-success);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .badge-status.degraded {
+      background-color: var(--status-warning-bg);
+      color: var(--status-warning);
+      border: 1px solid rgba(250, 204, 21, 0.2);
+    }
+    
+    .btn-premium {
+      background: var(--logo-gradient);
+      border: none;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(96, 54, 225, 0.3);
+    }
+    .btn-premium:hover, .btn-premium:focus {
+      background: var(--logo-gradient);
+      color: #ffffff;
+      box-shadow: 0 0 25px rgba(216, 61, 194, 0.6);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <span class="brand-logo">KOMNI</span>
+        <span class="brand-version">v2.4-ENT</span>
+      </div>
+
+      <div class="nav-section-title">Telemetry & Routing</div>
+      <ul class="nav-menu">
+        <li class="nav-item active"><a href="#">Overview</a></li>
+        <li class="nav-item"><a href="#">API Traffic Mesh</a></li>
+        <li class="nav-item"><a href="#">Payload Audit Logs</a></li>
+        <li class="nav-item"><a href="#">Latency & Performance</a></li>
+      </ul>
+
+      <div class="nav-section-title">Intelligence & Policy</div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="#">Policy Engine</a></li>
+        <li class="nav-item"><a href="#">Fraud & Risk Intercepts</a></li>
+        <li class="nav-item"><a href="#">Provider Routing Rules</a></li>
+      </ul>
+
+      <div class="nav-section-title">Infrastructure</div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="#">Gateway Nodes</a></li>
+        <li class="nav-item"><a href="#">API Keys & Hooks</a></li>
+        <li class="nav-item"><a href="#">System Settings</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Workspace -->
+    <main class="workspace">
+      
+      <!-- Top Control Header -->
+      <header class="top-bar">
+        <div class="context-selector">
+          <span class="badge-env production">Production</span>
+          <select class="select-input">
+            <option>Org: Enterprise Financial Mesh</option>
+            <option>Org: Sandbox Testing Environment</option>
+          </select>
+          <select class="select-input">
+            <option>Timeframe: Last 24 Hours</option>
+            <option>Timeframe: Last 1 Hour</option>
+            <option>Timeframe: Real-time (5m)</option>
+          </select>
+        </div>
+
+        <div class="top-actions">
+          <div class="system-health">
+            <span class="pulse-dot"></span>
+            <span>Middleware Mesh Operational</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Main Viewport -->
+      <div class="dashboard-viewport">
+        
+        <!-- Key Metrics Cards -->
+        <section class="metrics-header-grid">
+          
+          <div class="kpi-card">
+            <div class="kpi-title">Middleware Request Volume</div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-requests">2,849,120</span>
+              <span class="kpi-trend positive">+14.2%</span>
+            </div>
+            <div class="kpi-subtext">Intercepted via API proxies</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-title">Evaluated Transaction Value</div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-volume">$14.82M</span>
+              <span class="kpi-trend positive">+8.6%</span>
+            </div>
+            <div class="kpi-subtext">Passed through intelligence layer</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-title">P99 Gateway Latency Overhead</div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" style="color: #60a5fa;">3.4ms</span>
+              <span class="kpi-trend" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;">Optimal</span>
+            </div>
+            <div class="kpi-subtext">KOMNI execution latency</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-title">Policy Interceptions</div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" style="color: var(--status-danger);">1,429</span>
+              <span class="kpi-trend" style="background: var(--status-danger-bg); color: var(--status-danger);">0.05%</span>
+            </div>
+            <div class="kpi-subtext">Fraud/Compliance blocks</div>
+          </div>
+
+        </section>
+
+        <!-- Dynamic Chart & Live Log Terminal -->
+        <section class="telemetry-split">
+          
+          <!-- Throughput Chart -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Throughput & Middleware Traffic Analysis (RPS)</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Avg: 1,240 req/sec</span>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container">
+                <svg class="traffic-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#D83DC2" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#6036E1" stop-opacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  <path class="chart-area" d="M 0 150 L 0 100 Q 60 40 120 80 T 240 60 T 360 90 T 500 30 L 500 150 Z"></path>
+                  <path class="chart-line" d="M 0 100 Q 60 40 120 80 T 240 60 T 360 90 T 500 30"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-time Payload Log Stream -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Real-Time Request Stream</span>
+              <span style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Streaming</span>
+            </div>
+            <div class="panel-body" style="padding: 16px;">
+              <div class="log-stream" id="log-stream-container">
+                <!-- Log rows inserted via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Managed Target Routes Table -->
+        <section class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Managed Gateway Providers & Downstream Routes</span>
+            <button class="select-input btn-premium">+ Add Route Policy</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Route Name</th>
+                <th>Downstream Target</th>
+                <th>Policy Rule Set</th>
+                <th>24h Volume</th>
+                <th>P99 Latency</th>
+                <th>Health Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>/v1/checkout/intent</strong></td>
+                <td style="font-family: var(--font-mono); color: var(--accent-magenta);">stripe_primary_gw</td>
+                <td><span style="color: var(--text-secondary);">AML_Compliance_v4</span></td>
+                <td style="font-family: var(--font-mono); color: var(--text-primary);">$8,420,190.00</td>
+                <td style="font-family: var(--font-mono);">2.8ms</td>
+                <td><span class="badge-status active">Operational</span></td>
+              </tr>
+              <tr>
+                <td><strong>/v1/settlements/direct</strong></td>
+                <td style="font-family: var(--font-mono); color: var(--accent-magenta);">ach_network_bridge</td>
+                <td><span style="color: var(--text-secondary);">Velocity_Limits_v2</span></td>
+                <td style="font-family: var(--font-mono); color: var(--text-primary);">$4,102,000.00</td>
+                <td style="font-family: var(--font-mono);">4.1ms</td>
+                <td><span class="badge-status active">Operational</span></td>
+              </tr>
+              <tr>
+                <td><strong>/v1/payouts/crypto</strong></td>
+                <td style="font-family: var(--font-mono); color: var(--accent-magenta);">polygon_usdc_node</td>
+                <td><span style="color: var(--text-secondary);">NonCustodial_Sanctions</span></td>
+                <td style="font-family: var(--font-mono); color: var(--text-primary);">$2,298,930.00</td>
+                <td style="font-family: var(--font-mono);">5.8ms</td>
+                <td><span class="badge-status degraded">High Load</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // Real-Time Log Simulation Engine
+    const routes = [
+      { method: 'POST', path: '/v1/checkout/intent', status: 200 },
+      { method: 'POST', path: '/v1/settlements/direct', status: 200 },
+      { method: 'GET', path: '/v1/policy/evaluate', status: 200 },
+      { method: 'POST', path: '/v1/payouts/crypto', status: 201 },
+      { method: 'POST', path: '/v1/checkout/intent', status: 403 }
+    ];
+
+    const container = document.getElementById('log-stream-container');
+
+    function appendLog() {
+      const route = routes[Math.floor(Math.random() * routes.length)];
+      const latency = (Math.random() * 4 + 1.2).toFixed(1);
+      
+      const row = document.createElement('div');
+      row.className = 'log-row';
+      
+      const methodClass = route.method === 'POST' ? 'method-post' : 'method-get';
+      const statusColor = route.status === 403 ? '#ef4444' : '#8A8A8A';
+
+      row.innerHTML = `
+        <span class="log-method ${methodClass}">${route.method}</span>
+        <span class="log-path">${route.path}</span>
+        <span class="log-latency" style="color:${statusColor}">${route.status} | ${latency}ms</span>
+      `;
+
+      container.insertBefore(row, container.firstChild);
+
+      if (container.children.length > 6) {
+        container.removeChild(container.lastChild);
+      }
+    }
+
+    setInterval(appendLog, 1400);
+    appendLog();
+    appendLog();
+    appendLog();
+  </script>
+</body>
+</html>
