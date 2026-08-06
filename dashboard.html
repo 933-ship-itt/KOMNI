@@ -85,6 +85,12 @@
       display: flex;
       width: 100vw;
       height: 100vh;
+      transition: filter 0.4s var(--ease-expensive);
+    }
+
+    .app-container.blur-dashboard {
+      filter: blur(10px) opacity(0.3);
+      pointer-events: none;
     }
 
     /* Sidebar Navigation */
@@ -384,22 +390,6 @@
       position: relative;
     }
 
-    svg.traffic-chart {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
-
-    .chart-line {
-      fill: none;
-      stroke: var(--accent-magenta);
-      stroke-width: 2.5;
-    }
-
-    .chart-area {
-      fill: url(#chartGradient);
-    }
-
     .chart-empty {
       height: 100%;
       display: flex;
@@ -514,12 +504,6 @@
       color: var(--status-success);
       border: 1px solid rgba(34, 197, 94, 0.2);
     }
-
-    .badge-status.degraded {
-      background-color: var(--status-warning-bg);
-      color: var(--status-warning);
-      border: 1px solid rgba(250, 204, 21, 0.2);
-    }
     
     .btn-premium {
       background: var(--logo-gradient);
@@ -527,6 +511,11 @@
       color: #ffffff;
       font-weight: 600;
       box-shadow: 0 0 15px rgba(96, 54, 225, 0.3);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.3s ease;
     }
     .btn-premium:hover, .btn-premium:focus {
       background: var(--logo-gradient);
@@ -534,11 +523,322 @@
       box-shadow: 0 0 25px rgba(216, 61, 194, 0.6);
       transform: translateY(-1px);
     }
+
+    /* ==========================================================================
+       4. FULL SCREEN INITIALIZATION & ONBOARDING SETUP WIZARD
+       ========================================================================== */
+    .wizard-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 20%, #150a36 0%, #020205 80%);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transition: opacity 0.5s var(--ease-expensive), visibility 0.5s ease;
+    }
+
+    .wizard-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .wizard-container {
+      width: 100%;
+      max-width: 680px;
+      background-color: rgba(10, 8, 20, 0.85);
+      border: 1px solid var(--border-strong);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(96, 54, 225, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: wizardFadeIn 0.5s var(--ease-expensive);
+    }
+
+    @keyframes wizardFadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .wizard-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .wizard-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .wizard-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-primary);
+    }
+
+    .wizard-steps-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-element);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    .step-dot.active {
+      background: var(--accent-violet);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(96, 54, 225, 0.6);
+    }
+
+    .step-dot.completed {
+      background: var(--status-success-bg);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: var(--status-success);
+    }
+
+    .wizard-body {
+      padding: 32px;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .wizard-step {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      height: 100%;
+      animation: stepSlide 0.3s ease-out;
+    }
+
+    .wizard-step.active {
+      display: flex;
+    }
+
+    @keyframes stepSlide {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .step-heading {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .step-description {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Option Grid Cards */
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .option-card {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      transition: all 0.3s var(--ease-expensive);
+    }
+
+    .option-card:hover:not(.disabled) {
+      border-color: var(--border-strong);
+      background-color: var(--bg-element);
+      transform: translateY(-2px);
+    }
+
+    .option-card.selected {
+      border-color: var(--accent-violet);
+      background-color: rgba(96, 54, 225, 0.08);
+      box-shadow: 0 0 20px rgba(96, 54, 225, 0.2);
+    }
+
+    .option-card.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      border-style: dashed;
+    }
+
+    .option-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .option-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .badge-coming-soon {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+
+    .badge-available {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      background: var(--status-success-bg);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: var(--status-success);
+    }
+
+    .option-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Form Field Design */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+
+    .form-input {
+      background-color: #030308;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-violet);
+      box-shadow: 0 0 15px rgba(96, 54, 225, 0.3);
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Wizard Action Bar */
+    .wizard-footer {
+      padding: 20px 32px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      background-color: var(--bg-element);
+    }
+
+    .btn-primary {
+      background: var(--logo-gradient);
+      border: none;
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+      box-shadow: 0 0 15px rgba(96, 54, 225, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 0 25px rgba(216, 61, 194, 0.6);
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
+  <!-- App Container (Blurred until setup wizard completes) -->
+  <div class="app-container blur-dashboard" id="main-app">
     
     <!-- Navigation Sidebar -->
     <aside class="sidebar">
@@ -590,9 +890,10 @@
 
         <div class="top-actions">
           <div class="system-health">
-            <span class="pulse-dot" style="background-color: var(--text-muted); box-shadow: none;"></span>
-            <span>Awaiting interception feed</span>
+            <span class="pulse-dot" id="system-status-dot" style="background-color: var(--status-warning); box-shadow: 0 0 12px var(--status-warning);"></span>
+            <span id="system-status-text">Awaiting payment provider initialization</span>
           </div>
+          <button class="select-input btn-premium" onclick="reopenWizard()" style="font-size: 11px; padding: 6px 12px;">+ Reconfigure Node</button>
         </div>
       </header>
 
@@ -651,7 +952,7 @@
             </div>
             <div class="panel-body">
               <div class="chart-container">
-                <div class="chart-empty">Awaiting interception data</div>
+                <div class="chart-empty" id="chart-state">Awaiting interception data</div>
               </div>
             </div>
           </div>
@@ -692,7 +993,7 @@
                 <th>Health Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="routes-table-body">
               <tr>
                 <td><strong>—</strong></td>
                 <td style="font-family: var(--font-mono); color: var(--text-muted);">—</td>
@@ -726,15 +1027,292 @@
 
   </div>
 
-  <script>
-    // Placeholder stream until interception scripts are wired in.
-    const container = document.getElementById('log-stream-container');
+  <!-- ==========================================================================
+       5. FULL SCREEN INITIALIZATION SETUP WIZARD (MODAL OVERLAY)
+       ========================================================================== -->
+  <div class="wizard-overlay" id="setup-wizard">
+    <div class="wizard-container">
+      
+      <!-- Wizard Top Header -->
+      <div class="wizard-header">
+        <div class="wizard-brand">
+          <span class="brand-logo">KOMNI</span>
+          <span class="wizard-title">— Middleware Setup Wizard</span>
+        </div>
+        <div class="wizard-steps-indicator">
+          <div class="step-dot active" id="dot-1">1</div>
+          <div class="step-dot" id="dot-2">2</div>
+          <div class="step-dot" id="dot-3">3</div>
+        </div>
+      </div>
 
+      <!-- Wizard Step Content Container -->
+      <div class="wizard-body">
+        
+        <!-- STEP 1: Choose Processor -->
+        <div class="wizard-step active" id="wizard-step-1">
+          <div>
+            <h2 class="step-heading">Connect Payment Processor</h2>
+            <p class="step-description">Select your payment infrastructure provider to route middleware traffic through KOMNI.</p>
+          </div>
+
+          <div class="option-grid">
+            <!-- Stripe Option (Active) -->
+            <div class="option-card selected" onclick="selectProcessor(this, 'stripe')">
+              <div class="option-header">
+                <span class="option-title">Stripe</span>
+                <span class="badge-available">Available</span>
+              </div>
+              <p class="option-desc">Connect Stripe API keys to intercept charges, subscriptions, and Webhook events.</p>
+            </div>
+
+            <!-- PayPal Option (Disabled) -->
+            <div class="option-card disabled">
+              <div class="option-header">
+                <span class="option-title">PayPal</span>
+                <span class="badge-coming-soon">Coming Soon</span>
+              </div>
+              <p class="option-desc">RestAPI & Commerce Platform integration for express checkout routing.</p>
+            </div>
+
+            <!-- Paystack Option (Disabled) -->
+            <div class="option-card disabled">
+              <div class="option-header">
+                <span class="option-title">Paystack</span>
+                <span class="badge-coming-soon">Coming Soon</span>
+              </div>
+              <p class="option-desc">African digital commerce payment gateway & split settlement rules.</p>
+            </div>
+
+            <!-- Square Option (Disabled) -->
+            <div class="option-card disabled">
+              <div class="option-header">
+                <span class="option-title">Square</span>
+                <span class="badge-coming-soon">Coming Soon</span>
+              </div>
+              <p class="option-desc">POS & Online Payment SDK middleware synchronization.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Import Mode (Individual vs Catalogue) -->
+        <div class="wizard-step" id="wizard-step-2">
+          <div>
+            <h2 class="step-heading">Select Stripe Import Scope</h2>
+            <p class="step-description">Choose how you want to expose Stripe assets to the KOMNI financial routing mesh.</p>
+          </div>
+
+          <div class="option-grid">
+            <!-- Individual Product Option -->
+            <div class="option-card selected" onclick="selectImportMode(this, 'individual')">
+              <div class="option-header">
+                <span class="option-title">Individual Product Scope</span>
+                <span class="badge-available">Targeted</span>
+              </div>
+              <p class="option-desc">Connect a specific Stripe Product ID to monitor localized transaction volume and policy rules.</p>
+            </div>
+
+            <!-- Entire Catalogue Option -->
+            <div class="option-card" onclick="selectImportMode(this, 'catalogue')">
+              <div class="option-header">
+                <span class="option-title">Full Catalogue Sync</span>
+                <span class="badge-available">Full Access</span>
+              </div>
+              <p class="option-desc">Sync all active products, price objects, and subscription tiers automatically.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: API Credentials & Configuration -->
+        <div class="wizard-step" id="wizard-step-3">
+          <div>
+            <h2 class="step-heading">Configure API Integration Keys</h2>
+            <p class="step-description" id="step-3-desc">Provide your Secret Key and target identifiers to finish initial setup.</p>
+          </div>
+
+          <form id="wizard-form" style="display: flex; flex-direction: column; gap: 16px; margin-top: 8px;" onsubmit="handleWizardFinish(event)">
+            <div class="form-group">
+              <label class="form-label" for="stripe-sk">Stripe Secret API Key (Required)</label>
+              <input type="password" id="stripe-sk" class="form-input" placeholder="sk_test_... or sk_live_..." required>
+              <span class="form-hint">Used to establish authenticated RPC telemetry connection with Stripe.</span>
+            </div>
+
+            <div class="form-group" id="product-id-group">
+              <label class="form-label" for="stripe-prod-id">Stripe Product ID (Required for Single Scope)</label>
+              <input type="text" id="stripe-prod-id" class="form-input" placeholder="prod_..." required>
+              <span class="form-hint">Target product identifier to isolate policy checks against.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="stripe-whsec">Webhook Endpoint Secret (Optional)</label>
+              <input type="text" id="stripe-whsec" class="form-input" placeholder="whsec_...">
+              <span class="form-hint">Enables signature verification for real-time live request feeds.</span>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Wizard Footer Action Buttons -->
+      <div class="wizard-footer">
+        <button class="btn-secondary" id="btn-back" onclick="previousStep()" style="visibility: hidden;">Back</button>
+        <button class="btn-primary" id="btn-next" onclick="nextStep()">Continue &rarr;</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       6. INTERACTION & STEPPER JAVASCRIPT
+       ========================================================================== -->
+  <script>
+    let currentStep = 1;
+    let selectedProcessor = 'stripe';
+    let selectedImportMode = 'individual';
+
+    function selectProcessor(element, provider) {
+      if (provider !== 'stripe') return;
+      document.querySelectorAll('#wizard-step-1 .option-card').forEach(c => c.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedProcessor = provider;
+    }
+
+    function selectImportMode(element, mode) {
+      document.querySelectorAll('#wizard-step-2 .option-card').forEach(c => c.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedImportMode = mode;
+      
+      // Update Step 3 inputs dynamically based on selection
+      const prodGroup = document.getElementById('product-id-group');
+      const prodInput = document.getElementById('stripe-prod-id');
+      const step3Desc = document.getElementById('step-3-desc');
+
+      if (mode === 'catalogue') {
+        prodGroup.style.display = 'none';
+        prodInput.removeAttribute('required');
+        step3Desc.textContent = 'Provide your Secret Key to sync your complete catalog and pricing structures.';
+      } else {
+        prodGroup.style.display = 'flex';
+        prodInput.setAttribute('required', 'true');
+        step3Desc.textContent = 'Provide your Secret Key and target Product ID to isolate telemetry for that item.';
+      }
+    }
+
+    function updateStepUI() {
+      // Toggle steps
+      document.querySelectorAll('.wizard-step').forEach((step, idx) => {
+        if (idx + 1 === currentStep) {
+          step.classList.add('active');
+        } else {
+          step.classList.remove('active');
+        }
+      });
+
+      // Update Header Dot Indicators
+      for (let i = 1; i <= 3; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i === currentStep) {
+          dot.className = 'step-dot active';
+        } else if (i < currentStep) {
+          dot.className = 'step-dot completed';
+          dot.innerHTML = '✓';
+        } else {
+          dot.className = 'step-dot';
+          dot.innerHTML = i;
+        }
+      }
+
+      // Back Button state
+      const btnBack = document.getElementById('btn-back');
+      if (currentStep > 1) {
+        btnBack.style.visibility = 'visible';
+      } else {
+        btnBack.style.visibility = 'hidden';
+      }
+
+      // Next Button Label state
+      const btnNext = document.getElementById('btn-next');
+      if (currentStep === 3) {
+        btnNext.innerHTML = 'Initialize Dashboard &rarr;';
+      } else {
+        btnNext.innerHTML = 'Continue &rarr;';
+      }
+    }
+
+    function nextStep() {
+      if (currentStep === 3) {
+        // Validate form before submitting
+        const form = document.getElementById('wizard-form');
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+        finishSetup();
+        return;
+      }
+      currentStep++;
+      updateStepUI();
+    }
+
+    function previousStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepUI();
+      }
+    }
+
+    function finishSetup() {
+      const sk = document.getElementById('stripe-sk').value;
+      const prodId = document.getElementById('stripe-prod-id').value;
+
+      // Hide wizard overlay with smooth blur removal transition
+      document.getElementById('setup-wizard').classList.add('hidden');
+      document.getElementById('main-app').classList.remove('blur-dashboard');
+
+      // Update Dashboard UI Elements to reflect connection state
+      document.getElementById('system-status-dot').style.backgroundColor = 'var(--status-success)';
+      document.getElementById('system-status-dot').style.boxShadow = '0 0 12px var(--status-success)';
+      document.getElementById('system-status-text').textContent = `Connected: Stripe (${selectedImportMode === 'individual' ? 'Single Product: ' + prodId : 'Full Catalogue Scope'})`;
+
+      const routesTable = document.getElementById('routes-table-body');
+      routesTable.innerHTML = `
+        <tr>
+          <td><strong>Stripe Gateway Mesh (${selectedImportMode.toUpperCase()})</strong></td>
+          <td style="font-family: var(--font-mono); color: #a78bfa;">https://api.stripe.com/v1</td>
+          <td><span style="color: var(--text-primary);">Active Middleware Intercept</span></td>
+          <td style="font-family: var(--font-mono); color: var(--text-primary);">$0.00</td>
+          <td style="font-family: var(--font-mono);">12ms</td>
+          <td><span class="badge-status active">Connected</span></td>
+        </tr>
+      `;
+
+      // Update real-time log terminal container placeholder
+      const container = document.getElementById('log-stream-container');
+      if (container) {
+        container.innerHTML = `
+          <div class="log-row">
+            <span class="log-method method-post">INIT</span>
+            <span class="log-path">Stripe Provider Node Attached (${selectedImportMode})</span>
+            <span class="log-latency" style="color: var(--status-success);">OK | 12ms</span>
+          </div>
+        `;
+      }
+    }
+
+    function reopenWizard() {
+      currentStep = 1;
+      updateStepUI();
+      document.getElementById('main-app').classList.add('blur-dashboard');
+      document.getElementById('setup-wizard').classList.remove('hidden');
+    }
+
+    // Default stream container placeholder on launch
+    const container = document.getElementById('log-stream-container');
     if (container) {
       container.innerHTML = `
         <div class="log-row">
           <span class="log-method method-get">N/A</span>
-          <span class="log-path">No interception events yet</span>
+          <span class="log-path">No interception events yet — complete wizard setup</span>
           <span class="log-latency" style="color: var(--text-muted);">0 | 0ms</span>
         </div>
       `;
