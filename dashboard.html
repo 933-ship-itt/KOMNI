@@ -57,19 +57,6 @@
       scrollbar-color: var(--accent-violet) #000000;
     }
 
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #000000;
-      border-left: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent-violet) 0%, var(--accent-magenta) 100%);
-      border-radius: 3px;
-    }
-
     body {
       background-color: var(--bg-root);
       color: var(--text-primary);
@@ -303,23 +290,15 @@
       border: 1px solid rgba(34, 197, 94, 0.35);
     }
 
-    .select-input {
-      background-color: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      padding: 7px 12px;
+    .ik-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: rgba(96, 54, 225, 0.15);
+      border: 1px solid rgba(96, 54, 225, 0.4);
+      color: #b794f4;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 12px;
-      font-family: var(--font-sans);
-      outline: none;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .select-input:hover, .select-input:focus {
-      border-color: var(--border-strong);
-      color: var(--text-primary);
-      background-color: var(--bg-element);
+      letter-spacing: 0.5px;
     }
 
     .top-actions {
@@ -347,7 +326,6 @@
       background-color: var(--status-success);
       border-radius: 50%;
       box-shadow: 0 0 10px var(--status-success);
-      transition: all 0.3s ease;
     }
 
     .pulse-dot.offline {
@@ -363,7 +341,7 @@
     }
 
     .view-section {
-      display: none; /* Controlled by JS */
+      display: none; 
       flex-direction: column;
       gap: 20px;
       animation: fadeTab 0.3s ease forwards;
@@ -379,7 +357,7 @@
     }
 
     /* ==========================================================================
-       3. METRICS AND TELEMETRY PANELS (OVERVIEW TAB)
+       3. METRICS PANELS (OVERVIEW TAB)
        ========================================================================== */
     .metrics-header-grid {
       display: grid;
@@ -465,13 +443,6 @@
       color: var(--text-muted);
     }
 
-    /* Analytics Chart & Real-Time Stream Split */
-    .telemetry-split {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 16px;
-    }
-
     .panel {
       background-color: var(--bg-panel);
       border: 1px solid var(--border-color);
@@ -479,11 +450,6 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transition: border-color 0.25s ease;
-    }
-    
-    .panel:hover {
-      border-color: var(--border-strong);
     }
 
     .panel-header {
@@ -511,188 +477,57 @@
       flex: 1;
     }
 
-    /* Chart Area */
-    .chart-container {
-      width: 100%;
-      height: 200px;
-      position: relative;
-    }
-
-    svg.traffic-chart {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
-
-    .chart-line {
-      fill: none;
-      stroke: var(--accent-magenta);
-      stroke-width: 2.5;
-      transition: d 0.4s ease;
-      filter: drop-shadow(0 0 8px var(--accent-magenta-glow));
-    }
-
-    .chart-area {
-      fill: url(#chartGradient);
-      transition: d 0.4s ease;
-    }
-
-    /* Real-Time Live Stream Feed Terminal */
-    .log-stream {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      max-height: 200px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .log-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      animation: fadeIn 0.25s ease;
-    }
-
-    .log-row:hover {
-      border-color: rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-3px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .log-method {
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 9px;
-      letter-spacing: 0.5px;
-    }
-
-    .method-post { background: rgba(96, 54, 225, 0.25); color: #b794f4; border: 1px solid rgba(96, 54, 225, 0.4); }
-    .method-get { background: var(--status-success-bg); color: var(--status-success); border: 1px solid rgba(34, 197, 94, 0.3); }
-
-    .log-path {
-      color: var(--text-secondary);
-      flex: 1;
-      margin: 0 10px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .log-latency {
-      color: var(--text-muted);
-      font-size: 10px;
-    }
-
-    /* Data Table Section */
-    .data-table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    .data-table th {
-      padding: 12px 20px;
-      color: var(--text-secondary);
-      font-weight: 600;
-      border-bottom: 1px solid var(--border-color);
-      text-transform: uppercase;
-      font-size: 10px;
-      letter-spacing: 1px;
-      background: rgba(0, 0, 0, 0.3);
-    }
-
-    .data-table td {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      font-size: 12px;
-    }
-    
-    .data-table td strong {
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-
-    .data-table tr:hover td {
-      background-color: var(--bg-element);
-      color: var(--text-primary);
-    }
-
-    .badge-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      font-family: var(--font-mono);
-      text-transform: uppercase;
-    }
-
-    .badge-status.active {
-      background-color: var(--status-success-bg);
-      color: var(--status-success);
-      border: 1px solid rgba(34, 197, 94, 0.25);
-    }
-
     /* ==========================================================================
-       4. POLICY ENGINE TAB SPECIFICS
+       4. POLICY ENGINE TAB & STRIPE PRODUCTS
        ========================================================================== */
     .processor-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
-      margin-top: 10px;
     }
 
-    .processor-card {
+    .product-card {
       border: 1px solid var(--border-color);
       background: rgba(0,0,0,0.4);
       padding: 20px;
       border-radius: 8px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 14px;
-      cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
       overflow: hidden;
     }
 
-    .processor-card.active {
+    .product-card.active-route {
       border-color: var(--accent-violet);
       background: var(--bg-element);
       box-shadow: inset 0 0 20px rgba(96, 54, 225, 0.1);
     }
 
-    .processor-card.disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+    .product-card.active-route::before {
+      content: 'AUTO-ROUTE ACTIVE';
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--accent-violet);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 4px 10px;
+      border-bottom-left-radius: 6px;
     }
 
-    .proc-icon {
-      width: 40px;
-      height: 40px;
+    .prod-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .prod-icon {
+      width: 36px;
+      height: 36px;
       border-radius: 8px;
       background: var(--bg-panel);
       border: 1px solid var(--border-strong);
@@ -700,49 +535,107 @@
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 18px;
+      font-size: 16px;
       color: var(--text-primary);
     }
 
-    .processor-card.active .proc-icon {
+    .product-card.active-route .prod-icon {
       background: var(--accent-violet);
       border-color: var(--accent-magenta);
       box-shadow: 0 0 15px var(--accent-violet-glow);
     }
 
-    .proc-details {
+    .prod-details {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    .proc-details strong { color: var(--text-primary); font-size: 14px; font-weight: 600; }
-    .proc-details span { color: var(--text-secondary); font-size: 11px; }
+    .prod-details strong { color: var(--text-primary); font-size: 14px; font-weight: 600; }
+    .prod-details span { color: var(--text-secondary); font-size: 11px; font-family: var(--font-mono); }
 
-    .proc-status {
-      margin-left: auto;
-      font-size: 10px;
-      background: var(--status-success-bg);
-      color: var(--status-success);
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+    .prod-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: rgba(255,255,255,0.02);
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 10px;
+    .meta-row span:first-child { color: var(--text-muted); }
+    .meta-row span:last-child { color: var(--text-secondary); font-family: var(--font-mono); }
+
+    .btn-route {
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      padding: 8px 0;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-route:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .btn-premium {
+      background: var(--logo-gradient);
+      border: none;
+      color: #ffffff;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--accent-violet-glow);
+      transition: all 0.2s ease;
+    }
+    
+    .btn-premium:hover {
+      box-shadow: 0 0 25px var(--accent-magenta-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      width: 440px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     }
 
     .input-group {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      margin-bottom: 16px;
     }
 
     .input-group label {
@@ -757,67 +650,14 @@
       background: rgba(0,0,0,0.6);
       border: 1px solid var(--border-strong);
       color: var(--text-primary);
-      padding: 14px 16px;
+      padding: 12px 16px;
       border-radius: 8px;
-      font-family: var(--font-mono);
+      font-family: var(--font-sans);
       font-size: 13px;
       outline: none;
-      transition: all 0.2s ease;
       width: 100%;
     }
-
-    .komni-input:focus {
-      border-color: var(--accent-magenta);
-      box-shadow: 0 0 15px rgba(216, 61, 194, 0.15);
-      background: rgba(0,0,0,0.8);
-    }
-
-    .komni-input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .btn-premium {
-      background: var(--logo-gradient);
-      border: none;
-      color: #ffffff;
-      font-weight: 600;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      box-shadow: 0 0 15px var(--accent-violet-glow);
-      transition: all 0.2s ease;
-    }
-    
-    .btn-premium:hover {
-      box-shadow: 0 0 25px var(--accent-magenta-glow);
-      transform: translateY(-1px);
-    }
-
-    /* Modal Scaffolding */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-strong);
-      border-radius: 12px;
-      width: 440px;
-      padding: 24px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    }
+    .komni-input:focus { border-color: var(--accent-magenta); }
   </style>
 </head>
 <body>
@@ -844,24 +684,6 @@
             Overview
           </a>
         </li>
-        <li class="nav-item">
-          <a href="#" onclick="event.preventDefault();">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            API Traffic Mesh
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" onclick="event.preventDefault();">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Payload Audit Logs
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" onclick="event.preventDefault();">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Latency & Performance
-          </a>
-        </li>
       </ul>
 
       <div class="nav-section-title">Intelligence & Policy</div>
@@ -870,40 +692,6 @@
           <a href="#" onclick="event.preventDefault();">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Policy Engine
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" onclick="event.preventDefault();">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            Fraud & Risk Intercepts
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" onclick="event.preventDefault();">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
-            Provider Routing Rules
-          </a>
-        </li>
-      </ul>
-
-      <div class="nav-section-title">Infrastructure</div>
-      <ul class="nav-menu">
-        <li class="nav-item">
-          <a href="#" onclick="event.preventDefault();">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-            Gateway Nodes
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" onclick="event.preventDefault();">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-            API Keys & Hooks
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" onclick="event.preventDefault();">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            System Settings
           </a>
         </li>
       </ul>
@@ -926,20 +714,13 @@
       <header class="top-bar">
         <div class="context-selector">
           <span class="badge-env production">Production</span>
-          <select class="select-input">
-            <option>Org: Enterprise Financial Mesh</option>
-            <option>Org: Sandbox Testing Environment</option>
-          </select>
-          <select class="select-input">
-            <option>Timeframe: Live Polling (3s)</option>
-            <option>Timeframe: Last 24 Hours</option>
-          </select>
+          <span class="ik-badge" id="display-ik-key">IK-KEY: Loading...</span>
         </div>
 
         <div class="top-actions">
           <div class="system-health">
             <span class="pulse-dot" id="system-pulse"></span>
-            <span id="system-status-text">Connecting to Vercel Node...</span>
+            <span id="system-status-text">Connecting to Firebase & Stripe...</span>
           </div>
         </div>
       </header>
@@ -951,129 +732,30 @@
              OVERVIEW TAB
              ======================================================= -->
         <div id="tab-overview" class="view-section active">
-          <!-- Key Metrics Cards -->
           <section class="metrics-header-grid">
             <div class="kpi-card">
               <div class="kpi-title">
-                <span>Middleware Request Volume</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <span>Total Transactions</span>
               </div>
               <div class="kpi-value-row">
                 <span class="kpi-value" id="kpi-requests">0</span>
-                <span class="kpi-trend positive" id="kpi-requests-trend">+100%</span>
               </div>
-              <div class="kpi-subtext" id="kpi-requests-sub">Live middleware requests processed</div>
+              <div class="kpi-subtext">Live payloads synced to Firestore</div>
             </div>
-
             <div class="kpi-card">
               <div class="kpi-title">
-                <span>Evaluated Transaction Value</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span>Evaluated Volume</span>
               </div>
               <div class="kpi-value-row">
                 <span class="kpi-value" id="kpi-volume">$0.00</span>
-                <span class="kpi-trend positive" id="kpi-volume-trend">+100%</span>
               </div>
-              <div class="kpi-subtext" id="kpi-volume-sub">Processed payload USD total</div>
-            </div>
-
-            <div class="kpi-card">
-              <div class="kpi-title">
-                <span>P99 Gateway Latency Overhead</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <div class="kpi-value-row">
-                <span class="kpi-value" id="kpi-latency" style="color: var(--accent-magenta);">0ms</span>
-                <span class="kpi-trend positive" style="background: rgba(96, 54, 225, 0.2); color: #a78bfa;">P99</span>
-              </div>
-              <div class="kpi-subtext">Computed roundtrip delay overhead</div>
-            </div>
-
-            <div class="kpi-card">
-              <div class="kpi-title">
-                <span>Policy Interceptions</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <div class="kpi-value-row">
-                <span class="kpi-value" id="kpi-interceptions">0</span>
-                <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
-              </div>
-              <div class="kpi-subtext">Blocked / Redacted proxy payloads</div>
-            </div>
-          </section>
-
-          <!-- Dynamic Chart & Live Log Terminal -->
-          <section class="telemetry-split">
-            <!-- Throughput Chart -->
-            <div class="panel">
-              <div class="panel-header">
-                <span class="panel-title">Throughput & Middleware Traffic Analysis</span>
-                <span id="chart-avg-rps" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Live Stream</span>
-              </div>
-              <div class="panel-body">
-                <div class="chart-container" id="chart-container">
-                  <svg class="traffic-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#D83DC2" stop-opacity="0.35"/>
-                        <stop offset="100%" stop-color="#D83DC2" stop-opacity="0.0"/>
-                      </linearGradient>
-                    </defs>
-                    <path class="chart-area" id="chart-area-path" d="M 0 150 L 500 150 Z" />
-                    <path class="chart-line" id="chart-line-path" d="M 0 150 L 500 150" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- Real-time Payload Log Stream -->
-            <div class="panel">
-              <div class="panel-header">
-                <span class="panel-title">Real-Time Request Stream</span>
-                <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Syncing</span>
-              </div>
-              <div class="panel-body" style="padding: 14px;">
-                <div class="log-stream" id="log-stream-container">
-                  <div class="log-row">
-                    <span class="log-method method-get">SYNC</span>
-                    <span class="log-path">Polling KOMNI telemetry feed...</span>
-                    <span class="log-latency">--</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Managed Target Routes Table -->
-          <section class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Managed Gateway Providers & Downstream Routes</span>
-              <button class="btn-premium" onclick="openPolicyModal()">+ Add Route Policy</button>
-            </div>
-            <div class="data-table-wrapper">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Route Name</th>
-                    <th>Downstream Target</th>
-                    <th>Policy Rule Set</th>
-                    <th>Volume</th>
-                    <th>P99 Latency</th>
-                    <th>Health Status</th>
-                  </tr>
-                </thead>
-                <tbody id="routes-table-body">
-                  <tr>
-                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading active routes from Vercel interceptor...</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="kpi-subtext">Processed payload USD total</div>
             </div>
           </section>
         </div>
 
         <!-- =======================================================
-             POLICY ENGINE TAB (NEW WIZARD)
+             POLICY ENGINE TAB
              ======================================================= -->
         <div id="tab-policy" class="view-section">
           
@@ -1081,74 +763,17 @@
             <div class="panel-header">
               <span class="panel-title">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Primary Settlement Processor
+                Stripe Products & Active Route Map
               </span>
+              <button class="btn-premium" onclick="openProductModal()">+ Create Stripe Product</button>
             </div>
             <div class="panel-body">
               <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 13px;">
-                Configure how KOMNI routes authorized payloads downstream. The dashboard acts as a seamless processor overlay. Currently locked to Stripe for immediate phase rollout.
+                Select a product below to bind it to your Issuance Key. All incoming requests via your IK-KEY will be automatically re-routed to purchase the active product.
               </p>
               
-              <div class="processor-grid">
-                <!-- Stripe (Active) -->
-                <label class="processor-card active">
-                  <input type="radio" name="gateway_target" value="stripe" checked style="display:none;">
-                  <div class="proc-icon">S</div>
-                  <div class="proc-details">
-                    <strong>Stripe Gateway</strong>
-                    <span>Automatic fiat clearing & routing</span>
-                  </div>
-                  <div class="proc-status">Active</div>
-                </label>
-                
-                <!-- PayPal (Disabled) -->
-                <label class="processor-card disabled">
-                  <input type="radio" name="gateway_target" value="paypal" disabled style="display:none;">
-                  <div class="proc-icon" style="color: #003087;">P</div>
-                  <div class="proc-details">
-                    <strong>PayPal REST API</strong>
-                    <span>Digital wallet settlement</span>
-                  </div>
-                </label>
-
-                <!-- Coinbase (Disabled) -->
-                <label class="processor-card disabled">
-                  <input type="radio" name="gateway_target" value="coinbase" disabled style="display:none;">
-                  <div class="proc-icon" style="color: #0052FF;">C</div>
-                  <div class="proc-details">
-                    <strong>Coinbase Commerce</strong>
-                    <span>USDC Polygon Network</span>
-                  </div>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                Product Intercept Wizard
-              </span>
-            </div>
-            <div class="panel-body">
-              <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 13px;">
-                Bind a processor product ID to the middleware. When payloads hit the interceptor node, they will automatically be re-mapped to this target Product ID for execution.
-              </p>
-              
-              <div class="form-grid">
-                <div class="input-group">
-                  <label>Target Product / Service Name</label>
-                  <input type="text" class="komni-input" id="policy-product-name" placeholder="e.g., Enterprise Nexas Tier">
-                </div>
-                <div class="input-group">
-                  <label>Stripe Product / Price ID</label>
-                  <input type="text" class="komni-input" id="policy-product-id" placeholder="e.g., prod_R9Xw3... or price_1O...">
-                </div>
-              </div>
-
-              <div style="margin-top: 32px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 20px;">
-                <button class="btn-premium" id="btn-deploy-policy" onclick="deployPolicyToInterceptor()">Deploy to interceptor.py</button>
+              <div class="processor-grid" id="stripe-products-container">
+                <p style="color: var(--text-muted); font-size: 12px;">Fetching products from Stripe...</p>
               </div>
             </div>
           </div>
@@ -1160,186 +785,244 @@
 
   </div>
 
-  <!-- Modal Component Scaffold -->
-  <div class="modal-overlay" id="policyModal">
+  <!-- Create Product Modal -->
+  <div class="modal-overlay" id="productModal">
     <div class="modal-card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h3 style="font-size:14px; font-weight:700;">Add Middleware Route Policy</h3>
-        <span style="cursor:pointer; color:var(--text-muted);" onclick="closePolicyModal()">✕</span>
+        <h3 style="font-size:14px; font-weight:700;">Create Native Stripe Product</h3>
+        <span style="cursor:pointer; color:var(--text-muted);" onclick="closeProductModal()">✕</span>
       </div>
-      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Configure rules to route transaction payloads through KOMNI proxy targets.</p>
-      <button class="btn-premium" style="width:100%;" onclick="closePolicyModal()">Save Policy Rule</button>
+      <div class="input-group">
+        <label>Product Name</label>
+        <input type="text" class="komni-input" id="new-prod-name" placeholder="e.g. Enterprise Tier">
+      </div>
+      <div class="input-group">
+        <label>Amount (USD)</label>
+        <input type="number" class="komni-input" id="new-prod-amount" placeholder="e.g. 99.00">
+      </div>
+      <button class="btn-premium" style="width:100%; margin-top: 10px;" id="btn-submit-prod">Create & Sync</button>
     </div>
   </div>
 
-  <script>
-    const INTERCEPTOR_URL = 'https://komni-backend.vercel.app/api/interceptor';
+  <!-- Firebase & Logic Integration -->
+  <script type="module">
+    // 1. Firebase v9 Modular Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 2. Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
+      authDomain: "komni-2439f.firebaseapp.com",
+      projectId: "komni-2439f",
+      storageBucket: "komni-2439f.firebasestorage.app",
+      messagingSenderId: "1005791374529",
+      appId: "1:1005791374529:web:e1735b735f4c8c420eb840",
+      measurementId: "G-SKLPK0NHFZ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 3. Application State (Mocking variables passed from Setup Wizard)
+    const IK_KEY = "IK-LIVE-98f2a1"; 
+    // IMPORTANT: For local development prototyping, insert your testing secret key here.
+    const STRIPE_SECRET_KEY = "sk_test_YOUR_STRIPE_SECRET_KEY"; 
     
-    // Smooth buffer for live visualizer graph
-    let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, trafficVal(0)];
+    let activeRouteId = null;
 
-    function trafficVal(volume) {
-      return Math.min(130, Math.max(10, (volume * 2.5) + 20));
-    }
+    // Make utility functions global for inline HTML onClick handlers
+    window.switchTab = (tabId, element) => {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      if (element) element.classList.add('active');
+    };
 
-    function renderSVGChart(history) {
-      const width = 500;
-      const height = 150;
-      const step = width / (history.length - 1);
+    window.openProductModal = () => document.getElementById('productModal').classList.add('active');
+    window.closeProductModal = () => document.getElementById('productModal').classList.remove('active');
 
-      const points = history.map((val, idx) => {
-        const x = idx * step;
-        const y = height - val;
-        return `${x},${y}`;
-      });
-
-      const lineD = `M ${points.join(' L ')}`;
-      const areaD = `M 0,${height} L ${points.join(' L ')} L ${width},${height} Z`;
-
-      const linePath = document.getElementById('chart-line-path');
-      const areaPath = document.getElementById('chart-area-path');
-
-      if (linePath && areaPath) {
-        linePath.setAttribute('d', lineD);
-        areaPath.setAttribute('d', areaD);
-      }
-    }
-
-    async function fetchTelemetry() {
-      // Only update if overview tab is active (saves browser resources)
-      if (document.getElementById('tab-overview').style.display === 'none') return;
-
-      const pulseDot = document.getElementById('system-pulse');
-      const statusText = document.getElementById('system-status-text');
-
-      try {
-        const response = await fetch(INTERCEPTOR_URL, { method: 'GET' });
-        
-        if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
-        
-        const data = await response.json();
-        
-        pulseDot.classList.remove('offline');
-        statusText.innerText = 'Live Gateway Sync (Active)';
-
-        const metrics = data.metrics || {};
-        document.getElementById('kpi-requests').innerText = (metrics.total_requests || 0).toLocaleString();
-        document.getElementById('kpi-volume').innerText = `$${(metrics.total_volume || 0).toFixed(2)}`;
-        document.getElementById('kpi-latency').innerText = `${metrics.p99_latency_ms || 0}ms`;
-        document.getElementById('kpi-interceptions').innerText = metrics.policy_interceptions || 0;
-
-        const logsContainer = document.getElementById('log-stream-container');
-        if (logsContainer && data.recent_logs && data.recent_logs.length > 0) {
-          logsContainer.innerHTML = data.recent_logs.map(log => `
-            <div class="log-row">
-              <span class="log-method ${log.method === 'POST' ? 'method-post' : 'method-get'}">${log.method}</span>
-              <span class="log-path" title="${log.buyer}">${log.item || log.path} ($${log.amount})</span>
-              <span class="log-latency">${log.latency || '15ms'}</span>
-            </div>
-          `).join('');
-        } else if (logsContainer && (!data.recent_logs || data.recent_logs.length === 0)) {
-          logsContainer.innerHTML = `
-            <div class="log-row">
-              <span class="log-method method-get">IDLE</span>
-              <span class="log-path">Awaiting payment executions from store.html...</span>
-              <span class="log-latency">0ms</span>
-            </div>
-          `;
-        }
-
-        const tableBody = document.getElementById('routes-table-body');
-        if (tableBody && data.routes && data.routes.length > 0) {
-          tableBody.innerHTML = data.routes.map(route => `
-            <tr>
-              <td><strong>${route.name}</strong></td>
-              <td style="font-family: var(--font-mono); color: var(--text-muted);">${route.target}</td>
-              <td><span style="color: var(--accent-magenta); font-family: var(--font-mono);">${route.policy}</span></td>
-              <td style="font-family: var(--font-mono); color: var(--text-primary);">${route.volume}</td>
-              <td style="font-family: var(--font-mono);">${route.latency}</td>
-              <td><span class="badge-status active">● ${route.status}</span></td>
-            </tr>
-          `).join('');
-        }
-
-        trafficHistory.shift();
-        trafficHistory.push(trafficVal(metrics.total_requests || 0));
-        renderSVGChart(trafficHistory);
-
-      } catch (err) {
-        pulseDot.classList.add('offline');
-        statusText.innerText = 'Telemetry Feed Offline';
-        console.warn('KOMNI Polling Error:', err);
-      }
-    }
-
-    // Tab Switching Logic
-    function switchTab(tabId, element) {
-      // Hide all tabs
-      document.querySelectorAll('.view-section').forEach(el => {
-        el.style.display = 'none';
-        el.classList.remove('active');
-      });
-      // Deactivate all nav items
-      document.querySelectorAll('.nav-item').forEach(el => {
-        el.classList.remove('active');
-      });
-
-      // Show selected tab
-      const selectedTab = document.getElementById('tab-' + tabId);
-      if (selectedTab) {
-        selectedTab.style.display = 'flex';
-        selectedTab.classList.add('active');
-      }
+    // 4. Initialize Dashboard
+    async function initDashboard() {
+      document.getElementById('display-ik-key').innerText = `IK-KEY: ${IK_KEY}`;
       
-      // Activate clicked nav item
-      if (element) {
-        element.classList.add('active');
+      // Fetch merchant configurations from Firestore
+      const merchantRef = doc(db, "merchants", IK_KEY);
+      const docSnap = await getDoc(merchantRef);
+      
+      if (docSnap.exists()) {
+        activeRouteId = docSnap.data().active_route_id || null;
+      } else {
+        // Initialize basic merchant document
+        await setDoc(merchantRef, {
+          ik_key: IK_KEY,
+          active_route_id: null,
+          created_at: new Date().toISOString()
+        });
       }
+
+      await fetchAndRenderStripeProducts();
+      startTelemetrySync();
     }
 
-    // Mock Backend Policy Deployment
-    function deployPolicyToInterceptor() {
-      const btn = document.getElementById('btn-deploy-policy');
-      const prodId = document.getElementById('policy-product-id').value;
-      const prodName = document.getElementById('policy-product-name').value;
-
-      if (!prodId) {
-        alert("Please enter a valid Product/Price ID to deploy the intercept route.");
+    // 5. Fetch Products directly from Stripe API & Sync to Firestore
+    async function fetchAndRenderStripeProducts() {
+      if(STRIPE_SECRET_KEY === "sk_test_YOUR_STRIPE_SECRET_KEY") {
+        document.getElementById('stripe-products-container').innerHTML = 
+          `<p style="color: var(--status-danger);">Please insert your actual Stripe Secret Key in the code to fetch products.</p>`;
         return;
       }
 
-      btn.innerText = 'Compiling logic...';
-      btn.style.opacity = '0.7';
+      try {
+        const response = await fetch('https://api.stripe.com/v1/products?active=true', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+
+        const data = await response.json();
+        const products = data.data || [];
+        const container = document.getElementById('stripe-products-container');
+        container.innerHTML = '';
+
+        for (const prod of products) {
+          // Sync each product to Firestore for secondary indexing
+          const prodRef = doc(db, `merchants/${IK_KEY}/products`, prod.id);
+          await setDoc(prodRef, {
+            id: prod.id,
+            name: prod.name,
+            updated_at: new Date().toISOString()
+          }, { merge: true });
+
+          const isActive = prod.id === activeRouteId;
+          
+          const cardHtml = `
+            <div class="product-card ${isActive ? 'active-route' : ''}" id="card-${prod.id}">
+              <div class="prod-header">
+                <div class="prod-icon">${prod.name.charAt(0).toUpperCase()}</div>
+                <div class="prod-details">
+                  <strong>${prod.name}</strong>
+                  <span>ID: ${prod.id}</span>
+                </div>
+              </div>
+              <div class="prod-meta">
+                <div class="meta-row"><span>Type</span><span>Standard Payment</span></div>
+                <div class="meta-row"><span>Livemode</span><span>${prod.livemode}</span></div>
+              </div>
+              <button class="btn-route" onclick="window.setAutoRoute('${prod.id}', '${prod.name}')">
+                ${isActive ? 'Active Route' : 'Auto-Route to this Product'}
+              </button>
+            </div>
+          `;
+          container.insertAdjacentHTML('beforeend', cardHtml);
+        }
+        
+        document.getElementById('system-status-text').innerText = 'Synced with Firebase & Stripe';
+
+      } catch (err) {
+        console.error("Stripe fetch error:", err);
+      }
+    }
+
+    // 6. Set Active Route Policy
+    window.setAutoRoute = async (productId, productName) => {
+      try {
+        const merchantRef = doc(db, "merchants", IK_KEY);
+        await updateDoc(merchantRef, {
+          active_route_id: productId,
+          active_route_name: productName
+        });
+        activeRouteId = productId;
+        await fetchAndRenderStripeProducts(); // Re-render to update UI badges
+      } catch (err) {
+        console.error("Error setting route:", err);
+      }
+    };
+
+    // 7. Create New Stripe Product Directly
+    document.getElementById('btn-submit-prod').addEventListener('click', async () => {
+      const name = document.getElementById('new-prod-name').value;
+      const amount = parseFloat(document.getElementById('new-prod-amount').value);
+      
+      if (!name || isNaN(amount)) return alert("Invalid inputs.");
+
+      const btn = document.getElementById('btn-submit-prod');
+      btn.innerText = "Creating via Stripe...";
       btn.disabled = true;
 
-      setTimeout(() => {
-        btn.innerText = '✓ Deployed to interceptor.py';
-        btn.style.background = 'var(--status-success)';
-        btn.style.opacity = '1';
-        btn.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.4)';
+      try {
+        // 7a. Create Product via Stripe API
+        const prodRes = await fetch('https://api.stripe.com/v1/products', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({ name: name, active: 'true' })
+        });
+        const product = await prodRes.json();
+
+        // 7b. Create associated Price via Stripe API
+        await fetch('https://api.stripe.com/v1/prices', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            product: product.id,
+            unit_amount: amount * 100, // Cents conversion
+            currency: 'usd'
+          })
+        });
+
+        // Clear and close
+        document.getElementById('new-prod-name').value = '';
+        document.getElementById('new-prod-amount').value = '';
+        window.closeProductModal();
         
-        console.log(`[KOMNI-DEPLOY] Injecting rule: If request hits gateway -> Re-route to target Stripe ID: ${prodId} (${prodName})`);
-        
-        setTimeout(() => {
-          btn.innerText = 'Deploy to interceptor.py';
-          btn.style.background = 'var(--logo-gradient)';
-          btn.style.boxShadow = '0 0 15px var(--accent-violet-glow)';
-          btn.disabled = false;
-        }, 4000);
-      }, 1200);
+        // Refresh grid
+        await fetchAndRenderStripeProducts();
+
+      } catch (err) {
+        console.error("Error creating product:", err);
+      } finally {
+        btn.innerText = "Create & Sync";
+        btn.disabled = false;
+      }
+    });
+
+    // 8. Overview Metrics Telemetry Sync
+    function startTelemetrySync() {
+      // For demonstration, simulating live volume metrics that securely save to Firestore
+      let mockRequests = 1042;
+      let mockVolume = 14500.50;
+
+      setInterval(async () => {
+        mockRequests += Math.floor(Math.random() * 3);
+        mockVolume += Math.random() * 50;
+
+        document.getElementById('kpi-requests').innerText = mockRequests.toLocaleString();
+        document.getElementById('kpi-volume').innerText = `$${mockVolume.toFixed(2)}`;
+
+        // Sync live telemetry to Firestore under the IK key mapping
+        const metricsRef = doc(db, `merchants/${IK_KEY}/telemetry`, 'live_metrics');
+        try {
+          await setDoc(metricsRef, {
+            total_requests: mockRequests,
+            total_volume_usd: mockVolume,
+            last_ping: new Date().toISOString()
+          }, { merge: true });
+        } catch (e) {
+          console.error("Firestore telemetry sync failed:", e);
+        }
+      }, 5000); // Sync every 5 seconds
     }
 
-    function openPolicyModal() {
-      document.getElementById('policyModal').classList.add('active');
-    }
-
-    function closePolicyModal() {
-      document.getElementById('policyModal').classList.remove('active');
-    }
-
-    // Initialize telemetry polling cycle
-    fetchTelemetry();
-    setInterval(fetchTelemetry, 3000);
+    // Boot App
+    initDashboard();
   </script>
 </body>
 </html>
