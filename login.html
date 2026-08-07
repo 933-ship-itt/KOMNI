@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOMNI — Premium Access Terminal</title>
+  <meta name="description" content="KOMNI Enterprise Access Node - Authenticate session via Issuance Key.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- GSAP Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    /* ==========================================================================
+       1. SYSTEM VARIABLES & BASE STYLES
+       ========================================================================== */
+    :root {
+      --bg-color: #000000;
+      --text-primary: #FFFFFF;
+      --text-secondary: #8A8A8A;
+      --text-muted: #525252;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      
+      --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
+
+      /* Advert & Login Variables */
+      --bg-black: #030308;
+      --accent-violet: #6036E1;
+      --accent-magenta: #D83DC2;
+      --text-sub: #a1a1aa;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      scrollbar-width: thin;
+      scrollbar-color: #6036E1 #000000;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #000000;
+      border-left: 1px solid rgba(255, 255, 255, 0.03);
+      border-right: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #6036E1 0%, #D83DC2 100%);
+      border-radius: 4px;
+    }
+
+    html, body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* ==========================================================================
+       2. LOGIN VIEWPORT & KINETIC ADVERT STAGE
+       ========================================================================== */
+    .viewport-glow {
+      position: absolute;
+      width: 50vw;
+      height: 50vw;
+      border-radius: 50%;
+      filter: blur(160px);
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-left { top: -20%; left: -10%; background: var(--accent-violet); }
+
+    .app-viewport {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    .advert-side {
+      position: relative;
+      background: radial-gradient(circle at 50% 50%, #0a0618 0%, #020205 100%);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      overflow: hidden;
+    }
+
+    .advert-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 100px;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-pill img {
+      height: 18px;
+      width: auto;
+    }
+
+    .brand-pill span {
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 3px;
+    }
+
+    .sys-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .stage-wrapper {
+      position: relative;
+      flex: 1;
+      margin: 40px 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .advert-frame-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, #0d0722 0%, #030308 100%);
+      overflow: hidden;
+      color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .advert-frame-container canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+    }
+
+    .advert-frame-container .director-ui {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .advert-frame-container .scene-container {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      perspective: 1200px;
+    }
+
+    .advert-frame-container .scene-content {
+      position: absolute;
+      width: 90%;
+      max-width: 900px;
+      text-align: center;
+      top: 50%;
+      left: 50%;
+      opacity: 0;
+      transform: translate3d(-50%, calc(-50% + 40px), -100px) rotateX(-15deg);
+      filter: blur(12px);
+      transition: all 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+      visibility: hidden;
+    }
+
+    .advert-frame-container .scene-content.active {
+      opacity: 1;
+      transform: translate3d(-50%, -50%, 0) rotateX(0deg);
+      filter: blur(0px);
+      visibility: visible;
+    }
+
+    .advert-frame-container .scene-content.exit {
+      opacity: 0;
+      transform: translate3d(-50%, calc(-50% - 40px), 100px) rotateX(15deg);
+      filter: blur(16px);
+      visibility: visible;
+    }
+
+    .advert-frame-container h1 {
+      font-size: clamp(1.8rem, 3vw, 3.2rem);
+      margin: 0;
+      background: var(--logo-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .advert-frame-container p {
+      font-size: clamp(0.85rem, 1vw, 1.05rem);
+      color: var(--text-sub);
+      margin-top: 16px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .advert-frame-container .finale-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
+    .advert-frame-container .finale-stage.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .advert-frame-container .intro-svg {
+      width: 80%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .advert-frame-container .fill-text {
+      font-size: 80px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      fill: url(#svgGradLogin);
+    }
+
+    .advert-frame-container .sub-url-path {
+      font-size: 14px;
+      font-weight: 800;
+      fill: #ffffff;
+      letter-spacing: 0.5em;
+      opacity: 0.8;
+    }
+
+    .advert-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .nav-back-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .nav-back-link:hover {
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       3. ISSUANCE KEY LOGIN TERMINAL & CARDS
+       ========================================================================== */
+    .login-side {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      background: #020205;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: transparent;
+      border: none;
+      position: relative;
+    }
+
+    .brand-header {
+      margin-bottom: 36px;
+      text-align: left;
+    }
+
+    .main-logo-icon {
+      height: 32px;
+      width: auto;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 8px rgba(96, 54, 225, 0.25));
+    }
+
+    .login-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .field-label .label-title {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .field-label .key-type {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      padding: 0 44px 0 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #fff;
+      outline: none;
+      transition: all 0.3s var(--ease-expensive);
+    }
+
+    .input-wrapper input::placeholder {
+      color: var(--text-muted);
+      font-family: var(--font-main);
+    }
+
+    .input-wrapper input:focus {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .key-icon {
+      position: absolute;
+      right: 14px;
+      width: 16px;
+      height: 16px;
+      fill: rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+      transition: fill 0.3s ease;
+    }
+
+    .input-wrapper input:focus ~ .key-icon {
+      fill: rgba(255, 255, 255, 0.5);
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 48px;
+      background: #FFFFFF;
+      border: none;
+      border-radius: 6px;
+      color: #000000;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s var(--ease-expensive);
+    }
+
+    .submit-btn:hover { background: rgba(255, 255, 255, 0.9); }
+    .submit-btn:active { background: rgba(255, 255, 255, 0.8); }
+
+    .security-notice {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+    }
+
+    .security-notice-text {
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .shield-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Dynamic Multi-Step Login Cards */
+    .validation-card, .survey-card, .setup-card {
+      display: none;
+      width: 100%;
+      max-width: 420px;
+      background: transparent;
+      border: none;
+      position: relative;
+    }
+
+    .validation-card.is-active,
+    .survey-card.is-active,
+    .setup-card.is-active {
+      animation: cardLiftIn 0.5s var(--ease-expensive) both;
+    }
+
+    @keyframes cardLiftIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+        filter: blur(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    .auth-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    .auth-status-pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-magenta);
+      box-shadow: 0 0 12px rgba(216, 61, 194, 0.85);
+    }
+
+    .auth-status-pill.is-success {
+      color: #fff;
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .auth-status-pill.is-success::before {
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.95);
+    }
+
+    .auth-status-pill.is-error {
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .auth-status-pill.is-error::before {
+      background: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.95);
+    }
+
+    .terminal-box {
+      background: #030308;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 20px 0;
+      height: 180px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+    
+    .terminal-line {
+      display: block;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .terminal-line.info { color: #8A8A8A; }
+    .terminal-line.success { color: #22c55e; }
+    .terminal-line.error { color: #ef4444; }
+    .terminal-line.accent { color: var(--accent-magenta); }
+
+    /* Custom Radio Buttons */
+    .custom-survey-group { margin-bottom: 20px; }
+    .survey-question {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .survey-options { display: flex; flex-direction: column; gap: 8px; }
+    .survey-option {
+      display: flex;
+      align-items: center;
+      position: relative;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-expensive);
+    }
+    .survey-option:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .survey-option input[type="radio"] { position: absolute; opacity: 0; cursor: pointer; }
+    .option-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .survey-option input[type="radio"]:checked ~ .option-dot {
+      border-color: var(--accent-magenta);
+      box-shadow: 0 0 8px var(--accent-magenta);
+    }
+    .survey-option input[type="radio"]:checked ~ .option-dot::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-magenta);
+    }
+    .option-text { font-size: 12px; color: var(--text-secondary); transition: color 0.3s ease; }
+    .survey-option input[type="radio"]:checked ~ .option-text { color: #fff; font-weight: 500; }
+
+    /* Progress Setup Box */
+    .setup-progress-container { margin: 24px 0; }
+    .progress-bar-wrapper {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--logo-gradient);
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--accent-magenta);
+    }
+    .progress-label-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .progress-status-text { color: var(--text-secondary); }
+    .progress-percentage { color: var(--accent-magenta); font-weight: 600; }
+
+    /* Responsiveness */
+    @media (max-width: 1024px) {
+      .app-viewport { grid-template-columns: 1fr; overflow-y: auto; }
+      .advert-side { display: none; }
+      .login-side { height: 100vh; padding: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    <div class="viewport-glow glow-left"></div>
+    
+    <!-- LEFT SIDE: LIVE KINETIC ADVERT STAGE -->
+    <div class="advert-side">
+      <div class="advert-header">
+        <div class="brand-pill">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Emblem">
+          <span>KOMNI</span>
+        </div>
+        <div class="sys-badge">NODE // LIVE-TERMINAL</div>
+      </div>
+
+      <div class="stage-wrapper">
+        <div class="advert-frame-container">
+          <div class="director-ui">
+            <div class="scene-container">
+              <div class="scene-content active">
+                <h1>KOMNI</h1>
+                <p>Centralized operational governance & payment workflows.</p>
+              </div>
+              <div class="scene-content">
+                <h1>Unified Infrastructure</h1>
+                <p>Connect payment providers with absolute transaction oversight.</p>
+              </div>
+              <div class="scene-content">
+                <h1>Observable Controls</h1>
+                <p>Traceable, structured execution designed for mission-critical operations.</p>
+              </div>
+              <div class="scene-content">
+                <h1>Institutional Resilience</h1>
+                <p>Architected for evolving enterprise requirements & security compliance.</p>
+              </div>
+              <div class="scene-content">
+                <h1>Financial Operations</h1>
+                <p>Bring consistency, speed, and accountability to every workflow.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="finale-stage">
+            <svg class="intro-svg" viewBox="0 0 900 200">
+              <defs>
+                <linearGradient id="svgGradLogin" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#6036E1;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#D83DC2;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="fill-text">KOMNI</text>
+              <text x="50%" y="80%" text-anchor="middle" class="sub-url-path">KOMNI.COM</text>
+            </svg>
+          </div>
+
+          <canvas id="loginAdvertCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="advert-footer">
+        <a href="index.html" class="nav-back-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Main Platform
+        </a>
+        <span>SOC-2 TYPE II ENCRYPTED</span>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: CLEAN ISSUANCE KEY LOGIN TERMINAL -->
+    <div class="login-side">
+      
+      <!-- 1. INITIAL LOGIN CARD -->
+      <div class="login-card" id="loginCard">
+        <div class="brand-header">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
+          <h2 class="login-title">Institutional Sign In</h2>
+          <p class="login-subtitle">Enter your organization's verified Issuance Key to authenticate your access node.</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleAuthSubmit(event);">
+          <div class="form-group">
+            <div class="field-label">
+              <span class="label-title">Enterprise Issuance Key</span>
+              <span class="key-type">HSM / RSA-4096</span>
+            </div>
+            <div class="input-wrapper">
+              <input type="password" id="issuanceKeyInput" placeholder="test OR ik_live_99f38a..." autocomplete="off" spellcheck="false" required>
+              <svg class="key-icon" viewBox="0 0 24 24">
+                <path d="M7 14A5 5 0 0 1 12 9E1 1 0 0 1 13 10V11H17V13H19V15H21V18H18L14.7 14.7A5 5 0 0 1 7 14ZM7 11A3 3 0 1 0 10 14A3 3 0 0 0 7 11Z"/>
+              </svg>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="authBtn">
+            <span>Authenticate Session</span>
+          </button>
+        </form>
+
+        <div class="security-notice">
+          <div class="shield-dot"></div>
+          <div class="security-notice-text">System authorization required. Node session activity is permanently hash-chained.</div>
+        </div>
+      </div>
+
+      <!-- 2. VALIDATION CARD -->
+      <div class="validation-card" id="validationCard">
+        <div class="brand-header">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
+          <h2 class="login-title" id="validationTitle">Verifying Issuance Registry</h2>
+          <p class="login-subtitle">Establishing connection to the secure Firebase gatekeeper...</p>
+          <div class="auth-status-pill" id="validationStatusPill">Awaiting registry handshake</div>
+        </div>
+        
+        <div class="terminal-box" id="validationTerminal"></div>
+
+        <div id="retryButtonContainer" style="display: none; margin-top: 15px;">
+          <button class="submit-btn" onclick="resetLoginCard();">
+            <span>Try Another Key</span>
+          </button>
+        </div>
+
+        <div class="security-notice">
+          <div class="shield-dot"></div>
+          <div class="security-notice-text">Out-of-band HSM verification in progress.</div>
+        </div>
+      </div>
+
+      <!-- 3. SURVEY CARD -->
+      <div class="survey-card" id="surveyCard">
+        <div class="brand-header">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
+          <h2 class="login-title">Configure Client Preferences</h2>
+          <p class="login-subtitle">Key validated. Confirm the issued workspace preferences before the dashboard loads.</p>
+          <div class="auth-status-pill" id="surveyStatusPill">Preference profile required</div>
+        </div>
+
+        <form id="surveyForm" onsubmit="handleSurveySubmit(event);">
+          <div class="custom-survey-group">
+            <span class="survey-question">Preferred Operating Posture</span>
+            <div class="survey-options">
+              <label class="survey-option">
+                <input type="radio" name="govProfile" value="strict" checked>
+                <div class="option-dot"></div>
+                <div class="option-text">Strict issuance controls</div>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="govProfile" value="balanced">
+                <div class="option-dot"></div>
+                <div class="option-text">Balanced operations</div>
+              </label>
+            </div>
+          </div>
+
+          <div class="custom-survey-group">
+            <span class="survey-question">Notification Cadence</span>
+            <div class="survey-options">
+              <label class="survey-option">
+                <input type="radio" name="endpoint" value="email" checked>
+                <div class="option-dot"></div>
+                <div class="option-text">Email summaries</div>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="endpoint" value="console">
+                <div class="option-dot"></div>
+                <div class="option-text">Console-only updates</div>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <span>Finalize Preference Profile</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- 4. SETUP CARD -->
+      <div class="setup-card" id="setupCard">
+        <div class="brand-header">
+          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
+          <h2 class="login-title">Provisioning Issued Workspace</h2>
+          <p class="login-subtitle">Firebase registry verified. Preparing the dashboard shell and neutral telemetry.</p>
+          <div class="auth-status-pill" id="setupStatusPill">Building dashboard shell</div>
+        </div>
+
+        <div class="terminal-box" id="setupTerminal"></div>
+
+        <div class="setup-progress-container">
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill" id="setupProgressBar"></div>
+          </div>
+          <div class="progress-label-group">
+            <span class="progress-status-text" id="setupProgressStatus">Extracting packages...</span>
+            <span class="progress-percentage" id="setupProgressPercentage">0%</span>
+          </div>
+        </div>
+
+        <button class="submit-btn" id="launchDashboardBtn" style="display: none;" onclick="launchDashboard();">
+          <span>Enter Issued Dashboard</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // Live Backend Vercel Endpoint
+    const VERCEL_BACKEND_URL = 'https://komni-backend.vercel.app/api/verify_key';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Background Dynamic Particle Engine
+      class DynamicParticle {
+        constructor(canvasRef) { 
+          this.canvas = canvasRef;
+          this.reset(true); 
+        }
+        reset(init = false) {
+          const w = this.canvas.width || 800;
+          const h = this.canvas.height || 450;
+          this.x = (Math.random() - 0.5) * w * 3;
+          this.y = (Math.random() - 0.5) * h * 3;
+          this.z = init ? Math.random() * 1800 : 1800;
+          this.pz = this.z;
+          this.size = Math.random() * 2 + 1;
+          this.color = Math.random() > 0.4 ? '#6036E1' : '#D83DC2';
+        }
+        update(speed) {
+          this.pz = this.z;
+          this.z -= speed;
+          if (this.z < 1) this.reset();
+        }
+        draw(ctx, speedFactor) {
+          const w = this.canvas.width || 800;
+          const h = this.canvas.height || 450;
+          const s = 600 / this.z;
+          const ps = 600 / this.pz;
+          const x = this.x * s + w / 2;
+          const y = this.y * s + h / 2;
+          const px = this.x * ps + w / 2;
+          const py = this.y * ps + h / 2;
+
+          const alpha = Math.min(0.8, (1800 - this.z) / 1000);
+          if (alpha <= 0.01) return;
+          ctx.strokeStyle = this.color === '#6036E1' ? `rgba(96, 54, 225, ${alpha})` : `rgba(216, 61, 194, ${alpha})`;
+          ctx.lineWidth = this.size * s * (speedFactor * 0.2);
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(px, py);
+          ctx.stroke();
+        }
+      }
+
+      function initAdvertEngine(canvasId, containerSelector) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        
+        const ctx = canvas.getContext('2d');
+        const container = canvas.closest(containerSelector);
+        const scenes = container.querySelectorAll('.scene-content');
+        const finaleStage = container.querySelector('.finale-stage');
+        
+        let width = 0, height = 0, currentScene = 0, frame = 0;
+        const SCENE_DURATION = 160; 
+        let isActive = true;
+        let currentSpeed = 12;
+
+        function resize() {
+          width = canvas.width = container.clientWidth;
+          height = canvas.height = container.clientHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const particles = Array.from({ length: 350 }, () => new DynamicParticle(canvas));
+
+        function cycleScenes() {
+          if (!isActive) return;
+          const current = scenes[currentScene];
+          currentScene = (currentScene + 1) % (scenes.length + 1);
+
+          if (currentScene === scenes.length) {
+            current.classList.remove('active');
+            current.classList.add('exit');
+            finaleStage.classList.add('active');
+            
+            gsap.to({ speed: 12 }, { 
+              speed: 45, 
+              duration: 1.5, 
+              onUpdate: function() { currentSpeed = this.targets()[0].speed; },
+              onComplete: () => {
+                setTimeout(() => {
+                  if (!isActive) return;
+                  finaleStage.classList.remove('active');
+                  gsap.to({ speed: 45 }, { 
+                    speed: 12, 
+                    duration: 1.5, 
+                    onUpdate: function() { currentSpeed = this.targets()[0].speed; } 
+                  });
+                  
+                  scenes.forEach(s => s.classList.remove('active', 'exit'));
+                  currentScene = 0;
+                  scenes[0].classList.add('active');
+                }, 2500);
+              }
+            });
+          } else {
+            const prev = container.querySelector('.scene-content.active');
+            if (prev) {
+              prev.classList.remove('active');
+              prev.classList.add('exit');
+              setTimeout(() => prev.classList.remove('exit'), 1000);
+            }
+            scenes[currentScene].classList.add('active');
+          }
+        }
+
+        function render() {
+          if (!isActive) return;
+          frame++;
+          if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
+            frame = 0;
+            cycleScenes();
+          }
+
+          ctx.fillStyle = 'rgba(3, 3, 8, 0.25)'; 
+          ctx.fillRect(0, 0, width, height);
+
+          ctx.lineCap = 'round';
+          const speedFactor = currentSpeed / 12;
+          particles.forEach(p => {
+            p.update(currentSpeed);
+            p.draw(ctx, speedFactor);
+          });
+
+          requestAnimationFrame(render);
+        }
+
+        render();
+      }
+
+      initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
+    });
+
+    // Integrated Authentication with Vercel Python Backend
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      
+      let rawKey = document.getElementById('issuanceKeyInput').value.trim();
+      if (!rawKey) return;
+
+      // Convenience mapping: convert 'test' to demo test key format
+      let formattedKey = rawKey;
+      if (rawKey.toLowerCase() === 'test') {
+        formattedKey = 'ik_test_demo';
+      } else if (rawKey.toUpperCase().startsWith('IK-')) {
+        // Standardize IK- keys to lower case prefix for backend matching
+        formattedKey = 'ik_' + rawKey.substring(3);
+      }
+
+      document.getElementById('loginCard').style.display = 'none';
+      const valCard = document.getElementById('validationCard');
+      valCard.style.display = 'block';
+      valCard.classList.add('is-active');
+
+      const term = document.getElementById('validationTerminal');
+      const pill = document.getElementById('validationStatusPill');
+      
+      pill.className = 'auth-status-pill';
+      pill.innerText = 'Connecting to Gateway...';
+      document.getElementById('retryButtonContainer').style.display = 'none';
+
+      term.innerHTML = `<span class="terminal-line info">> Initializing HSM Handshake for key: ${rawKey}</span>`;
+
+      try {
+        term.innerHTML += '<span class="terminal-line accent">> Querying Vercel Serverless Backend...</span>';
+        
+        const response = await fetch(VERCEL_BACKEND_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ key: formattedKey })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.valid) {
+          term.innerHTML += `<span class="terminal-line success">> Backend Signature: VERIFIED [200 OK]</span>`;
+          if (data.metadata && data.metadata.owner) {
+            term.innerHTML += `<span class="terminal-line info">> Registered Owner: ${data.metadata.owner}</span>`;
+          }
+          pill.classList.add('is-success');
+          pill.innerText = 'Handshake Complete';
+
+          setTimeout(() => {
+            valCard.style.display = 'none';
+            const surCard = document.getElementById('surveyCard');
+            surCard.style.display = 'block';
+            surCard.classList.add('is-active');
+          }, 1800);
+
+        } else {
+          term.innerHTML += `<span class="terminal-line error">> AUTHENTICATION REJECTED: ${data.reason || 'Invalid Key'}</span>`;
+          pill.classList.add('is-error');
+          pill.innerText = 'Authentication Failed';
+          document.getElementById('retryButtonContainer').style.display = 'block';
+        }
+
+      } catch (err) {
+        term.innerHTML += `<span class="terminal-line error">> NETWORK ERROR: Unable to reach backend gateway.</span>`;
+        pill.classList.add('is-error');
+        pill.innerText = 'Gateway Error';
+        document.getElementById('retryButtonContainer').style.display = 'block';
+      }
+    }
+
+    function resetLoginCard() {
+      document.getElementById('validationCard').style.display = 'none';
+      const loginCard = document.getElementById('loginCard');
+      loginCard.style.display = 'block';
+      document.getElementById('issuanceKeyInput').value = '';
+      document.getElementById('issuanceKeyInput').focus();
+    }
+
+    function handleSurveySubmit(e) {
+      e.preventDefault();
+      document.getElementById('surveyCard').style.display = 'none';
+      const setupCard = document.getElementById('setupCard');
+      setupCard.style.display = 'block';
+      setupCard.classList.add('is-active');
+
+      let progress = 0;
+      const bar = document.getElementById('setupProgressBar');
+      const pct = document.getElementById('setupProgressPercentage');
+      const status = document.getElementById('setupProgressStatus');
+      const term = document.getElementById('setupTerminal');
+
+      term.innerHTML = '<span class="terminal-line info">> Provisioning workspace environment...</span>';
+
+      const interval = setInterval(() => {
+        progress += 10;
+        bar.style.width = progress + '%';
+        pct.innerText = progress + '%';
+
+        if (progress === 40) {
+          status.innerText = 'Binding telemetry sockets...';
+          term.innerHTML += '<span class="terminal-line accent">> Telemetry channel established.</span>';
+        } else if (progress === 80) {
+          status.innerText = 'Applying client preferences...';
+          term.innerHTML += '<span class="terminal-line info">> Governance posture attached.</span>';
+        } else if (progress >= 100) {
+          clearInterval(interval);
+          status.innerText = 'Workspace Ready';
+          term.innerHTML += '<span class="terminal-line success">> Shell compiled successfully.</span>';
+          document.getElementById('launchDashboardBtn').style.display = 'block';
+        }
+      }, 300);
+    }
+
+    function launchDashboard() {
+      window.location.href = 'dashboard.html#issued';
+    }
+  </script>
+</body>
+</html>
