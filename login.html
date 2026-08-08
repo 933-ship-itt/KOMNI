@@ -875,6 +875,21 @@
     // Live Backend Vercel Endpoint
     const VERCEL_BACKEND_URL = 'https://komni-backend.vercel.app/api/verify_key';
 
+    // ===================== FIREBASE CONFIGURATION =====================
+    // Replace with your own Firebase project credentials
+    const firebaseConfig = {
+  apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
+  authDomain: "komni-2439f.firebaseapp.com",
+  projectId: "komni-2439f",
+  storageBucket: "komni-2439f.firebasestorage.app",
+  messagingSenderId: "1005791374529",
+  appId: "1:1005791374529:web:e1735b735f4c8c420eb840",
+  measurementId: "G-SKLPK0NHFZ"
+};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    // =================================================================
+
     document.addEventListener('DOMContentLoaded', () => {
       // Background Dynamic Particle Engine
       class DynamicParticle {
@@ -1060,6 +1075,33 @@
           pill.classList.add('is-success');
           pill.innerText = 'Handshake Complete';
 
+          // ========== SAVE TO FIRESTORE & LOCAL STORAGE ==========
+          try {
+            const userData = {
+              owner: data.metadata.owner || '—',
+              tier: data.metadata.tier || '—',
+              key_type: data.metadata.key_type || '—',
+              status: data.metadata.status || 'active',
+              lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            // Use the formatted key as document ID
+            await db.collection('users').doc(formattedKey).set(userData);
+            // Also store in localStorage for dashboard
+            localStorage.setItem('komni_issuance_key', formattedKey);
+            localStorage.setItem('komni_user_metadata', JSON.stringify(userData));
+          } catch (firestoreError) {
+            console.warn('Firestore write failed, but continuing with localStorage fallback', firestoreError);
+            // Fallback: store only in localStorage
+            localStorage.setItem('komni_issuance_key', formattedKey);
+            localStorage.setItem('komni_user_metadata', JSON.stringify({
+              owner: data.metadata.owner || '—',
+              tier: data.metadata.tier || '—',
+              key_type: data.metadata.key_type || '—',
+              status: data.metadata.status || 'active'
+            }));
+          }
+          // ========================================================
+
           setTimeout(() => {
             valCard.style.display = 'none';
             const surCard = document.getElementById('surveyCard');
@@ -1126,7 +1168,8 @@
     }
 
     function launchDashboard() {
-      window.location.href = 'dashboard.html#issued';
+      // Redirect to dashboard (no hash needed)
+      window.location.href = 'dashboard.html';
     }
   </script>
 </body>
