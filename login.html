@@ -4,907 +4,217 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KOMNI — Premium Access Terminal</title>
-  <meta name="description" content="KOMNI Enterprise Access Node - Authenticate session via Issuance Key.">
-  
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-  <!-- GSAP Animation Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-  <!-- Firebase Compat SDKs -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
-    /* ==========================================================================
-       1. SYSTEM VARIABLES & BASE STYLES
-       ========================================================================== */
-    :root {
-      --bg-color: #000000;
-      --text-primary: #FFFFFF;
-      --text-secondary: #8A8A8A;
-      --text-muted: #525252;
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.18);
-      
-      --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
-      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
-
-      --bg-black: #030308;
-      --accent-violet: #6036E1;
-      --accent-magenta: #D83DC2;
-      --text-sub: #a1a1aa;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      scrollbar-width: thin;
-      scrollbar-color: #6036E1 #000000;
-    }
-
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: #000000;
-      border-left: 1px solid rgba(255, 255, 255, 0.03);
-      border-right: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #6036E1 0%, #D83DC2 100%);
-      border-radius: 4px;
-    }
-
-    html, body {
-      background-color: var(--bg-color);
-      color: var(--text-primary);
-      font-family: var(--font-main);
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    /* ==========================================================================
-       2. LOGIN VIEWPORT & KINETIC ADVERT STAGE
-       ========================================================================== */
-    .viewport-glow {
-      position: absolute;
-      width: 50vw;
-      height: 50vw;
-      border-radius: 50%;
-      filter: blur(160px);
-      opacity: 0.12;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .glow-left { top: -20%; left: -10%; background: var(--accent-violet); }
-
-    .app-viewport {
-      position: relative;
-      z-index: 10;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-    }
-
-    .advert-side {
-      position: relative;
-      background: radial-gradient(circle at 50% 50%, #0a0618 0%, #020205 100%);
-      border-right: 1px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 48px;
-      overflow: hidden;
-    }
-
-    .advert-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 20;
-    }
-
-    .brand-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-subtle);
-      border-radius: 100px;
-      backdrop-filter: blur(10px);
-    }
-
-    .brand-pill img {
-      height: 18px;
-      width: auto;
-    }
-
-    .brand-pill span {
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing: 3px;
-    }
-
-    .sys-badge {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .stage-wrapper {
-      position: relative;
-      flex: 1;
-      margin: 40px 0;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    }
-
-    .advert-frame-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 50%, #0d0722 0%, #030308 100%);
-      overflow: hidden;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
       color: #fff;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .advert-frame-container canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
-      width: 100%;
-      height: 100%;
-    }
-
-    .advert-frame-container .director-ui {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    .advert-frame-container .scene-container {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-      perspective: 1200px;
-    }
-
-    .advert-frame-container .scene-content {
-      position: absolute;
-      width: 90%;
-      max-width: 900px;
-      text-align: center;
-      top: 50%;
-      left: 50%;
-      opacity: 0;
-      transform: translate3d(-50%, calc(-50% + 40px), -100px) rotateX(-15deg);
-      filter: blur(12px);
-      transition: all 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-      visibility: hidden;
-    }
-
-    .advert-frame-container .scene-content.active {
-      opacity: 1;
-      transform: translate3d(-50%, -50%, 0) rotateX(0deg);
-      filter: blur(0px);
-      visibility: visible;
-    }
-
-    .advert-frame-container .scene-content.exit {
-      opacity: 0;
-      transform: translate3d(-50%, calc(-50% - 40px), 100px) rotateX(15deg);
-      filter: blur(16px);
-      visibility: visible;
-    }
-
-    .advert-frame-container h1 {
-      font-size: clamp(1.8rem, 3vw, 3.2rem);
-      margin: 0;
-      background: var(--logo-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-    }
-
-    .advert-frame-container p {
-      font-size: clamp(0.85rem, 1vw, 1.05rem);
-      color: var(--text-sub);
-      margin-top: 16px;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .advert-frame-container .finale-stage {
-      position: absolute;
-      inset: 0;
-      z-index: 20;
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.8s ease;
+      justify-content: center;
     }
-
-    .advert-frame-container .finale-stage.active {
-      opacity: 1;
-      pointer-events: auto;
+    .login-container {
+      max-width: 400px;
+      width: 100%;
+      padding: 40px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
     }
-
-    .advert-frame-container .intro-svg {
-      width: 80%;
-      height: auto;
-      overflow: visible;
-    }
-
-    .advert-frame-container .fill-text {
-      font-size: 80px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      fill: url(#svgGradLogin);
-    }
-
-    .advert-frame-container .sub-url-path {
+    .logo { text-align: center; margin-bottom: 32px; }
+    .logo h1 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #6036E1, #D83DC2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .logo p { color: #8A8A8A; font-size: 14px; margin-top: 8px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: #8A8A8A; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 14px;
-      font-weight: 800;
-      fill: #ffffff;
-      letter-spacing: 0.5em;
-      opacity: 0.8;
-    }
-
-    .advert-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 20;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .nav-back-link {
-      color: var(--text-secondary);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: color 0.3s ease;
-      cursor: pointer;
-    }
-
-    .nav-back-link:hover {
-      color: var(--text-primary);
-    }
-
-    /* ==========================================================================
-       3. ISSUANCE KEY LOGIN TERMINAL
-       ========================================================================== */
-    .login-side {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 60px;
-      background: #020205;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 380px;
-      background: transparent;
-      border: none;
-      position: relative;
-    }
-
-    .brand-header {
-      margin-bottom: 36px;
-      text-align: left;
-    }
-
-    .main-logo-icon {
-      height: 32px;
-      width: auto;
-      margin-bottom: 24px;
-      filter: drop-shadow(0 0 8px rgba(96, 54, 225, 0.25));
-    }
-
-    .login-title {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .login-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-      font-weight: 400;
-      line-height: 1.5;
-    }
-
-    .form-group {
-      margin-bottom: 24px;
-    }
-
-    .field-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .field-label .label-title {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-
-    .field-label .key-type {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 400;
-      color: var(--text-muted);
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-wrapper input {
-      width: 100%;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 6px;
-      padding: 0 44px 0 16px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: #fff;
       outline: none;
-      transition: all 0.3s var(--ease-expensive);
+      transition: border 0.2s;
     }
-
-    .input-wrapper input::placeholder {
-      color: var(--text-muted);
-      font-family: var(--font-main);
-    }
-
-    .input-wrapper input:focus {
-      border-color: rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .key-icon {
-      position: absolute;
-      right: 14px;
-      width: 16px;
-      height: 16px;
-      fill: rgba(255, 255, 255, 0.2);
-      pointer-events: none;
-      transition: fill 0.3s ease;
-    }
-
-    .input-wrapper input:focus ~ .key-icon {
-      fill: rgba(255, 255, 255, 0.5);
-    }
-
-    .submit-btn {
+    input:focus { border-color: rgba(255,255,255,0.2); }
+    button {
       width: 100%;
-      height: 48px;
-      background: #FFFFFF;
+      padding: 14px;
+      background: #fff;
       border: none;
-      border-radius: 6px;
-      color: #000000;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      border-radius: 8px;
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s var(--ease-expensive);
+      transition: opacity 0.2s;
+      margin-top: 8px;
     }
-
-    .submit-btn:hover { background: rgba(255, 255, 255, 0.9); }
-    .submit-btn:active { background: rgba(255, 255, 255, 0.8); }
-    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .security-notice {
-      margin-top: 32px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 11px;
-    }
-
-    .security-notice-text {
-      font-family: var(--font-mono);
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-
-    .shield-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--text-muted);
-      flex-shrink: 0;
-    }
-
-    /* ==========================================================================
-       4. INLINE VALIDATION STATUS
-       ========================================================================== */
-    .validation-status {
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status {
       margin-top: 16px;
-      display: none;
       padding: 12px;
       border-radius: 6px;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border-subtle);
-      font-family: var(--font-mono);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .validation-status.is-visible {
-      display: block;
-    }
-
-    .validation-status .status-line {
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .validation-status .status-line.success { color: #22c55e; }
-    .validation-status .status-line.error { color: #ef4444; }
-    .validation-status .status-line.accent { color: var(--accent-magenta); }
-
-    .retry-button {
-      margin-top: 12px;
+      color: #8A8A8A;
       display: none;
     }
-
-    /* ==========================================================================
-       5. RESPONSIVENESS
-       ========================================================================== */
-    @media (max-width: 1024px) {
-      .app-viewport { grid-template-columns: 1fr; overflow-y: auto; }
-      .advert-side { display: none; }
-      .login-side { height: 100vh; padding: 30px; }
-    }
+    .status.visible { display: block; }
+    .status .success { color: #22c55e; }
+    .status .error { color: #ef4444; }
+    .status .accent { color: #D83DC2; }
+    .retry { margin-top: 12px; display: none; }
+    .retry button { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); }
   </style>
 </head>
 <body>
-
-  <div class="app-viewport">
-    <div class="viewport-glow glow-left"></div>
-    
-    <!-- LEFT SIDE: LIVE KINETIC ADVERT STAGE -->
-    <div class="advert-side">
-      <div class="advert-header">
-        <div class="brand-pill">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Emblem">
-          <span>KOMNI</span>
-        </div>
-        <div class="sys-badge">NODE // LIVE-TERMINAL</div>
-      </div>
-
-      <div class="stage-wrapper">
-        <div class="advert-frame-container">
-          <div class="director-ui">
-            <div class="scene-container">
-              <div class="scene-content active">
-                <h1>KOMNI</h1>
-                <p>Centralized operational governance & payment workflows.</p>
-              </div>
-              <div class="scene-content">
-                <h1>Unified Infrastructure</h1>
-                <p>Connect payment providers with absolute transaction oversight.</p>
-              </div>
-              <div class="scene-content">
-                <h1>Observable Controls</h1>
-                <p>Traceable, structured execution designed for mission-critical operations.</p>
-              </div>
-              <div class="scene-content">
-                <h1>Institutional Resilience</h1>
-                <p>Architected for evolving enterprise requirements & security compliance.</p>
-              </div>
-              <div class="scene-content">
-                <h1>Financial Operations</h1>
-                <p>Bring consistency, speed, and accountability to every workflow.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="finale-stage">
-            <svg class="intro-svg" viewBox="0 0 900 200">
-              <defs>
-                <linearGradient id="svgGradLogin" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color:#6036E1;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#D83DC2;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="fill-text">KOMNI</text>
-              <text x="50%" y="80%" text-anchor="middle" class="sub-url-path">KOMNI.COM</text>
-            </svg>
-          </div>
-
-          <canvas id="loginAdvertCanvas"></canvas>
-        </div>
-      </div>
-
-      <div class="advert-footer">
-        <a href="index.html" class="nav-back-link">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Back to Main Platform
-        </a>
-        <span>SOC-2 TYPE II ENCRYPTED</span>
-      </div>
+  <div class="login-container">
+    <div class="logo">
+      <h1>KOMNI</h1>
+      <p>Institutional Sign In</p>
     </div>
-
-    <!-- RIGHT SIDE: CLEAN ISSUANCE KEY LOGIN TERMINAL -->
-    <div class="login-side">
-      
-      <!-- LOGIN CARD -->
-      <div class="login-card" id="loginCard">
-        <div class="brand-header">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title">Institutional Sign In</h2>
-          <p class="login-subtitle">Enter your organization's verified Issuance Key to authenticate your access node.</p>
-        </div>
-
-        <form id="loginForm" onsubmit="handleAuthSubmit(event);">
-          <div class="form-group">
-            <div class="field-label">
-              <span class="label-title">Enterprise Issuance Key</span>
-              <span class="key-type">HSM / RSA-4096</span>
-            </div>
-            <div class="input-wrapper">
-              <input type="password" id="issuanceKeyInput" placeholder="test OR ik_live_99f38a..." autocomplete="off" spellcheck="false" required>
-              <svg class="key-icon" viewBox="0 0 24 24">
-                <path d="M7 14A5 5 0 0 1 12 9E1 1 0 0 1 13 10V11H17V13H19V15H21V18H18L14.7 14.7A5 5 0 0 1 7 14ZM7 11A3 3 0 1 0 10 14A3 3 0 0 0 7 11Z"/>
-              </svg>
-            </div>
-          </div>
-
-          <button type="submit" class="submit-btn" id="authBtn">
-            <span>Authenticate Session</span>
-          </button>
-        </form>
-
-        <!-- Inline validation status -->
-        <div class="validation-status" id="validationStatus">
-          <span class="status-line" id="statusLine1"></span>
-          <span class="status-line" id="statusLine2"></span>
-          <span class="status-line" id="statusLine3"></span>
-          <div class="retry-button" id="retryButtonContainer">
-            <button class="submit-btn" onclick="resetLoginCard();" style="margin-top:8px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid var(--border-subtle);">
-              <span>Try Another Key</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="security-notice">
-          <div class="shield-dot"></div>
-          <div class="security-notice-text">System authorization required. Node session activity is permanently hash-chained.</div>
-        </div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Enterprise Issuance Key</label>
+        <input type="password" id="issuanceKey" placeholder="test or ik_010101" autocomplete="off" required>
       </div>
-
+      <button type="submit" id="authBtn">Authenticate Session</button>
+    </form>
+    <div class="status" id="status">
+      <span id="statusLine1"></span><br>
+      <span id="statusLine2"></span><br>
+      <span id="statusLine3"></span>
+      <div class="retry" id="retryContainer">
+        <button onclick="resetLogin()">Try Another Key</button>
+      </div>
     </div>
   </div>
 
   <script>
-    // ===================== FIREBASE CONFIGURATION =====================
-    // Replace with your own Firebase project credentials
+    // ========== FIREBASE CONFIG ==========
     const firebaseConfig = {
-  apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
-  authDomain: "komni-2439f.firebaseapp.com",
-  projectId: "komni-2439f",
-  storageBucket: "komni-2439f.firebasestorage.app",
-  messagingSenderId: "1005791374529",
-  appId: "1:1005791374529:web:e1735b735f4c8c420eb840",
-  measurementId: "G-SKLPK0NHFZ"
-};
+      apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
+      authDomain: "komni-2439f.firebaseapp.com",
+      projectId: "komni-2439f",
+      storageBucket: "komni-2439f.firebasestorage.app",
+      messagingSenderId: "1005791374529",
+      appId: "1:1005791374529:web:e1735b735f4c8c420eb840",
+      measurementId: "G-SKLPK0NHFZ"
+    };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    // =================================================================
 
-    const VERCEL_BACKEND_URL = 'https://komni-backend.vercel.app/api/verify_key';
+    const VERCEL_BACKEND = 'https://komni-backend.vercel.app/api/verify_key';
 
-    // --- Background Particle Engine (unchanged) ---
-    document.addEventListener('DOMContentLoaded', () => {
-      class DynamicParticle {
-        constructor(canvasRef) { 
-          this.canvas = canvasRef;
-          this.reset(true); 
-        }
-        reset(init = false) {
-          const w = this.canvas.width || 800;
-          const h = this.canvas.height || 450;
-          this.x = (Math.random() - 0.5) * w * 3;
-          this.y = (Math.random() - 0.5) * h * 3;
-          this.z = init ? Math.random() * 1800 : 1800;
-          this.pz = this.z;
-          this.size = Math.random() * 2 + 1;
-          this.color = Math.random() > 0.4 ? '#6036E1' : '#D83DC2';
-        }
-        update(speed) {
-          this.pz = this.z;
-          this.z -= speed;
-          if (this.z < 1) this.reset();
-        }
-        draw(ctx, speedFactor) {
-          const w = this.canvas.width || 800;
-          const h = this.canvas.height || 450;
-          const s = 600 / this.z;
-          const ps = 600 / this.pz;
-          const x = this.x * s + w / 2;
-          const y = this.y * s + h / 2;
-          const px = this.x * ps + w / 2;
-          const py = this.y * ps + h / 2;
-
-          const alpha = Math.min(0.8, (1800 - this.z) / 1000);
-          if (alpha <= 0.01) return;
-          ctx.strokeStyle = this.color === '#6036E1' ? `rgba(96, 54, 225, ${alpha})` : `rgba(216, 61, 194, ${alpha})`;
-          ctx.lineWidth = this.size * s * (speedFactor * 0.2);
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(px, py);
-          ctx.stroke();
-        }
-      }
-
-      function initAdvertEngine(canvasId, containerSelector) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return null;
-        
-        const ctx = canvas.getContext('2d');
-        const container = canvas.closest(containerSelector);
-        const scenes = container.querySelectorAll('.scene-content');
-        const finaleStage = container.querySelector('.finale-stage');
-        
-        let width = 0, height = 0, currentScene = 0, frame = 0;
-        const SCENE_DURATION = 160; 
-        let isActive = true;
-        let currentSpeed = 12;
-
-        function resize() {
-          width = canvas.width = container.clientWidth;
-          height = canvas.height = container.clientHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        const particles = Array.from({ length: 350 }, () => new DynamicParticle(canvas));
-
-        function cycleScenes() {
-          if (!isActive) return;
-          const current = scenes[currentScene];
-          currentScene = (currentScene + 1) % (scenes.length + 1);
-
-          if (currentScene === scenes.length) {
-            current.classList.remove('active');
-            current.classList.add('exit');
-            finaleStage.classList.add('active');
-            
-            gsap.to({ speed: 12 }, { 
-              speed: 45, 
-              duration: 1.5, 
-              onUpdate: function() { currentSpeed = this.targets()[0].speed; },
-              onComplete: () => {
-                setTimeout(() => {
-                  if (!isActive) return;
-                  finaleStage.classList.remove('active');
-                  gsap.to({ speed: 45 }, { 
-                    speed: 12, 
-                    duration: 1.5, 
-                    onUpdate: function() { currentSpeed = this.targets()[0].speed; } 
-                  });
-                  
-                  scenes.forEach(s => s.classList.remove('active', 'exit'));
-                  currentScene = 0;
-                  scenes[0].classList.add('active');
-                }, 2500);
-              }
-            });
-          } else {
-            const prev = container.querySelector('.scene-content.active');
-            if (prev) {
-              prev.classList.remove('active');
-              prev.classList.add('exit');
-              setTimeout(() => prev.classList.remove('exit'), 1000);
-            }
-            scenes[currentScene].classList.add('active');
-          }
-        }
-
-        function render() {
-          if (!isActive) return;
-          frame++;
-          if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
-            frame = 0;
-            cycleScenes();
-          }
-
-          ctx.fillStyle = 'rgba(3, 3, 8, 0.25)'; 
-          ctx.fillRect(0, 0, width, height);
-
-          ctx.lineCap = 'round';
-          const speedFactor = currentSpeed / 12;
-          particles.forEach(p => {
-            p.update(currentSpeed);
-            p.draw(ctx, speedFactor);
-          });
-
-          requestAnimationFrame(render);
-        }
-
-        render();
-      }
-
-      initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
-    });
-
-    // ===================== AUTH HANDLING =====================
-    async function handleAuthSubmit(e) {
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      let rawKey = document.getElementById('issuanceKeyInput').value.trim();
+      const rawKey = document.getElementById('issuanceKey').value.trim();
       if (!rawKey) return;
 
-      // Normalise key
+      // Normalise
       let formattedKey = rawKey;
-      if (rawKey.toLowerCase() === 'test') {
-        formattedKey = 'ik_test_demo';
-      } else if (rawKey.toUpperCase().startsWith('IK-')) {
-        formattedKey = 'ik_' + rawKey.substring(3);
-      }
+      if (rawKey.toLowerCase() === 'test') formattedKey = 'ik_test_demo';
+      else if (rawKey.toUpperCase().startsWith('IK-')) formattedKey = 'ik_' + rawKey.substring(3);
 
       const btn = document.getElementById('authBtn');
-      btn.disabled = true;
-      btn.querySelector('span').textContent = 'Verifying...';
-
-      // Show status area
-      const statusDiv = document.getElementById('validationStatus');
-      statusDiv.classList.add('is-visible');
+      const statusDiv = document.getElementById('status');
       const line1 = document.getElementById('statusLine1');
       const line2 = document.getElementById('statusLine2');
       const line3 = document.getElementById('statusLine3');
-      const retryContainer = document.getElementById('retryButtonContainer');
-      retryContainer.style.display = 'none';
+      const retry = document.getElementById('retryContainer');
 
-      line1.textContent = `> Initializing HSM Handshake for key: ${rawKey}`;
-      line1.className = 'status-line';
-      line2.textContent = '> Querying Vercel Serverless Backend...';
-      line2.className = 'status-line accent';
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+      statusDiv.classList.add('visible');
+      retry.style.display = 'none';
+      line1.textContent = `> Initializing for key: ${rawKey}`;
+      line1.className = '';
+      line2.textContent = '> Contacting Vercel backend...';
+      line2.className = 'accent';
       line3.textContent = '';
 
       try {
-        const response = await fetch(VERCEL_BACKEND_URL, {
+        const resp = await fetch(VERCEL_BACKEND, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: formattedKey })
         });
+        const data = await resp.json();
 
-        const data = await response.json();
-
-        if (response.ok && data.valid) {
-          line2.textContent = '> Backend Signature: VERIFIED [200 OK]';
-          line2.className = 'status-line success';
-          if (data.metadata && data.metadata.owner) {
-            line3.textContent = `> Registered Owner: ${data.metadata.owner}`;
-            line3.className = 'status-line info';
+        if (resp.ok && data.valid) {
+          line2.textContent = '> Signature VERIFIED';
+          line2.className = 'success';
+          if (data.metadata?.owner) {
+            line3.textContent = `> Owner: ${data.metadata.owner}`;
+            line3.className = '';
           }
 
-          // --- Save to Firebase and localStorage ---
-          try {
-            const userData = {
-              owner: data.metadata.owner || '—',
-              tier: data.metadata.tier || '—',
-              key_type: data.metadata.key_type || '—',
-              status: data.metadata.status || 'active',
-              lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            await db.collection('users').doc(formattedKey).set(userData);
-            localStorage.setItem('komni_issuance_key', formattedKey);
-            localStorage.setItem('komni_user_metadata', JSON.stringify(userData));
-          } catch (firestoreError) {
-            console.warn('Firestore write failed, continuing with localStorage fallback', firestoreError);
-            localStorage.setItem('komni_issuance_key', formattedKey);
-            localStorage.setItem('komni_user_metadata', JSON.stringify({
-              owner: data.metadata.owner || '—',
-              tier: data.metadata.tier || '—',
-              key_type: data.metadata.key_type || '—',
-              status: data.metadata.status || 'active'
-            }));
-          }
+          // Save to Firestore & localStorage
+          const userData = {
+            owner: data.metadata?.owner || '—',
+            tier: data.metadata?.tier || '—',
+            key_type: data.metadata?.key_type || '—',
+            status: data.metadata?.status || 'active',
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+          };
+          await db.collection('users').doc(formattedKey).set(userData);
+          localStorage.setItem('komni_issuance_key', formattedKey);
+          localStorage.setItem('komni_user_metadata', JSON.stringify(userData));
 
-          // Update button and redirect after a short delay
-          btn.querySelector('span').textContent = '✔ Authenticated!';
+          btn.textContent = '✔ Authenticated! Redirecting...';
           btn.style.background = '#22c55e';
           btn.style.color = '#fff';
           btn.disabled = true;
 
-          // Redirect to dashboard after 1.5 seconds
           setTimeout(() => {
             window.location.href = 'dashboard.html';
-          }, 1500);
+          }, 1200);
 
         } else {
-          // Authentication failed
-          line2.textContent = `> AUTHENTICATION REJECTED: ${data.reason || 'Invalid Key'}`;
-          line2.className = 'status-line error';
-          line3.textContent = '';
-          btn.querySelector('span').textContent = 'Retry';
+          line2.textContent = `> REJECTED: ${data.reason || 'Invalid key'}`;
+          line2.className = 'error';
+          btn.textContent = 'Retry';
           btn.disabled = false;
           btn.style.background = '#ef4444';
           btn.style.color = '#fff';
-          retryContainer.style.display = 'block';
+          retry.style.display = 'block';
         }
-
       } catch (err) {
-        console.error('Network error:', err);
-        line2.textContent = '> NETWORK ERROR: Unable to reach backend gateway.';
-        line2.className = 'status-line error';
-        line3.textContent = '';
-        btn.querySelector('span').textContent = 'Retry';
+        line2.textContent = '> NETWORK ERROR - check console';
+        line2.className = 'error';
+        btn.textContent = 'Retry';
         btn.disabled = false;
         btn.style.background = '#ef4444';
         btn.style.color = '#fff';
-        retryContainer.style.display = 'block';
+        retry.style.display = 'block';
+        console.error(err);
       }
-    }
+    });
 
-    function resetLoginCard() {
+    function resetLogin() {
       const btn = document.getElementById('authBtn');
       btn.disabled = false;
-      btn.querySelector('span').textContent = 'Authenticate Session';
-      btn.style.background = '#FFFFFF';
-      btn.style.color = '#000000';
-      document.getElementById('validationStatus').classList.remove('is-visible');
-      document.getElementById('issuanceKeyInput').value = '';
-      document.getElementById('issuanceKeyInput').focus();
-      document.getElementById('retryButtonContainer').style.display = 'none';
+      btn.textContent = 'Authenticate Session';
+      btn.style.background = '#fff';
+      btn.style.color = '#000';
+      document.getElementById('status').classList.remove('visible');
+      document.getElementById('issuanceKey').value = '';
+      document.getElementById('issuanceKey').focus();
     }
   </script>
 </body>
