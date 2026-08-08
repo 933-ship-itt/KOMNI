@@ -1,1324 +1,2146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KOMNI — Financial Intelligence & Middleware Console</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Firebase Compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-  <style>
-    /* ==========================================================================
-       1. ENTERPRISE DESIGN SYSTEM VARIABLES & RESET
-       ========================================================================== */
-    :root {
-      --bg-root: #000000;
-      --bg-surface: #030308;
-      --bg-panel: rgba(255, 255, 255, 0.02);
-      --bg-element: rgba(255, 255, 255, 0.04);
-      --bg-hover: rgba(255, 255, 255, 0.06);
-      --bg-active: rgba(255, 255, 255, 0.08);
-
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.18);
-      --border-focus: rgba(96, 54, 225, 0.6);
-
-      --text-primary: #FFFFFF;
-      --text-secondary: #8A8A8A;
-      --text-muted: #525252;
-
-      --accent-violet: #6036E1;
-      --accent-magenta: #D83DC2;
-      --logo-gradient: linear-gradient(135deg, #6036E1 0%, #D83DC2 100%);
-      --accent-violet-glow: rgba(96, 54, 225, 0.25);
-      --accent-magenta-glow: rgba(216, 61, 194, 0.25);
-      
-      --status-success: #22c55e;
-      --status-success-bg: rgba(34, 197, 94, 0.12);
-      --status-warning: #facc15;
-      --status-warning-bg: rgba(250, 204, 21, 0.12);
-      --status-danger: #ef4444;
-      --status-danger-bg: rgba(239, 68, 68, 0.12);
-
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      --font-display: 'Plus Jakarta Sans', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
-      scrollbar-width: thin;
-      scrollbar-color: var(--accent-violet) #000000;
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #000000;
-      border-left: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent-violet) 0%, var(--accent-magenta) 100%);
-      border-radius: 3px;
-    }
-
-    body {
-      background-color: var(--bg-root);
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      font-size: 13px;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-    }
-
-    /* ==========================================================================
-       2. APP LAYOUT STRUCTURE
-       ========================================================================== */
-    .app-container {
-      display: flex;
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-    }
-
-    /* Sidebar Navigation */
-    aside.sidebar {
-      width: 256px;
-      background-color: rgba(3, 3, 8, 0.95);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      z-index: 200;
-      user-select: none;
-    }
-
-    .brand-header {
-      padding: 22px 24px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      background: var(--logo-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 12px var(--accent-violet-glow);
-    }
-
-    .brand-logo {
-      font-family: var(--font-display);
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      background: var(--logo-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .brand-version {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--accent-magenta);
-      background: rgba(216, 61, 194, 0.1);
-      padding: 3px 8px;
-      border-radius: 4px;
-      border: 1px solid rgba(216, 61, 194, 0.25);
-    }
-
-    .nav-section-title {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      padding: 24px 24px 10px;
-    }
-
-    .nav-menu {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      padding: 0 12px;
-    }
-
-    .nav-item a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 9px 12px;
-      color: var(--text-secondary);
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 500;
-      font-size: 12.5px;
-      transition: all 0.2s var(--ease-expensive);
-      cursor: pointer;
-    }
-
-    .nav-item a svg {
-      width: 16px;
-      height: 16px;
-      stroke: var(--text-secondary);
-      transition: stroke 0.2s ease;
-    }
-
-    .nav-item a:hover {
-      background-color: var(--bg-element);
-      color: var(--text-primary);
-    }
-
-    .nav-item a:hover svg {
-      stroke: var(--text-primary);
-    }
-
-    .nav-item.active a {
-      background-color: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: inset 2px 0 0 var(--accent-violet);
-    }
-
-    .nav-item.active a svg {
-      stroke: var(--accent-magenta);
-    }
-
-    .sidebar-footer {
-      margin-top: auto;
-      padding: 16px 20px;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(0, 0, 0, 0.4);
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1f1c2c, #928dab);
-      border: 1px solid var(--border-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 11px;
-    }
-
-    .user-meta {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .user-name {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .user-role {
-      font-size: 10px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-    }
-
-    /* Main Workspace */
-    main.workspace {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: radial-gradient(circle at 50% -20%, #120930 0%, #030308 70%);
-      position: relative;
-    }
-
-    /* Top Utility Header */
-    header.top-bar {
-      height: 60px;
-      background-color: rgba(3, 3, 8, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 28px;
-      z-index: 100;
-    }
-
-    .context-selector {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .badge-env {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-
-    .badge-env.production {
-      background-color: var(--status-success-bg);
-      color: var(--status-success);
-      border: 1px solid rgba(34, 197, 94, 0.35);
-    }
-
-    .select-input {
-      background-color: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      padding: 7px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-family: var(--font-sans);
-      outline: none;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .select-input:hover, .select-input:focus {
-      border-color: var(--border-strong);
-      color: var(--text-primary);
-      background-color: var(--bg-element);
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .system-health {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-secondary);
-      background: rgba(255, 255, 255, 0.02);
-      padding: 6px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border-color);
-    }
-
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      background-color: var(--status-success);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--status-success);
-      transition: all 0.3s ease;
-    }
-
-    .pulse-dot.offline {
-      background-color: var(--status-warning);
-      box-shadow: 0 0 10px var(--status-warning);
-    }
-
-    /* Dashboard View Area & Tab System */
-    .dashboard-viewport {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px;
-      position: relative;
-    }
-
-    .view-section {
-      display: none;
-      flex-direction: column;
-      gap: 20px;
-      animation: fadeView 0.3s ease;
-    }
-
-    .view-section.active {
-      display: flex;
-    }
-
-    @keyframes fadeView {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ==========================================================================
-       3. METRICS AND TELEMETRY PANELS (OVERVIEW TAB)
-       ========================================================================== */
-    .metrics-header-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    .kpi-card {
-      background-color: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: all 0.25s var(--ease-expensive);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .kpi-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: transparent;
-      transition: background 0.3s ease;
-    }
-
-    .kpi-card:hover {
-      border-color: var(--border-strong);
-      background-color: var(--bg-element);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-    }
-
-    .kpi-card:hover::before {
-      background: var(--logo-gradient);
-    }
-
-    .kpi-title {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-secondary);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .kpi-value-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-    }
-
-    .kpi-value {
-      font-size: 26px;
-      font-weight: 500;
-      color: var(--text-primary);
-      letter-spacing: -0.5px;
-      font-family: var(--font-sans);
-    }
-
-    .kpi-trend {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-
-    .kpi-trend.positive {
-      color: var(--status-success);
-      background: var(--status-success-bg);
-    }
-
-    .kpi-subtext {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    /* Analytics Chart & Real-Time Stream Split */
-    .telemetry-split {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 16px;
-    }
-
-    .panel {
-      background-color: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transition: border-color 0.25s ease;
-    }
-    
-    .panel:hover {
-      border-color: var(--border-strong);
-    }
-
-    .panel-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: rgba(0, 0, 0, 0.25);
-    }
-
-    .panel-title {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-transform: uppercase;
-    }
-
-    .panel-body {
-      padding: 20px;
-      flex: 1;
-    }
-
-    /* Chart Area */
-    .chart-container {
-      width: 100%;
-      height: 200px;
-      position: relative;
-    }
-
-    svg.traffic-chart {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
-
-    .chart-line {
-      fill: none;
-      stroke: var(--accent-magenta);
-      stroke-width: 2.5;
-      transition: d 0.4s ease;
-      filter: drop-shadow(0 0 8px var(--accent-magenta-glow));
-    }
-
-    .chart-area {
-      fill: url(#chartGradient);
-      transition: d 0.4s ease;
-    }
-
-    /* Real-Time Live Stream Feed Terminal */
-    .log-stream {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      max-height: 200px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .log-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      animation: fadeIn 0.25s ease;
-    }
-
-    .log-row:hover {
-      border-color: rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-3px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .log-method {
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 9px;
-      letter-spacing: 0.5px;
-    }
-
-    .method-post { background: rgba(96, 54, 225, 0.25); color: #b794f4; border: 1px solid rgba(96, 54, 225, 0.4); }
-    .method-get { background: var(--status-success-bg); color: var(--status-success); border: 1px solid rgba(34, 197, 94, 0.3); }
-
-    .log-path {
-      color: var(--text-secondary);
-      flex: 1;
-      margin: 0 10px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .log-latency {
-      color: var(--text-muted);
-      font-size: 10px;
-    }
-
-    /* Data Table Section */
-    .data-table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    .data-table th {
-      padding: 12px 20px;
-      color: var(--text-secondary);
-      font-weight: 600;
-      border-bottom: 1px solid var(--border-color);
-      text-transform: uppercase;
-      font-size: 10px;
-      letter-spacing: 1px;
-      background: rgba(0, 0, 0, 0.3);
-    }
-
-    .data-table td {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      font-size: 12px;
-    }
-    
-    .data-table td strong {
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-
-    .data-table tr:hover td {
-      background-color: var(--bg-element);
-      color: var(--text-primary);
-    }
-
-    .badge-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      font-family: var(--font-mono);
-      text-transform: uppercase;
-    }
-
-    .badge-status.active {
-      background-color: var(--status-success-bg);
-      color: var(--status-success);
-      border: 1px solid rgba(34, 197, 94, 0.25);
-    }
-
-    /* ==========================================================================
-       4. POLICY GUARD SETUP TAB UI
-       ========================================================================== */
-    .policy-setup-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .setup-input {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      transition: all 0.2s ease;
-    }
-    
-    .setup-input:focus {
-      border-color: var(--border-focus);
-      background: rgba(0, 0, 0, 0.6);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(96, 54, 225, 0.15);
-    }
-
-    .setup-input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .btn-premium {
-      background: var(--logo-gradient);
-      border: none;
-      color: #ffffff;
-      font-weight: 600;
-      padding: 12px 20px;
-      border-radius: 6px;
-      font-size: 13px;
-      cursor: pointer;
-      box-shadow: 0 0 15px var(--accent-violet-glow);
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    
-    .btn-premium:hover {
-      box-shadow: 0 0 25px var(--accent-magenta-glow);
-      transform: translateY(-1px);
-    }
-
-    .secure-note {
-      font-size: 12px;
-      color: var(--status-success);
-      background: var(--status-success-bg);
-      border: 1px solid rgba(34, 197, 94, 0.2);
-      padding: 12px 16px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    
-    .info-card {
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px dashed var(--border-strong);
-      border-radius: 8px;
-      padding: 20px;
-    }
-    
-    .info-card h4 {
-      color: var(--text-primary);
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-    
-    .info-card p {
-      color: var(--text-secondary);
-      font-size: 12px;
-      line-height: 1.6;
-      margin-bottom: 12px;
-    }
-
-    .info-card ul {
-      padding-left: 20px;
-      color: var(--text-secondary);
-      font-size: 12px;
-      line-height: 1.6;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KOMNI — Financial Intelligence & Middleware Console</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ==========================================================================
+           1. ENTERPRISE DESIGN SYSTEM VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --bg-root: #000000;
+            --bg-surface: #030308;
+            --bg-panel: rgba(255, 255, 255, 0.02);
+            --bg-element: rgba(255, 255, 255, 0.04);
+            --bg-hover: rgba(255, 255, 255, 0.06);
+            --bg-active: rgba(255, 255, 255, 0.08);
+
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-strong: rgba(255, 255, 255, 0.18);
+            --border-focus: rgba(96, 54, 225, 0.6);
+
+            --text-primary: #FFFFFF;
+            --text-secondary: #8A8A8A;
+            --text-muted: #525252;
+
+            --accent-violet: #6036E1;
+            --accent-magenta: #D83DC2;
+            --logo-gradient: linear-gradient(135deg, #6036E1 0%, #D83DC2 100%);
+            --accent-violet-glow: rgba(96, 54, 225, 0.25);
+            --accent-magenta-glow: rgba(216, 61, 194, 0.25);
+
+            --status-success: #22c55e;
+            --status-success-bg: rgba(34, 197, 94, 0.12);
+            --status-warning: #facc15;
+            --status-warning-bg: rgba(250, 204, 21, 0.12);
+            --status-danger: #ef4444;
+            --status-danger-bg: rgba(239, 68, 68, 0.12);
+
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-display: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-violet) #000000;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--accent-violet) 0%, var(--accent-magenta) 100%);
+            border-radius: 3px;
+        }
+
+        body {
+            background-color: var(--bg-root);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* ==========================================================================
+           2. APP LAYOUT STRUCTURE
+           ========================================================================== */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar Navigation */
+        aside.sidebar {
+            width: 256px;
+            background-color: rgba(3, 3, 8, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 200;
+            user-select: none;
+        }
+
+        .brand-header {
+            padding: 22px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: var(--logo-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px var(--accent-violet-glow);
+        }
+
+        .brand-logo {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: var(--logo-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-version {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--accent-magenta);
+            background: rgba(216, 61, 194, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(216, 61, 194, 0.25);
+        }
+
+        .nav-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding: 24px 24px 10px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 0 12px;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 12.5px;
+            transition: all 0.2s var(--ease-expensive);
+            cursor: pointer;
+        }
+
+        .nav-item a svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-secondary);
+            transition: stroke 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: var(--bg-element);
+            color: var(--text-primary);
+        }
+
+        .nav-item a:hover svg {
+            stroke: var(--text-primary);
+        }
+
+        .nav-item.active a {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 2px 0 0 var(--accent-violet);
+        }
+
+        .nav-item.active a svg {
+            stroke: var(--accent-magenta);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            border: 1px solid var(--border-strong);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-role {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Main Workspace */
+        main.workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% -20%, #120930 0%, #030308 70%);
+            position: relative;
+        }
+
+        /* Top Utility Header */
+        header.top-bar {
+            height: 60px;
+            background-color: rgba(3, 3, 8, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .context-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge-env {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .badge-env.production {
+            background-color: var(--status-success-bg);
+            color: var(--status-success);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+        }
+
+        .select-input {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: var(--font-sans);
+            outline: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .select-input:hover,
+        .select-input:focus {
+            border-color: var(--border-strong);
+            color: var(--text-primary);
+            background-color: var(--bg-element);
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .system-health {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--status-success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--status-success);
+            transition: all 0.3s ease;
+        }
+
+        .pulse-dot.offline {
+            background-color: var(--status-danger);
+            box-shadow: 0 0 10px var(--status-danger);
+        }
+
+        /* ==========================================================================
+           3. VIEW CONTAINERS (Overview / Policy Workspace)
+           ========================================================================== */
+        .view-container {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .view-container.active {
+            display: flex;
+        }
+
+        /* Dashboard Viewport (Overview) */
+        .dashboard-viewport {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ==========================================================================
+           4. METRICS AND TELEMETRY PANELS (Overview)
+           ========================================================================== */
+        .metrics-header-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.25s var(--ease-expensive);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: transparent;
+            transition: background 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: var(--border-strong);
+            background-color: var(--bg-element);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .kpi-card:hover::before {
+            background: var(--logo-gradient);
+        }
+
+        .kpi-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kpi-value-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+
+        .kpi-value {
+            font-size: 26px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            font-family: var(--font-sans);
+        }
+
+        .kpi-trend {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .kpi-trend.positive {
+            color: var(--status-success);
+            background: var(--status-success-bg);
+        }
+
+        .kpi-subtext {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .telemetry-split {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+        }
+
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: border-color 0.25s ease;
+        }
+
+        .panel:hover {
+            border-color: var(--border-strong);
+        }
+
+        .panel-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.25);
+        }
+
+        .panel-title {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .panel-body {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            position: relative;
+        }
+
+        svg.traffic-chart {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: var(--accent-magenta);
+            stroke-width: 2.5;
+            transition: d 0.4s ease;
+            filter: drop-shadow(0 0 8px var(--accent-magenta-glow));
+        }
+
+        .chart-area {
+            fill: url(#chartGradient);
+            transition: d 0.4s ease;
+        }
+
+        .log-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .log-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .log-row:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-3px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .log-method {
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            letter-spacing: 0.5px;
+        }
+
+        .method-post {
+            background: rgba(96, 54, 225, 0.25);
+            color: #b794f4;
+            border: 1px solid rgba(96, 54, 225, 0.4);
+        }
+        .method-get {
+            background: var(--status-success-bg);
+            color: var(--status-success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .log-path {
+            color: var(--text-secondary);
+            flex: 1;
+            margin: 0 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-latency {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .data-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .data-table th {
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 1px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .data-table td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .data-table td strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .data-table tr:hover td {
+            background-color: var(--bg-element);
+            color: var(--text-primary);
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        .badge-status.active {
+            background-color: var(--status-success-bg);
+            color: var(--status-success);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .badge-status.expired {
+            background-color: var(--status-danger-bg);
+            color: var(--status-danger);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .badge-status.revoked {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-premium {
+            background: var(--logo-gradient);
+            border: none;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            box-shadow: 0 0 12px var(--accent-violet-glow);
+            transition: all 0.2s ease;
+            font-family: var(--font-sans);
+        }
+
+        .btn-premium:hover {
+            box-shadow: 0 0 20px var(--accent-magenta-glow);
+            transform: translateY(-1px);
+        }
+
+        .btn-premium.outline {
+            background: transparent;
+            border: 1px solid var(--border-strong);
+            box-shadow: none;
+            color: var(--text-secondary);
+        }
+
+        .btn-premium.outline:hover {
+            background: var(--bg-element);
+            color: var(--text-primary);
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-premium.small {
+            padding: 4px 10px;
+            font-size: 10px;
+        }
+
+        .btn-premium.danger {
+            background: var(--status-danger);
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-premium.danger:hover {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+
+        /* ==========================================================================
+           5. POLICY WORKSPACE — LEFT / RIGHT SPLIT
+           ========================================================================== */
+        .policy-workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .policy-workspace-header {
+            padding: 16px 28px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            min-height: 60px;
+        }
+
+        .policy-workspace-header .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .policy-workspace-header .breadcrumb span {
+            color: var(--text-secondary);
+        }
+
+        .policy-workspace-header .breadcrumb .current {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .policy-workspace-header .breadcrumb .separator {
+            color: var(--text-muted);
+        }
+
+        .policy-workspace-body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .policy-workspace-body .left-panel {
+            padding: 24px 28px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .policy-workspace-body .right-panel {
+            padding: 24px 28px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ---- API Key Form ---- */
+        .api-key-form {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .api-key-form .form-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .api-key-form .form-title .badge-new {
+            font-size: 9px;
+            text-transform: uppercase;
+            background: var(--accent-violet-glow);
+            color: var(--accent-magenta);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(216, 61, 194, 0.3);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .form-group .form-control {
+            width: 100%;
+            background: var(--bg-root);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: var(--font-sans);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-group .form-control:focus {
+            border-color: var(--accent-violet);
+            box-shadow: 0 0 0 3px var(--accent-violet-glow);
+        }
+
+        .form-group .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding-top: 4px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            text-transform: none;
+            letter-spacing: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-group label input[type="checkbox"] {
+            accent-color: var(--accent-violet);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        /* ---- Generated Key Display ---- */
+        .key-display {
+            background: var(--bg-root);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .key-display.visible {
+            display: flex;
+        }
+
+        .key-display .key-value {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--accent-magenta);
+            letter-spacing: 0.5px;
+            word-break: break-all;
+            flex: 1;
+            margin-right: 12px;
+        }
+
+        .key-display .copy-btn {
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .key-display .copy-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-color: var(--border-strong);
+        }
+
+        /* ---- API Key List ---- */
+        .api-key-list {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .api-key-list .list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .api-key-list .list-header .list-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .api-key-list .list-header .key-count {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .api-key-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .api-key-item:last-child {
+            border-bottom: none;
+        }
+
+        .api-key-item .key-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .api-key-item .key-info .key-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .api-key-item .key-info .key-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .api-key-item .key-info .key-meta .dot {
+            color: var(--text-muted);
+        }
+
+        .api-key-item .key-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .api-key-item .key-actions .badge-status {
+            font-size: 9px;
+            padding: 2px 8px;
+        }
+
+        /* ---- Right Panel: Stripe Overview ---- */
+        .stripe-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .stripe-card .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .stripe-card .card-header .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stripe-card .card-header .stripe-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: var(--status-success-bg);
+            color: var(--status-success);
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stripe-card .card-header .stripe-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--status-success);
+            display: inline-block;
+        }
+
+        .stripe-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .stripe-detail:last-child {
+            border-bottom: none;
+        }
+
+        .stripe-detail .label {
+            color: var(--text-secondary);
+        }
+
+        .stripe-detail .value {
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+
+        /* ---- Other Processors ---- */
+        .processors-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .processors-card .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .processor-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .processor-item:last-child {
+            border-bottom: none;
+        }
+
+        .processor-item .proc-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 11px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .processor-item .proc-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .processor-item .proc-status {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .processor-item .proc-status.coming {
+            color: var(--status-warning);
+            border-color: rgba(250, 204, 21, 0.2);
+            background: var(--status-warning-bg);
+        }
+
+        /* ---- API Usage Stats (right panel) ---- */
+        .usage-stats {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .usage-stats .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .usage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .usage-stat-item {
+            background: var(--bg-root);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .usage-stat-item .stat-number {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+        }
+
+        .usage-stat-item .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* ==========================================================================
+           6. MODAL
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            border-radius: 12px;
+            width: 440px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        /* ==========================================================================
+           7. RESPONSIVE TOUCH-UPS
+           ========================================================================== */
+        @media (max-width: 1200px) {
+            .policy-workspace-body {
+                grid-template-columns: 1fr;
+            }
+            .policy-workspace-body .left-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .metrics-header-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .telemetry-split {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            aside.sidebar {
+                width: 64px;
+            }
+            .brand-logo,
+            .brand-version,
+            .nav-section-title,
+            .nav-item a span,
+            .user-meta {
+                display: none;
+            }
+            .nav-item a {
+                justify-content: center;
+                padding: 12px;
+            }
+            .nav-item a svg {
+                width: 20px;
+                height: 20px;
+            }
+            .brand-header {
+                justify-content: center;
+                padding: 16px;
+            }
+            .sidebar-footer {
+                justify-content: center;
+                padding: 12px;
+            }
+            .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            .metrics-header-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .policy-workspace-body .left-panel,
+            .policy-workspace-body .right-panel {
+                padding: 16px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .top-bar {
+                padding: 0 16px;
+                flex-wrap: wrap;
+                height: auto;
+                min-height: 60px;
+                gap: 8px;
+            }
+            .context-selector {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* ==========================================================================
+           8. UTILITY
+           ========================================================================== */
+        .text-muted {
+            color: var(--text-muted);
+        }
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+        .text-accent {
+            color: var(--accent-magenta);
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-center {
+            align-items: center;
+        }
+        .flex-between {
+            justify-content: space-between;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="app-container">
-    
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <div class="brand-header">
-        <div class="brand-group">
-          <div class="brand-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          </div>
-          <span class="brand-logo">KOMNI</span>
+    <div class="app-container">
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand-header">
+                <div class="brand-group">
+                    <div class="brand-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <span class="brand-logo">KOMNI</span>
+                </div>
+                <span class="brand-version">v2.4-ENT</span>
+            </div>
+
+            <div class="nav-section-title">Telemetry & Routing</div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-view="overview">
+                    <a onclick="switchView('overview')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        <span>Overview</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-view="api-traffic">
+                    <a onclick="switchView('api-traffic')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        <span>API Traffic Mesh</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-view="audit">
+                    <a onclick="switchView('audit')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <span>Payload Audit Logs</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-view="latency">
+                    <a onclick="switchView('latency')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Latency & Performance</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-section-title">Intelligence & Policy</div>
+            <ul class="nav-menu">
+                <li class="nav-item" data-view="policy-engine">
+                    <a onclick="switchView('policy-engine')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span>Policy Engine</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-view="fraud">
+                    <a onclick="switchView('fraud')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <span>Fraud & Risk Intercepts</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-view="routing">
+                    <a onclick="switchView('routing')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+                        <span>Provider Routing Rules</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-section-title">Infrastructure</div>
+            <ul class="nav-menu">
+                <li class="nav-item" data-view="gateway">
+                    <a onclick="switchView('gateway')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                        <span>Gateway Nodes</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-view="api-keys">
+                    <a onclick="switchView('api-keys')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                        <span>API Keys & Hooks</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-view="settings">
+                    <a onclick="switchView('settings')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        <span>System Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">G</div>
+                    <div class="user-meta">
+                        <span class="user-name">Gideon Ops</span>
+                        <span class="user-role">Lead Engineer</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Workspace -->
+        <main class="workspace">
+
+            <!-- Top Control Header -->
+            <header class="top-bar">
+                <div class="context-selector">
+                    <span class="badge-env production">Production</span>
+                    <select class="select-input">
+                        <option>Org: Enterprise Financial Mesh</option>
+                        <option>Org: Sandbox Testing Environment</option>
+                    </select>
+                    <select class="select-input">
+                        <option>Timeframe: Live Polling (3s)</option>
+                        <option>Timeframe: Last 24 Hours</option>
+                    </select>
+                </div>
+
+                <div class="top-actions">
+                    <div class="system-health">
+                        <span class="pulse-dot" id="system-pulse"></span>
+                        <span id="system-status-text">Connecting to Vercel Node...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ======================================================================
+            VIEW: OVERVIEW (default)
+            ====================================================================== -->
+            <div class="view-container active" id="view-overview">
+                <div class="dashboard-viewport">
+
+                    <!-- Key Metrics Cards -->
+                    <section class="metrics-header-grid">
+
+                        <div class="kpi-card">
+                            <div class="kpi-title">
+                                <span>Middleware Request Volume</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            </div>
+                            <div class="kpi-value-row">
+                                <span class="kpi-value" id="kpi-requests">0</span>
+                                <span class="kpi-trend positive" id="kpi-requests-trend">+100%</span>
+                            </div>
+                            <div class="kpi-subtext" id="kpi-requests-sub">Live middleware requests processed</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-title">
+                                <span>Evaluated Transaction Value</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <div class="kpi-value-row">
+                                <span class="kpi-value" id="kpi-volume">$0.00</span>
+                                <span class="kpi-trend positive" id="kpi-volume-trend">+100%</span>
+                            </div>
+                            <div class="kpi-subtext" id="kpi-volume-sub">Processed payload USD total</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-title">
+                                <span>P99 Gateway Latency Overhead</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <div class="kpi-value-row">
+                                <span class="kpi-value" id="kpi-latency" style="color: var(--accent-magenta);">0ms</span>
+                                <span class="kpi-trend positive" style="background: rgba(96, 54, 225, 0.2); color: #a78bfa;">P99</span>
+                            </div>
+                            <div class="kpi-subtext">Computed roundtrip delay overhead</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-title">
+                                <span>Policy Interceptions</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </div>
+                            <div class="kpi-value-row">
+                                <span class="kpi-value" id="kpi-interceptions">0</span>
+                                <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
+                            </div>
+                            <div class="kpi-subtext">Blocked / Redacted proxy payloads</div>
+                        </div>
+
+                    </section>
+
+                    <!-- Dynamic Chart & Live Log Terminal -->
+                    <section class="telemetry-split">
+
+                        <div class="panel">
+                            <div class="panel-header">
+                                <span class="panel-title">Throughput & Middleware Traffic Analysis</span>
+                                <span id="chart-avg-rps" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Live Stream</span>
+                            </div>
+                            <div class="panel-body">
+                                <div class="chart-container" id="chart-container">
+                                    <svg class="traffic-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
+                                        <defs>
+                                            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stop-color="#D83DC2" stop-opacity="0.35"/>
+                                                <stop offset="100%" stop-color="#D83DC2" stop-opacity="0.0"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <path class="chart-area" id="chart-area-path" d="M 0 150 L 500 150 Z" />
+                                        <path class="chart-line" id="chart-line-path" d="M 0 150 L 500 150" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-header">
+                                <span class="panel-title">Real-Time Request Stream</span>
+                                <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Syncing</span>
+                            </div>
+                            <div class="panel-body" style="padding: 14px;">
+                                <div class="log-stream" id="log-stream-container">
+                                    <div class="log-row">
+                                        <span class="log-method method-get">SYNC</span>
+                                        <span class="log-path">Polling KOMNI telemetry feed...</span>
+                                        <span class="log-latency">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <!-- Managed Target Routes Table -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">Managed Gateway Providers & Downstream Routes</span>
+                            <button class="btn-premium" onclick="openPolicyModal()">+ Add Route Policy</button>
+                        </div>
+                        <div class="data-table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Route Name</th>
+                                        <th>Downstream Target</th>
+                                        <th>Policy Rule Set</th>
+                                        <th>Volume</th>
+                                        <th>P99 Latency</th>
+                                        <th>Health Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="routes-table-body">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading active routes from Vercel interceptor...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+            <!-- ======================================================================
+            VIEW: POLICY ENGINE WORKSPACE
+            ====================================================================== -->
+            <div class="view-container" id="view-policy-engine">
+                <div class="policy-workspace">
+
+                    <!-- Workspace Header -->
+                    <div class="policy-workspace-header">
+                        <div class="breadcrumb">
+                            <span>⚙️</span>
+                            <span class="current">Policy Engine</span>
+                            <span class="separator">/</span>
+                            <span>API Key Management</span>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <span style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">v2.4-ENT</span>
+                            <button class="btn-premium small" onclick="switchView('overview')">← Back to Overview</button>
+                        </div>
+                    </div>
+
+                    <!-- Body: Left (API Keys) + Right (Overview) -->
+                    <div class="policy-workspace-body">
+
+                        <!-- LEFT PANEL -->
+                        <div class="left-panel">
+
+                            <!-- Create API Key Form -->
+                            <div class="api-key-form">
+                                <div class="form-title">
+                                    <span>🔑 Create KOMNI Product API Key</span>
+                                    <span class="badge-new">Stripe Connected</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="keyName">Key Name</label>
+                                    <input type="text" class="form-control" id="keyName" placeholder="e.g. Production Payment Gateway" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="keyDesc">Description (optional)</label>
+                                    <input type="text" class="form-control" id="keyDesc" placeholder="What is this key used for?" />
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Permissions</label>
+                                        <div class="checkbox-group">
+                                            <label><input type="checkbox" class="perm-check" value="read" checked /> Read</label>
+                                            <label><input type="checkbox" class="perm-check" value="write" /> Write</label>
+                                            <label><input type="checkbox" class="perm-check" value="admin" /> Admin</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="keyExpiry">Expiration</label>
+                                        <select class="form-control" id="keyExpiry">
+                                            <option value="never">Never</option>
+                                            <option value="30d">30 Days</option>
+                                            <option value="90d">90 Days</option>
+                                            <option value="1y">1 Year</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button class="btn-premium" onclick="generateApiKey()">⚡ Generate Key</button>
+                                    <button class="btn-premium outline" onclick="clearKeyForm()">Clear</button>
+                                </div>
+
+                                <!-- Generated Key Display -->
+                                <div class="key-display" id="keyDisplay">
+                                    <span class="key-value" id="generatedKeyValue">komni_live_xxxxxxxxxxxxx</span>
+                                    <button class="copy-btn" onclick="copyGeneratedKey()">📋 Copy</button>
+                                </div>
+                                <div id="keyGenMessage" style="font-size:11px; color:var(--text-muted); margin-top:8px;"></div>
+                            </div>
+
+                            <!-- Existing API Keys List -->
+                            <div class="api-key-list">
+                                <div class="list-header">
+                                    <span class="list-title">🔐 Existing API Keys</span>
+                                    <span class="key-count" id="keyCountBadge">0 keys</span>
+                                </div>
+                                <div id="apiKeyListContainer">
+                                    <div style="text-align:center; color:var(--text-muted); padding:20px 0; font-size:12px;">
+                                        No API keys created yet. Generate your first key above.
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT PANEL — Overview -->
+                        <div class="right-panel">
+
+                            <!-- Stripe Connection Card -->
+                            <div class="stripe-card">
+                                <div class="card-header">
+                                    <span class="card-title">
+                                        <span>💳</span> Stripe Connection
+                                    </span>
+                                    <span class="stripe-badge">
+                                        <span class="dot"></span> Connected
+                                    </span>
+                                </div>
+                                <div class="stripe-detail">
+                                    <span class="label">Account</span>
+                                    <span class="value">acct_1Lv2pKQzX3kE9F</span>
+                                </div>
+                                <div class="stripe-detail">
+                                    <span class="label">Mode</span>
+                                    <span class="value" style="color:var(--status-success);">Live</span>
+                                </div>
+                                <div class="stripe-detail">
+                                    <span class="label">Connected Since</span>
+                                    <span class="value">January 15, 2026</span>
+                                </div>
+                                <div class="stripe-detail">
+                                    <span class="label">Webhook Endpoint</span>
+                                    <span class="value" style="font-size:10px;">https://api.komni.io/webhook/stripe</span>
+                                </div>
+                                <div style="margin-top:12px; font-size:11px; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:12px;">
+                                    ⚡ All API keys automatically bind to the connected Stripe account for payment processing.
+                                </div>
+                            </div>
+
+                            <!-- Other Processors (Coming Soon) -->
+                            <div class="processors-card">
+                                <div class="card-title">🔌 Other Payment Processors</div>
+                                <div class="processor-item">
+                                    <div class="proc-icon">A</div>
+                                    <span class="proc-name">Adyen</span>
+                                    <span class="proc-status coming">Coming Soon</span>
+                                </div>
+                                <div class="processor-item">
+                                    <div class="proc-icon">C</div>
+                                    <span class="proc-name">Checkout.com</span>
+                                    <span class="proc-status coming">Coming Soon</span>
+                                </div>
+                                <div class="processor-item">
+                                    <div class="proc-icon">B</div>
+                                    <span class="proc-name">Braintree</span>
+                                    <span class="proc-status coming">Coming Soon</span>
+                                </div>
+                                <div style="margin-top:10px; font-size:11px; color:var(--text-muted); padding-top:10px; border-top:1px solid var(--border-color);">
+                                    🚀 Additional processor support is actively in development. <br/>Stripe remains the primary integration for now.
+                                </div>
+                            </div>
+
+                            <!-- API Usage Stats -->
+                            <div class="usage-stats">
+                                <div class="card-title">📊 API Usage Overview</div>
+                                <div class="usage-grid">
+                                    <div class="usage-stat-item">
+                                        <div class="stat-number" id="statTotalKeys">0</div>
+                                        <div class="stat-label">Total Keys</div>
+                                    </div>
+                                    <div class="usage-stat-item">
+                                        <div class="stat-number" id="statActiveKeys" style="color:var(--status-success);">0</div>
+                                        <div class="stat-label">Active</div>
+                                    </div>
+                                    <div class="usage-stat-item">
+                                        <div class="stat-number" id="statRequests" style="color:var(--accent-magenta);">0</div>
+                                        <div class="stat-label">Total Requests</div>
+                                    </div>
+                                    <div class="usage-stat-item">
+                                        <div class="stat-number" id="statVolume" style="color:#a78bfa;">$0</div>
+                                        <div class="stat-label">Processed Volume</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======================================================================
+            PLACEHOLDER VIEWS (other nav items)
+            ====================================================================== -->
+            <div class="view-container" id="view-api-traffic">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;">API Traffic Mesh — Coming Soon</div>
+            </div>
+            <div class="view-container" id="view-audit">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;">Payload Audit Logs — Coming Soon</div>
+            </div>
+            <div class="view-container" id="view-latency">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;">Latency & Performance — Coming Soon</div>
+            </div>
+            <div class="view-container" id="view-fraud">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;">Fraud & Risk Intercepts — Coming Soon</div>
+            </div>
+            <div class="view-container" id="view-routing">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;">Provider Routing Rules — Coming Soon</div>
+            </div>
+            <div class="view-container" id="view-gateway">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;">Gateway Nodes — Coming Soon</div>
+            </div>
+            <div class="view-container" id="view-api-keys">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;">API Keys & Hooks — Coming Soon</div>
+            </div>
+            <div class="view-container" id="view-settings">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;">System Settings — Coming Soon</div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Modal Component Scaffold -->
+    <div class="modal-overlay" id="policyModal">
+        <div class="modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:14px; font-weight:700;">Add Middleware Route Policy</h3>
+                <span style="cursor:pointer; color:var(--text-muted);" onclick="closePolicyModal()">✕</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Configure rules to route transaction payloads through KOMNI proxy targets.</p>
+            <button class="btn-premium" style="width:100%;" onclick="closePolicyModal()">Save Policy Rule</button>
         </div>
-        <span class="brand-version">v2.4-ENT</span>
-      </div>
+    </div>
 
-      <div class="nav-section-title">Telemetry & Routing</div>
-      <ul class="nav-menu">
-        <li class="nav-item active" id="nav-overview">
-          <a onclick="switchTab('overview')">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Overview
-          </a>
-        </li>
-        <li class="nav-item">
-          <a>
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            API Traffic Mesh
-          </a>
-        </li>
-        <li class="nav-item">
-          <a>
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Payload Audit Logs
-          </a>
-        </li>
-        <li class="nav-item">
-          <a>
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Latency & Performance
-          </a>
-        </li>
-      </ul>
+    <script>
+        // ===========================================================================
+        // 1. TELEMETRY POLLING (unchanged)
+        // ===========================================================================
+        const INTERCEPTOR_URL = 'https://komni-backend.vercel.app/api/interceptor';
 
-      <div class="nav-section-title">Intelligence & Policy</div>
-      <ul class="nav-menu">
-        <!-- New Setup Route connected to Policy tab -->
-        <li class="nav-item" id="nav-policy">
-          <a onclick="switchTab('policy')">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Policy Engine (Setup)
-          </a>
-        </li>
-        <li class="nav-item">
-          <a>
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            Fraud & Risk Intercepts
-          </a>
-        </li>
-      </ul>
+        let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, 40];
 
-      <div class="nav-section-title">Infrastructure</div>
-      <ul class="nav-menu">
-        <li class="nav-item">
-          <a>
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-            Gateway Nodes
-          </a>
-        </li>
-        <li class="nav-item">
-          <a>
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            System Settings
-          </a>
-        </li>
-      </ul>
+        function trafficVal(volume) {
+            return Math.min(130, Math.max(10, (volume * 2.5) + 20));
+        }
 
-      <div class="sidebar-footer">
-        <div class="user-profile">
-          <div class="avatar">G</div>
-          <div class="user-meta">
-            <span class="user-name">Gideon Ops</span>
-            <span class="user-role">Lead Engineer</span>
-          </div>
-        </div>
-      </div>
-    </aside>
+        function renderSVGChart(history) {
+            const width = 500;
+            const height = 150;
+            const step = width / (history.length - 1);
+            const points = history.map((val, idx) => {
+                const x = idx * step;
+                const y = height - val;
+                return `${x},${y}`;
+            });
+            const lineD = `M ${points.join(' L ')}`;
+            const areaD = `M 0,${height} L ${points.join(' L ')} L ${width},${height} Z`;
+            const linePath = document.getElementById('chart-line-path');
+            const areaPath = document.getElementById('chart-area-path');
+            if (linePath && areaPath) {
+                linePath.setAttribute('d', lineD);
+                areaPath.setAttribute('d', areaD);
+            }
+        }
 
-    <!-- Main Content Workspace -->
-    <main class="workspace">
-      
-      <!-- Top Control Header -->
-      <header class="top-bar">
-        <div class="context-selector">
-          <span class="badge-env production">Production</span>
-          <select class="select-input">
-            <option>Org: Enterprise Financial Mesh</option>
-            <option>Org: Sandbox Testing Environment</option>
-          </select>
-          <select class="select-input">
-            <option>Timeframe: Live Polling (3s)</option>
-            <option>Timeframe: Last 24 Hours</option>
-          </select>
-        </div>
+        async function fetchTelemetry() {
+            const pulseDot = document.getElementById('system-pulse');
+            const statusText = document.getElementById('system-status-text');
+            try {
+                const response = await fetch(INTERCEPTOR_URL, { method: 'GET' });
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+                const data = await response.json();
 
-        <div class="top-actions">
-          <div class="system-health">
-            <!-- Initially offline waiting for setup -->
-            <span class="pulse-dot offline" id="system-pulse"></span>
-            <span id="system-status-text">Disconnected - Setup Required</span>
-          </div>
-        </div>
-      </header>
+                pulseDot.classList.remove('offline');
+                statusText.innerText = 'Live Gateway Sync (Active)';
 
-      <!-- Dashboard Main Viewport -->
-      <div class="dashboard-viewport">
-        
-        <!-- ========================================== -->
-        <!-- VIEW 1: OVERVIEW METRICS TAB (DEFAULT)     -->
-        <!-- ========================================== -->
-        <div id="view-overview" class="view-section active">
-          
-          <!-- Key Metrics Cards -->
-          <section class="metrics-header-grid">
-            <div class="kpi-card">
-              <div class="kpi-title">
-                <span>Middleware Request Volume</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              </div>
-              <div class="kpi-value-row">
-                <span class="kpi-value" id="kpi-requests">0</span>
-                <span class="kpi-trend positive" id="kpi-requests-trend">+0%</span>
-              </div>
-              <div class="kpi-subtext" id="kpi-requests-sub">Live middleware requests processed</div>
-            </div>
+                const metrics = data.metrics || {};
+                document.getElementById('kpi-requests').innerText = (metrics.total_requests || 0).toLocaleString();
+                document.getElementById('kpi-volume').innerText = `$${(metrics.total_volume || 0).toFixed(2)}`;
+                document.getElementById('kpi-latency').innerText = `${metrics.p99_latency_ms || 0}ms`;
+                document.getElementById('kpi-interceptions').innerText = metrics.policy_interceptions || 0;
 
-            <div class="kpi-card">
-              <div class="kpi-title">
-                <span>Evaluated Transaction Value</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </div>
-              <div class="kpi-value-row">
-                <span class="kpi-value" id="kpi-volume">$0.00</span>
-                <span class="kpi-trend positive" id="kpi-volume-trend">+0%</span>
-              </div>
-              <div class="kpi-subtext" id="kpi-volume-sub">Processed payload USD total</div>
-            </div>
+                const logsContainer = document.getElementById('log-stream-container');
+                if (logsContainer && data.recent_logs && data.recent_logs.length > 0) {
+                    logsContainer.innerHTML = data.recent_logs.map(log => `
+                        <div class="log-row">
+                            <span class="log-method ${log.method === 'POST' ? 'method-post' : 'method-get'}">${log.method}</span>
+                            <span class="log-path" title="${log.buyer}">${log.item || log.path} ($${log.amount})</span>
+                            <span class="log-latency">${log.latency || '15ms'}</span>
+                        </div>
+                    `).join('');
+                } else if (logsContainer && (!data.recent_logs || data.recent_logs.length === 0)) {
+                    logsContainer.innerHTML = `
+                        <div class="log-row">
+                            <span class="log-method method-get">IDLE</span>
+                            <span class="log-path">Awaiting payment executions from store.html...</span>
+                            <span class="log-latency">0ms</span>
+                        </div>
+                    `;
+                }
 
-            <div class="kpi-card">
-              <div class="kpi-title">
-                <span>P99 Gateway Latency Overhead</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <div class="kpi-value-row">
-                <span class="kpi-value" id="kpi-latency" style="color: var(--accent-magenta);">0ms</span>
-                <span class="kpi-trend positive" style="background: rgba(96, 54, 225, 0.2); color: #a78bfa;">P99</span>
-              </div>
-              <div class="kpi-subtext">Computed roundtrip delay overhead</div>
-            </div>
+                const tableBody = document.getElementById('routes-table-body');
+                if (tableBody && data.routes && data.routes.length > 0) {
+                    tableBody.innerHTML = data.routes.map(route => `
+                        <tr>
+                            <td><strong>${route.name}</strong></td>
+                            <td style="font-family: var(--font-mono); color: var(--text-muted);">${route.target}</td>
+                            <td><span style="color: var(--accent-magenta); font-family: var(--font-mono);">${route.policy}</span></td>
+                            <td style="font-family: var(--font-mono); color: var(--text-primary);">${route.volume}</td>
+                            <td style="font-family: var(--font-mono);">${route.latency}</td>
+                            <td><span class="badge-status active">● ${route.status}</span></td>
+                        </tr>
+                    `).join('');
+                }
 
-            <div class="kpi-card">
-              <div class="kpi-title">
-                <span>Policy Interceptions</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <div class="kpi-value-row">
-                <span class="kpi-value" id="kpi-interceptions">0</span>
-                <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
-              </div>
-              <div class="kpi-subtext">Blocked / Redacted proxy payloads</div>
-            </div>
-          </section>
+                trafficHistory.shift();
+                trafficHistory.push(trafficVal(metrics.total_requests || 0));
+                renderSVGChart(trafficHistory);
 
-          <!-- Dynamic Chart & Live Log Terminal -->
-          <section class="telemetry-split">
-            <div class="panel">
-              <div class="panel-header">
-                <span class="panel-title">Throughput & Middleware Traffic Analysis</span>
-                <span id="chart-avg-rps" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Live Stream</span>
-              </div>
-              <div class="panel-body">
-                <div class="chart-container" id="chart-container">
-                  <svg class="traffic-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#D83DC2" stop-opacity="0.35"/>
-                        <stop offset="100%" stop-color="#D83DC2" stop-opacity="0.0"/>
-                      </linearGradient>
-                    </defs>
-                    <path class="chart-area" id="chart-area-path" d="M 0 150 L 500 150 Z" />
-                    <path class="chart-line" id="chart-line-path" d="M 0 150 L 500 150" />
-                  </svg>
+            } catch (err) {
+                pulseDot.classList.add('offline');
+                statusText.innerText = 'Telemetry Feed Offline';
+                console.warn('KOMNI Polling Error:', err);
+            }
+        }
+
+        // ===========================================================================
+        // 2. NAVIGATION: View Switching
+        // ===========================================================================
+        function switchView(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            // Show target view
+            const target = document.getElementById('view-' + viewId);
+            if (target) target.classList.add('active');
+
+            // Update nav active state
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const navItem = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+            if (navItem) navItem.classList.add('active');
+
+            // If switching to policy-engine, refresh stats
+            if (viewId === 'policy-engine') {
+                updateKeyStats();
+            }
+        }
+
+        // ===========================================================================
+        // 3. API KEY MANAGEMENT
+        // ===========================================================================
+        let apiKeys = [];
+        let generatedKey = '';
+
+        function generateApiKey() {
+            const nameInput = document.getElementById('keyName');
+            const descInput = document.getElementById('keyDesc');
+            const expirySelect = document.getElementById('keyExpiry');
+            const perms = Array.from(document.querySelectorAll('.perm-check:checked')).map(cb => cb.value);
+
+            const name = nameInput.value.trim() || 'Unnamed Key';
+            const desc = descInput.value.trim() || 'No description';
+            const expiry = expirySelect.value;
+
+            if (!name) {
+                document.getElementById('keyGenMessage').textContent = '⚠️ Please enter a key name.';
+                return;
+            }
+
+            // Generate a realistic API key
+            const prefix = 'komni_live';
+            const random = Array.from({ length: 24 }, () =>
+                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' [Math.floor(Math.random() * 62)]
+            ).join('');
+            const key = `${prefix}_${random}`;
+            generatedKey = key;
+
+            // Show the key
+            const display = document.getElementById('keyDisplay');
+            document.getElementById('generatedKeyValue').textContent = key;
+            display.classList.add('visible');
+
+            // Save to our "database"
+            const newKey = {
+                id: 'key_' + Date.now(),
+                name: name,
+                description: desc,
+                key: key,
+                permissions: perms,
+                expiry: expiry,
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                lastUsed: new Date().toISOString(),
+            };
+            apiKeys.unshift(newKey);
+            renderKeyList();
+            updateKeyStats();
+
+            document.getElementById('keyGenMessage').textContent =
+                `✅ Key "${name}" generated successfully! Copy it now — it won't be shown again.`;
+            document.getElementById('keyGenMessage').style.color = 'var(--status-success)';
+
+            // Clear form fields (but keep name/desc for convenience)
+            // nameInput.value = '';
+            // descInput.value = '';
+        }
+
+        function copyGeneratedKey() {
+            const keyText = document.getElementById('generatedKeyValue').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(keyText).then(() => {
+                    const msg = document.getElementById('keyGenMessage');
+                    msg.textContent = '📋 Copied to clipboard!';
+                    msg.style.color = 'var(--text-secondary)';
+                    setTimeout(() => {
+                        msg.textContent = '';
+                    }, 2000);
+                }).catch(() => {
+                    fallbackCopy(keyText);
+                });
+            } else {
+                fallbackCopy(keyText);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                const msg = document.getElementById('keyGenMessage');
+                msg.textContent = '📋 Copied to clipboard!';
+                msg.style.color = 'var(--text-secondary)';
+                setTimeout(() => { msg.textContent = ''; }, 2000);
+            } catch (e) {
+                alert('Copy failed. Please select and copy the key manually.');
+            }
+            document.body.removeChild(ta);
+        }
+
+        function clearKeyForm() {
+            document.getElementById('keyName').value = '';
+            document.getElementById('keyDesc').value = '';
+            document.getElementById('keyExpiry').value = 'never';
+            document.querySelectorAll('.perm-check').forEach(cb => cb.checked = false);
+            document.querySelector('.perm-check[value="read"]').checked = true;
+            document.getElementById('keyDisplay').classList.remove('visible');
+            document.getElementById('keyGenMessage').textContent = '';
+        }
+
+        function revokeKey(keyId) {
+            if (!confirm('Revoke this API key? This action cannot be undone.')) return;
+            const key = apiKeys.find(k => k.id === keyId);
+            if (key) {
+                key.status = 'revoked';
+                renderKeyList();
+                updateKeyStats();
+            }
+        }
+
+        function renderKeyList() {
+            const container = document.getElementById('apiKeyListContainer');
+            if (apiKeys.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; color:var(--text-muted); padding:20px 0; font-size:12px;">
+                        No API keys created yet. Generate your first key above.
+                    </div>
+                `;
+                return;
+            }
+            container.innerHTML = apiKeys.map(k => `
+                <div class="api-key-item">
+                    <div class="key-info">
+                        <span class="key-name">${k.name}</span>
+                        <span class="key-meta">
+                            <span>${k.description}</span>
+                            <span class="dot">•</span>
+                            <span>${new Date(k.createdAt).toLocaleDateString()}</span>
+                            <span class="dot">•</span>
+                            <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">${k.key.slice(0,12)}…</span>
+                        </span>
+                    </div>
+                    <div class="key-actions">
+                        <span class="badge-status ${k.status === 'active' ? 'active' : k.status === 'expired' ? 'expired' : 'revoked'}">
+                            ${k.status === 'active' ? '● Active' : k.status === 'expired' ? '● Expired' : '● Revoked'}
+                        </span>
+                        ${k.status === 'active' ? `<button class="btn-premium small danger" onclick="revokeKey('${k.id}')">Revoke</button>` : ''}
+                    </div>
                 </div>
-              </div>
-            </div>
+            `).join('');
+        }
 
-            <div class="panel">
-              <div class="panel-header">
-                <span class="panel-title">Real-Time Request Stream</span>
-                <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-warning); letter-spacing: 1px; text-transform: uppercase;">● Waiting</span>
-              </div>
-              <div class="panel-body" style="padding: 14px;">
-                <div class="log-stream" id="log-stream-container">
-                  <div class="log-row">
-                    <span class="log-method method-get">IDLE</span>
-                    <span class="log-path">Awaiting Policy Guard configuration...</span>
-                    <span class="log-latency">--</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+        function updateKeyStats() {
+            const total = apiKeys.length;
+            const active = apiKeys.filter(k => k.status === 'active').length;
+            document.getElementById('statTotalKeys').textContent = total;
+            document.getElementById('statActiveKeys').textContent = active;
+            document.getElementById('keyCountBadge').textContent = `${total} key${total !== 1 ? 's' : ''}`;
 
-          <!-- Managed Target Routes Table -->
-          <section class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Managed Gateway Providers & Downstream Routes</span>
-            </div>
-            <div class="data-table-wrapper">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Route Name</th>
-                    <th>Downstream Target</th>
-                    <th>Policy Rule Set</th>
-                    <th>Volume</th>
-                    <th>P99 Latency</th>
-                    <th>Health Status</th>
-                  </tr>
-                </thead>
-                <tbody id="routes-table-body">
-                  <tr>
-                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Connection offline. Initialize Policy Guard to load routes.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </div>
+            // Simulate some request/volume data
+            const reqs = total * 1247 + Math.floor(Math.random() * 5000);
+            const vol = (total * 452.30 + Math.random() * 2000).toFixed(2);
+            document.getElementById('statRequests').textContent = reqs.toLocaleString();
+            document.getElementById('statVolume').textContent = `$${vol}`;
+        }
 
+        // ===========================================================================
+        // 4. MODAL
+        // ===========================================================================
+        function openPolicyModal() {
+            document.getElementById('policyModal').classList.add('active');
+        }
 
-        <!-- ========================================== -->
-        <!-- VIEW 2: POLICY GUARD SETUP TAB             -->
-        <!-- ========================================== -->
-        <div id="view-policy" class="view-section">
-          
-          <div style="margin-bottom: 8px;">
-            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 4px;">Policy Engine Configuration</h2>
-            <p style="color: var(--text-secondary); font-size: 13px;">Attach your product logic and payment processor defaults directly to the KOMNI intercept layer.</p>
-          </div>
+        function closePolicyModal() {
+            document.getElementById('policyModal').classList.remove('active');
+        }
 
-          <div class="policy-setup-grid">
-            
-            <!-- Main Configuration Panel -->
-            <div class="panel">
-              <div class="panel-header">
-                <span class="panel-title">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-magenta)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  Processor Authentication
-                </span>
-              </div>
-              <div class="panel-body">
-                
-                <div class="secure-note">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                  <div>
-                    <strong style="display: block; color: var(--text-primary); margin-bottom: 2px;">End-to-End Encrypted</strong>
-                    All entered keys are symmetrically encrypted at rest and securely managed within the KOMNI isolated enterprise zone.
-                  </div>
-                </div>
+        // ===========================================================================
+        // 5. INIT
+        // ===========================================================================
+        fetchTelemetry();
+        setInterval(fetchTelemetry, 3000);
 
-                <div class="form-group">
-                  <label class="form-label">Business Issuance Key</label>
-                  <input type="text" id="issuanceKey" class="setup-input" placeholder="e.g. ik_live_09x...">
-                </div>
+        // Seed with a couple of demo keys for the policy workspace
+        (function seedDemoKeys() {
+            const demoKeys = [{
+                id: 'key_demo_1',
+                name: 'Production Payment Gateway',
+                description: 'Live payment processing for storefront',
+                key: 'komni_live_demo_7Xk9Q2mP4nR8vW3',
+                permissions: ['read', 'write'],
+                expiry: 'never',
+                status: 'active',
+                createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+                lastUsed: new Date().toISOString(),
+            }, {
+                id: 'key_demo_2',
+                name: 'Analytics Webhook',
+                description: 'Event data forwarding to analytics service',
+                key: 'komni_live_demo_5Fj8S1tL9pX6cV2',
+                permissions: ['read'],
+                expiry: '90d',
+                status: 'active',
+                createdAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+                lastUsed: new Date(Date.now() - 3600000 * 2).toISOString(),
+            }];
+            apiKeys = demoKeys;
+            renderKeyList();
+            updateKeyStats();
+        })();
 
-                <div class="form-group">
-                  <label class="form-label">Stripe Secret Key</label>
-                  <input type="password" id="stripeSk" class="setup-input" placeholder="sk_live_...">
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Target Product ID</label>
-                  <input type="text" id="productId" class="setup-input" placeholder="prod_xYZ123...">
-                </div>
-
-                <div style="margin-top: 30px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 20px;">
-                  <button class="btn-premium" style="width: 100%;" onclick="saveSetupAndConnect()">
-                    Initialize & Connect Gateway Interface
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Help / Status Panel -->
-            <div class="panel">
-              <div class="panel-header">
-                <span class="panel-title">Connection Status</span>
-              </div>
-              <div class="panel-body" style="display: flex; flex-direction: column; gap: 20px;">
-                
-                <div class="info-card">
-                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                    <div id="policy-status-dot" style="width: 12px; height: 12px; border-radius: 50%; background: var(--status-warning);"></div>
-                    <strong id="policy-status-text" style="color: var(--text-primary); font-size: 14px;">Awaiting Configuration</strong>
-                  </div>
-                  <p>Once keys are provided, KOMNI will establish a secure handshake with the Firestore registry and automatically start polling the telemetry interceptor.</p>
-                </div>
-
-                <div class="info-card">
-                  <h4>What happens during initialization?</h4>
-                  <ul>
-                    <li>Keys are stored and indexed by Issuance ID.</li>
-                    <li>Proxy API token is dynamically issued.</li>
-                    <li>Live WebSocket/Polling sync is established.</li>
-                    <li>Traffic charts and route tables will populate.</li>
-                  </ul>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    </main>
-
-  </div>
-
-  <script>
-    // System Configurations
-    const INTERCEPTOR_URL = 'https://komni-backend.vercel.app/api/interceptor';
-    let isConnected = false;
-    let komniApiKey = null;
-    let telemetryInterval = null;
-
-    // Firebase Initialization (Replace these with standard environment configurations)
-    const firebaseConfig = {
-      apiKey: "AIzaSy_KOMNI_MOCK_KEY_FOR_DEMO",
-      authDomain: "komni-enterprise.firebaseapp.com",
-      projectId: "komni-enterprise",
-      storageBucket: "komni-enterprise.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abcdef123456"
-    };
-    
-    // Initialize Firebase
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-    
-    // Smooth buffer for live visualizer graph
-    let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, trafficVal(0)];
-
-    function trafficVal(volume) {
-      return Math.min(130, Math.max(10, (volume * 2.5) + 20));
-    }
-
-    function renderSVGChart(history) {
-      const width = 500;
-      const height = 150;
-      const step = width / (history.length - 1);
-
-      const points = history.map((val, idx) => {
-        const x = idx * step;
-        const y = height - val;
-        return `${x},${y}`;
-      });
-
-      const lineD = `M ${points.join(' L ')}`;
-      const areaD = `M 0,${height} L ${points.join(' L ')} L ${width},${height} Z`;
-
-      const linePath = document.getElementById('chart-line-path');
-      const areaPath = document.getElementById('chart-area-path');
-
-      if (linePath && areaPath) {
-        linePath.setAttribute('d', lineD);
-        areaPath.setAttribute('d', areaD);
-      }
-    }
-
-    // ==========================================
-    // TAB VIEW SWITCHING LOGIC
-    // ==========================================
-    function switchTab(tabId) {
-      // 1. Hide all views
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      // 2. Remove active state from nav items
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      
-      // 3. Show selected view
-      const selectedView = document.getElementById(`view-${tabId}`);
-      if(selectedView) selectedView.classList.add('active');
-      
-      // 4. Highlight selected nav item
-      const selectedNav = document.getElementById(`nav-${tabId}`);
-      if(selectedNav) selectedNav.classList.add('active');
-    }
-
-    // ==========================================
-    // POLICY SETUP & CONNECTION LOGIC
-    // ==========================================
-    async function saveSetupAndConnect() {
-  const issuanceKey = document.getElementById('issuanceKey').value.trim();
-  const stripeSk = document.getElementById('stripeSk').value.trim();
-  const productId = document.getElementById('productId').value.trim();
-
-  if (!issuanceKey || !stripeSk || !productId) {
-    alert("Action Denied: Please provide Issuance Key, Stripe SK, and Product ID.");
-    return;
-  }
-
-  // 1. Grab the button and put it in a loading state
-  const btn = document.querySelector('.btn-premium');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = 'Authenticating...';
-  btn.style.opacity = '0.7';
-  btn.style.pointerEvents = 'none';
-
-  try {
-    /* 
-      ===============================================================
-      REAL FIREBASE CALL 
-      Uncomment this ONLY when you add your real firebaseConfig keys
-      ===============================================================
-      await db.collection('businesses').doc(issuanceKey).set({
-        processor: 'stripe',
-        stripeSecretKey: stripeSk,
-        attachedProductId: productId,
-        configTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-    */
-
-    // 2. Mock a network delay for UI testing (remove this when using real Firebase)
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // 3. Issue new proxy API Key for the Interceptor
-    komniApiKey = "komni_api_" + Math.random().toString(36).substring(2, 15);
-    isConnected = true;
-
-    alert(`Processor Configured Successfully.\nYour issued Interceptor API Key: ${komniApiKey}\nConnecting to telemetry feeds now...`);
-
-    // 4. Update UI Indicators
-    document.getElementById('system-status-text').innerText = 'Live Gateway Sync (Active)';
-    document.getElementById('system-pulse').classList.remove('offline');
-    document.getElementById('stream-status-badge').innerText = '● Syncing';
-    document.getElementById('stream-status-badge').style.color = 'var(--status-success)';
-    
-    document.getElementById('policy-status-dot').style.background = 'var(--status-success)';
-    document.getElementById('policy-status-text').innerText = 'Gateway Connected & Synced';
-
-    // 5. Kickoff the telemetry loop
-    fetchTelemetry();
-    if (telemetryInterval) clearInterval(telemetryInterval);
-    telemetryInterval = setInterval(fetchTelemetry, 3000);
-
-    // 6. Switch user back to Overview tab automatically to see telemetry
-    switchTab('overview');
-
-  } catch (error) {
-    console.error("Firestore Registry Error:", error);
-    alert("Failed to initialize Policy Guard against Firestore registry.");
-  } finally {
-    // 7. Reset the button state whether it succeeds or fails
-    btn.innerHTML = originalText;
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = 'auto';
-  }
-}
-
-    // ==========================================
-    // TELEMETRY POLLING FETCH
-    // ==========================================
-    async function fetchTelemetry() {
-      if (!isConnected) return; // Prevent polling until setup is complete
-
-      const pulseDot = document.getElementById('system-pulse');
-      const statusText = document.getElementById('system-status-text');
-
-      try {
-        const response = await fetch(INTERCEPTOR_URL, { 
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${komniApiKey}`,
-            'Content-Type': 'application/json'
-          }
+        // Close modal on overlay click
+        document.getElementById('policyModal').addEventListener('click', function(e) {
+            if (e.target === this) closePolicyModal();
         });
-        
-        if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
-        
-        const data = await response.json();
-        
-        // 1. Update Top-Bar System Health Indicator
-        pulseDot.classList.remove('offline');
-        statusText.innerText = 'Live Gateway Sync (Active)';
 
-        // 2. Update KPI Metrics Cards
-        const metrics = data.metrics || {};
-        document.getElementById('kpi-requests').innerText = (metrics.total_requests || 0).toLocaleString();
-        document.getElementById('kpi-volume').innerText = `$${(metrics.total_volume || 0).toFixed(2)}`;
-        document.getElementById('kpi-latency').innerText = `${metrics.p99_latency_ms || 0}ms`;
-        document.getElementById('kpi-interceptions').innerText = metrics.policy_interceptions || 0;
+        // Keyboard shortcut: Escape to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closePolicyModal();
+        });
 
-        // 3. Update Real-Time Request Stream Panel
-        const logsContainer = document.getElementById('log-stream-container');
-        if (logsContainer && data.recent_logs && data.recent_logs.length > 0) {
-          logsContainer.innerHTML = data.recent_logs.map(log => `
-            <div class="log-row">
-              <span class="log-method ${log.method === 'POST' ? 'method-post' : 'method-get'}">${log.method}</span>
-              <span class="log-path" title="${log.buyer}">${log.item || log.path} ($${log.amount})</span>
-              <span class="log-latency">${log.latency || '15ms'}</span>
-            </div>
-          `).join('');
-        } else if (logsContainer && (!data.recent_logs || data.recent_logs.length === 0)) {
-          logsContainer.innerHTML = `
-            <div class="log-row">
-              <span class="log-method method-get">IDLE</span>
-              <span class="log-path">Awaiting payment executions...</span>
-              <span class="log-latency">0ms</span>
-            </div>
-          `;
-        }
-
-        // 4. Update Managed Gateway Routes Table
-        const tableBody = document.getElementById('routes-table-body');
-        if (tableBody && data.routes && data.routes.length > 0) {
-          tableBody.innerHTML = data.routes.map(route => `
-            <tr>
-              <td><strong>${route.name}</strong></td>
-              <td style="font-family: var(--font-mono); color: var(--text-muted);">${route.target}</td>
-              <td><span style="color: var(--accent-magenta); font-family: var(--font-mono);">${route.policy}</span></td>
-              <td style="font-family: var(--font-mono); color: var(--text-primary);">${route.volume}</td>
-              <td style="font-family: var(--font-mono);">${route.latency}</td>
-              <td><span class="badge-status active">● ${route.status}</span></td>
-            </tr>
-          `).join('');
-        }
-
-        // 5. Shift SVG Graph Line Smoothly
-        trafficHistory.shift();
-        trafficHistory.push(trafficVal(metrics.total_requests || 0));
-        renderSVGChart(trafficHistory);
-
-      } catch (err) {
-        pulseDot.classList.add('offline');
-        statusText.innerText = 'Telemetry Feed Offline';
-        console.warn('KOMNI Polling Error:', err);
-      }
-    }
-  </script>
+        // Auto-show policy workspace hint in console
+        console.log('🔐 KOMNI Policy Engine: Click "Policy Engine" in the sidebar to manage API keys.');
+        console.log('💳 Stripe integration is active. Other processors coming soon.');
+    </script>
 </body>
 </html>
