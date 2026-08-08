@@ -1173,53 +1173,72 @@
     // POLICY SETUP & CONNECTION LOGIC
     // ==========================================
     async function saveSetupAndConnect() {
-      const issuanceKey = document.getElementById('issuanceKey').value.trim();
-      const stripeSk = document.getElementById('stripeSk').value.trim();
-      const productId = document.getElementById('productId').value.trim();
+  const issuanceKey = document.getElementById('issuanceKey').value.trim();
+  const stripeSk = document.getElementById('stripeSk').value.trim();
+  const productId = document.getElementById('productId').value.trim();
 
-      if (!issuanceKey || !stripeSk || !productId) {
-        alert("Action Denied: Please provide Issuance Key, Stripe SK, and Product ID.");
-        return;
-      }
+  if (!issuanceKey || !stripeSk || !productId) {
+    alert("Action Denied: Please provide Issuance Key, Stripe SK, and Product ID.");
+    return;
+  }
 
-      try {
-        // Save Processor/Product configuration indexing under Issuance Key to Firestore
-        await db.collection('businesses').doc(issuanceKey).set({
-          processor: 'stripe',
-          stripeSecretKey: stripeSk,
-          attachedProductId: productId,
-          configTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+  // 1. Grab the button and put it in a loading state
+  const btn = document.querySelector('.btn-premium');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'Authenticating...';
+  btn.style.opacity = '0.7';
+  btn.style.pointerEvents = 'none';
 
-        // Issue new proxy API Key for the Interceptor
-        komniApiKey = "komni_api_" + Math.random().toString(36).substring(2, 15);
-        isConnected = true;
+  try {
+    /* 
+      ===============================================================
+      REAL FIREBASE CALL 
+      Uncomment this ONLY when you add your real firebaseConfig keys
+      ===============================================================
+      await db.collection('businesses').doc(issuanceKey).set({
+        processor: 'stripe',
+        stripeSecretKey: stripeSk,
+        attachedProductId: productId,
+        configTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    */
 
-        alert(`Processor Configured Successfully.\nYour issued Interceptor API Key: ${komniApiKey}\nConnecting to telemetry feeds now...`);
+    // 2. Mock a network delay for UI testing (remove this when using real Firebase)
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-        // Update UI Indicators
-        document.getElementById('system-status-text').innerText = 'Live Gateway Sync (Active)';
-        document.getElementById('system-pulse').classList.remove('offline');
-        document.getElementById('stream-status-badge').innerText = '● Syncing';
-        document.getElementById('stream-status-badge').style.color = 'var(--status-success)';
-        
-        // Update Policy Status panel in the setup tab
-        document.getElementById('policy-status-dot').style.background = 'var(--status-success)';
-        document.getElementById('policy-status-text').innerText = 'Gateway Connected & Synced';
+    // 3. Issue new proxy API Key for the Interceptor
+    komniApiKey = "komni_api_" + Math.random().toString(36).substring(2, 15);
+    isConnected = true;
 
-        // Kickoff the telemetry loop
-        fetchTelemetry();
-        if (telemetryInterval) clearInterval(telemetryInterval);
-        telemetryInterval = setInterval(fetchTelemetry, 3000);
+    alert(`Processor Configured Successfully.\nYour issued Interceptor API Key: ${komniApiKey}\nConnecting to telemetry feeds now...`);
 
-        // Switch user back to Overview tab automatically to see telemetry
-        switchTab('overview');
+    // 4. Update UI Indicators
+    document.getElementById('system-status-text').innerText = 'Live Gateway Sync (Active)';
+    document.getElementById('system-pulse').classList.remove('offline');
+    document.getElementById('stream-status-badge').innerText = '● Syncing';
+    document.getElementById('stream-status-badge').style.color = 'var(--status-success)';
+    
+    document.getElementById('policy-status-dot').style.background = 'var(--status-success)';
+    document.getElementById('policy-status-text').innerText = 'Gateway Connected & Synced';
 
-      } catch (error) {
-        console.error("Firestore Registry Error:", error);
-        alert("Failed to initialize Policy Guard against Firestore registry.");
-      }
-    }
+    // 5. Kickoff the telemetry loop
+    fetchTelemetry();
+    if (telemetryInterval) clearInterval(telemetryInterval);
+    telemetryInterval = setInterval(fetchTelemetry, 3000);
+
+    // 6. Switch user back to Overview tab automatically to see telemetry
+    switchTab('overview');
+
+  } catch (error) {
+    console.error("Firestore Registry Error:", error);
+    alert("Failed to initialize Policy Guard against Firestore registry.");
+  } finally {
+    // 7. Reset the button state whether it succeeds or fails
+    btn.innerHTML = originalText;
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  }
+}
 
     // ==========================================
     // TELEMETRY POLLING FETCH
