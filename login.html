@@ -442,6 +442,7 @@
 
     .submit-btn:hover { background: rgba(255, 255, 255, 0.9); }
     .submit-btn:active { background: rgba(255, 255, 255, 0.8); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .security-notice {
       margin-top: 32px;
@@ -468,7 +469,7 @@
     }
 
     /* ==========================================================================
-       4. VALIDATION STATUS (embedded in login card)
+       4. INLINE VALIDATION STATUS
        ========================================================================== */
     .validation-status {
       margin-top: 16px;
@@ -611,7 +612,7 @@
           </button>
         </form>
 
-        <!-- Validation status area (hidden by default) -->
+        <!-- Inline validation status -->
         <div class="validation-status" id="validationStatus">
           <span class="status-line" id="statusLine1"></span>
           <span class="status-line" id="statusLine2"></span>
@@ -799,12 +800,11 @@
         formattedKey = 'ik_' + rawKey.substring(3);
       }
 
-      // Disable the submit button to prevent double-clicks
       const btn = document.getElementById('authBtn');
       btn.disabled = true;
       btn.querySelector('span').textContent = 'Verifying...';
 
-      // Show validation status area
+      // Show status area
       const statusDiv = document.getElementById('validationStatus');
       statusDiv.classList.add('is-visible');
       const line1 = document.getElementById('statusLine1');
@@ -848,10 +848,8 @@
             await db.collection('users').doc(formattedKey).set(userData);
             localStorage.setItem('komni_issuance_key', formattedKey);
             localStorage.setItem('komni_user_metadata', JSON.stringify(userData));
-            console.log('✅ User data saved to Firebase & localStorage');
           } catch (firestoreError) {
-            console.warn('⚠️ Firestore write failed, but continuing with localStorage fallback', firestoreError);
-            // Still store in localStorage so dashboard can work
+            console.warn('Firestore write failed, continuing with localStorage fallback', firestoreError);
             localStorage.setItem('komni_issuance_key', formattedKey);
             localStorage.setItem('komni_user_metadata', JSON.stringify({
               owner: data.metadata.owner || '—',
@@ -861,7 +859,7 @@
             }));
           }
 
-          // Update button to show success and redirect after a moment
+          // Update button and redirect after a short delay
           btn.querySelector('span').textContent = '✔ Authenticated!';
           btn.style.background = '#22c55e';
           btn.style.color = '#fff';
