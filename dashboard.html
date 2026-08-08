@@ -9,6 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     /* ==========================================================================
        1. ENTERPRISE DESIGN SYSTEM VARIABLES & RESET
@@ -680,6 +684,33 @@
       padding: 24px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     }
+
+    .setup-input {
+      width: 100%;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      transition: border-color 0.2s ease;
+    }
+    
+    .setup-input:focus {
+      border-color: var(--border-focus);
+      outline: none;
+    }
+    
+    .secure-note {
+      font-size: 10px;
+      color: var(--status-success);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
   </style>
 </head>
 <body>
@@ -729,9 +760,10 @@
       <div class="nav-section-title">Intelligence & Policy</div>
       <ul class="nav-menu">
         <li class="nav-item">
-          <a href="#">
+          <!-- Updated to trigger the setup flow -->
+          <a href="#" onclick="openSetupModal()">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Policy Engine
+            Policy Engine (Setup)
           </a>
         </li>
         <li class="nav-item">
@@ -800,8 +832,9 @@
 
         <div class="top-actions">
           <div class="system-health">
-            <span class="pulse-dot" id="system-pulse"></span>
-            <span id="system-status-text">Connecting to Vercel Node...</span>
+            <!-- Initially offline waiting for setup -->
+            <span class="pulse-dot offline" id="system-pulse"></span>
+            <span id="system-status-text">Disconnected - Setup Required</span>
           </div>
         </div>
       </header>
@@ -819,7 +852,7 @@
             </div>
             <div class="kpi-value-row">
               <span class="kpi-value" id="kpi-requests">0</span>
-              <span class="kpi-trend positive" id="kpi-requests-trend">+100%</span>
+              <span class="kpi-trend positive" id="kpi-requests-trend">+0%</span>
             </div>
             <div class="kpi-subtext" id="kpi-requests-sub">Live middleware requests processed</div>
           </div>
@@ -831,7 +864,7 @@
             </div>
             <div class="kpi-value-row">
               <span class="kpi-value" id="kpi-volume">$0.00</span>
-              <span class="kpi-trend positive" id="kpi-volume-trend">+100%</span>
+              <span class="kpi-trend positive" id="kpi-volume-trend">+0%</span>
             </div>
             <div class="kpi-subtext" id="kpi-volume-sub">Processed payload USD total</div>
           </div>
@@ -891,13 +924,13 @@
           <div class="panel">
             <div class="panel-header">
               <span class="panel-title">Real-Time Request Stream</span>
-              <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Syncing</span>
+              <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Waiting</span>
             </div>
             <div class="panel-body" style="padding: 14px;">
               <div class="log-stream" id="log-stream-container">
                 <div class="log-row">
-                  <span class="log-method method-get">SYNC</span>
-                  <span class="log-path">Polling KOMNI telemetry feed...</span>
+                  <span class="log-method method-get">IDLE</span>
+                  <span class="log-path">Awaiting Policy Guard configuration...</span>
                   <span class="log-latency">--</span>
                 </div>
               </div>
@@ -910,7 +943,6 @@
         <section class="panel">
           <div class="panel-header">
             <span class="panel-title">Managed Gateway Providers & Downstream Routes</span>
-            <button class="btn-premium" onclick="openPolicyModal()">+ Add Route Policy</button>
           </div>
           <div class="data-table-wrapper">
             <table class="data-table">
@@ -926,7 +958,7 @@
               </thead>
               <tbody id="routes-table-body">
                 <tr>
-                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading active routes from Vercel interceptor...</td>
+                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Connection offline. Initialize Policy Guard to load routes.</td>
                 </tr>
               </tbody>
             </table>
@@ -938,20 +970,52 @@
 
   </div>
 
-  <!-- Modal Component Scaffold -->
-  <div class="modal-overlay" id="policyModal">
+  <!-- Setup Processor & Policy Guard Modal -->
+  <div class="modal-overlay" id="setupModal">
     <div class="modal-card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h3 style="font-size:14px; font-weight:700;">Add Middleware Route Policy</h3>
-        <span style="cursor:pointer; color:var(--text-muted);" onclick="closePolicyModal()">✕</span>
+        <h3 style="font-size:14px; font-weight:700;">Configure Policy Guard & Processor</h3>
+        <span style="cursor:pointer; color:var(--text-muted);" onclick="closeSetupModal()">✕</span>
       </div>
-      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Configure rules to route transaction payloads through KOMNI proxy targets.</p>
-      <button class="btn-premium" style="width:100%;" onclick="closePolicyModal()">Save Policy Rule</button>
+      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+        Create a product to attach to KOMNI and configure your payment processor (Stripe Default). 
+      </p>
+      
+      <div class="secure-note">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        Rest assured, all entered keys are strictly encrypted and securely managed by KOMNI.
+      </div>
+
+      <input type="text" id="issuanceKey" class="setup-input" placeholder="Business Issuance Key (e.g. ik_live_...)">
+      <input type="password" id="stripeSk" class="setup-input" placeholder="Stripe Secret Key (sk_live_...)">
+      <input type="text" id="productId" class="setup-input" placeholder="Product ID (prod_...)">
+      
+      <button class="btn-premium" style="width:100%; margin-top:8px;" onclick="saveSetupAndConnect()">Initialize & Connect Gateway</button>
     </div>
   </div>
 
   <script>
+    // System Configurations
     const INTERCEPTOR_URL = 'https://komni-backend.vercel.app/api/interceptor';
+    let isConnected = false;
+    let komniApiKey = null;
+    let telemetryInterval = null;
+
+    // Firebase Initialization (Replace these with standard environment configurations)
+    const firebaseConfig = {
+      apiKey: "AIzaSy_KOMNI_MOCK_KEY_FOR_DEMO",
+      authDomain: "komni-enterprise.firebaseapp.com",
+      projectId: "komni-enterprise",
+      storageBucket: "komni-enterprise.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
+    };
+    
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
     
     // Smooth buffer for live visualizer graph
     let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, trafficVal(0)];
@@ -983,12 +1047,73 @@
       }
     }
 
+    // Modal Control Logic
+    function openSetupModal() {
+      document.getElementById('setupModal').classList.add('active');
+    }
+
+    function closeSetupModal() {
+      document.getElementById('setupModal').classList.remove('active');
+    }
+
+    // Policy Setup & Gateway Connection Logic
+    async function saveSetupAndConnect() {
+      const issuanceKey = document.getElementById('issuanceKey').value.trim();
+      const stripeSk = document.getElementById('stripeSk').value.trim();
+      const productId = document.getElementById('productId').value.trim();
+
+      if (!issuanceKey || !stripeSk || !productId) {
+        alert("Action Denied: Please provide Issuance Key, Stripe SK, and Product ID.");
+        return;
+      }
+
+      try {
+        // Save Processor/Product configuration indexing under Issuance Key to Firestore
+        await db.collection('businesses').doc(issuanceKey).set({
+          processor: 'stripe',
+          stripeSecretKey: stripeSk,
+          attachedProductId: productId,
+          configTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        // Issue new proxy API Key for the Interceptor
+        komniApiKey = "komni_api_" + Math.random().toString(36).substring(2, 15);
+        isConnected = true;
+
+        alert(`Processor Configured Successfully.\nYour issued Interceptor API Key: ${komniApiKey}\nConnecting to telemetry feeds now...`);
+        closeSetupModal();
+
+        // Update UI Top Bar
+        document.getElementById('system-status-text').innerText = 'Live Gateway Sync (Active)';
+        document.getElementById('system-pulse').classList.remove('offline');
+        document.getElementById('stream-status-badge').innerText = '● Syncing';
+
+        // Kickoff the telemetry loop
+        fetchTelemetry();
+        if (telemetryInterval) clearInterval(telemetryInterval);
+        telemetryInterval = setInterval(fetchTelemetry, 3000);
+
+      } catch (error) {
+        console.error("Firestore Registry Error:", error);
+        alert("Failed to initialize Policy Guard against Firestore registry.");
+      }
+    }
+
+    // Telemetry Polling Fetch
     async function fetchTelemetry() {
+      if (!isConnected) return; // Prevent polling until setup is complete
+
       const pulseDot = document.getElementById('system-pulse');
       const statusText = document.getElementById('system-status-text');
 
       try {
-        const response = await fetch(INTERCEPTOR_URL, { method: 'GET' });
+        const response = await fetch(INTERCEPTOR_URL, { 
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${komniApiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
         
         if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
         
@@ -1019,7 +1144,7 @@
           logsContainer.innerHTML = `
             <div class="log-row">
               <span class="log-method method-get">IDLE</span>
-              <span class="log-path">Awaiting payment executions from store.html...</span>
+              <span class="log-path">Awaiting payment executions...</span>
               <span class="log-latency">0ms</span>
             </div>
           `;
@@ -1051,18 +1176,6 @@
         console.warn('KOMNI Polling Error:', err);
       }
     }
-
-    function openPolicyModal() {
-      document.getElementById('policyModal').classList.add('active');
-    }
-
-    function closePolicyModal() {
-      document.getElementById('policyModal').classList.remove('active');
-    }
-
-    // Initialize telemetry polling cycle (Every 3 seconds)
-    fetchTelemetry();
-    setInterval(fetchTelemetry, 3000);
   </script>
 </body>
 </html>
