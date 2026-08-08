@@ -182,6 +182,7 @@
       font-weight: 500;
       font-size: 12.5px;
       transition: all 0.2s var(--ease-expensive);
+      cursor: pointer;
     }
 
     .nav-item a svg {
@@ -351,22 +352,36 @@
     }
 
     .pulse-dot.offline {
-      background-color: var(--status-danger);
-      box-shadow: 0 0 10px var(--status-danger);
+      background-color: var(--status-warning);
+      box-shadow: 0 0 10px var(--status-warning);
     }
 
-    /* Dashboard View Area */
+    /* Dashboard View Area & Tab System */
     .dashboard-viewport {
       flex: 1;
       overflow-y: auto;
       padding: 28px;
-      display: flex;
+      position: relative;
+    }
+
+    .view-section {
+      display: none;
       flex-direction: column;
       gap: 20px;
+      animation: fadeView 0.3s ease;
+    }
+
+    .view-section.active {
+      display: flex;
+    }
+
+    @keyframes fadeView {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ==========================================================================
-       3. METRICS AND TELEMETRY PANELS
+       3. METRICS AND TELEMETRY PANELS (OVERVIEW TAB)
        ========================================================================== */
     .metrics-header-grid {
       display: grid;
@@ -642,74 +657,112 @@
       border: 1px solid rgba(34, 197, 94, 0.25);
     }
 
+    /* ==========================================================================
+       4. POLICY GUARD SETUP TAB UI
+       ========================================================================== */
+    .policy-setup-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .setup-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+    
+    .setup-input:focus {
+      border-color: var(--border-focus);
+      background: rgba(0, 0, 0, 0.6);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(96, 54, 225, 0.15);
+    }
+
+    .setup-input::placeholder {
+      color: var(--text-muted);
+    }
+
     .btn-premium {
       background: var(--logo-gradient);
       border: none;
       color: #ffffff;
       font-weight: 600;
-      padding: 6px 14px;
+      padding: 12px 20px;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 13px;
       cursor: pointer;
-      box-shadow: 0 0 12px var(--accent-violet-glow);
+      box-shadow: 0 0 15px var(--accent-violet-glow);
       transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     
     .btn-premium:hover {
-      box-shadow: 0 0 20px var(--accent-magenta-glow);
+      box-shadow: 0 0 25px var(--accent-magenta-glow);
       transform: translateY(-1px);
     }
 
-    /* Modal Scaffolding */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-strong);
-      border-radius: 12px;
-      width: 440px;
-      padding: 24px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    }
-
-    .setup-input {
-      width: 100%;
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 10px 14px;
-      border-radius: 6px;
-      margin-bottom: 12px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      transition: border-color 0.2s ease;
-    }
-    
-    .setup-input:focus {
-      border-color: var(--border-focus);
-      outline: none;
-    }
-    
     .secure-note {
-      font-size: 10px;
+      font-size: 12px;
       color: var(--status-success);
-      margin-bottom: 16px;
+      background: var(--status-success-bg);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      padding: 12px 16px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    
+    .info-card {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px dashed var(--border-strong);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .info-card h4 {
+      color: var(--text-primary);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    
+    .info-card p {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .info-card ul {
+      padding-left: 20px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -731,26 +784,26 @@
 
       <div class="nav-section-title">Telemetry & Routing</div>
       <ul class="nav-menu">
-        <li class="nav-item active">
-          <a href="#">
+        <li class="nav-item active" id="nav-overview">
+          <a onclick="switchTab('overview')">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Overview
           </a>
         </li>
         <li class="nav-item">
-          <a href="#">
+          <a>
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             API Traffic Mesh
           </a>
         </li>
         <li class="nav-item">
-          <a href="#">
+          <a>
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             Payload Audit Logs
           </a>
         </li>
         <li class="nav-item">
-          <a href="#">
+          <a>
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             Latency & Performance
           </a>
@@ -759,23 +812,17 @@
 
       <div class="nav-section-title">Intelligence & Policy</div>
       <ul class="nav-menu">
-        <li class="nav-item">
-          <!-- Updated to trigger the setup flow -->
-          <a href="#" onclick="openSetupModal()">
+        <!-- New Setup Route connected to Policy tab -->
+        <li class="nav-item" id="nav-policy">
+          <a onclick="switchTab('policy')">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Policy Engine (Setup)
           </a>
         </li>
         <li class="nav-item">
-          <a href="#">
+          <a>
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             Fraud & Risk Intercepts
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
-            Provider Routing Rules
           </a>
         </li>
       </ul>
@@ -783,19 +830,13 @@
       <div class="nav-section-title">Infrastructure</div>
       <ul class="nav-menu">
         <li class="nav-item">
-          <a href="#">
+          <a>
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
             Gateway Nodes
           </a>
         </li>
         <li class="nav-item">
-          <a href="#">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-            API Keys & Hooks
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#">
+          <a>
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             System Settings
           </a>
@@ -842,156 +883,219 @@
       <!-- Dashboard Main Viewport -->
       <div class="dashboard-viewport">
         
-        <!-- Key Metrics Cards -->
-        <section class="metrics-header-grid">
+        <!-- ========================================== -->
+        <!-- VIEW 1: OVERVIEW METRICS TAB (DEFAULT)     -->
+        <!-- ========================================== -->
+        <div id="view-overview" class="view-section active">
           
-          <div class="kpi-card">
-            <div class="kpi-title">
-              <span>Middleware Request Volume</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            </div>
-            <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-requests">0</span>
-              <span class="kpi-trend positive" id="kpi-requests-trend">+0%</span>
-            </div>
-            <div class="kpi-subtext" id="kpi-requests-sub">Live middleware requests processed</div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-title">
-              <span>Evaluated Transaction Value</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-volume">$0.00</span>
-              <span class="kpi-trend positive" id="kpi-volume-trend">+0%</span>
-            </div>
-            <div class="kpi-subtext" id="kpi-volume-sub">Processed payload USD total</div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-title">
-              <span>P99 Gateway Latency Overhead</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-latency" style="color: var(--accent-magenta);">0ms</span>
-              <span class="kpi-trend positive" style="background: rgba(96, 54, 225, 0.2); color: #a78bfa;">P99</span>
-            </div>
-            <div class="kpi-subtext">Computed roundtrip delay overhead</div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-title">
-              <span>Policy Interceptions</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-interceptions">0</span>
-              <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
-            </div>
-            <div class="kpi-subtext">Blocked / Redacted proxy payloads</div>
-          </div>
-
-        </section>
-
-        <!-- Dynamic Chart & Live Log Terminal -->
-        <section class="telemetry-split">
-          
-          <!-- Throughput Chart -->
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Throughput & Middleware Traffic Analysis</span>
-              <span id="chart-avg-rps" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Live Stream</span>
-            </div>
-            <div class="panel-body">
-              <div class="chart-container" id="chart-container">
-                <svg class="traffic-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#D83DC2" stop-opacity="0.35"/>
-                      <stop offset="100%" stop-color="#D83DC2" stop-opacity="0.0"/>
-                    </linearGradient>
-                  </defs>
-                  <path class="chart-area" id="chart-area-path" d="M 0 150 L 500 150 Z" />
-                  <path class="chart-line" id="chart-line-path" d="M 0 150 L 500 150" />
-                </svg>
+          <!-- Key Metrics Cards -->
+          <section class="metrics-header-grid">
+            <div class="kpi-card">
+              <div class="kpi-title">
+                <span>Middleware Request Volume</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
               </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-requests">0</span>
+                <span class="kpi-trend positive" id="kpi-requests-trend">+0%</span>
+              </div>
+              <div class="kpi-subtext" id="kpi-requests-sub">Live middleware requests processed</div>
             </div>
-          </div>
 
-          <!-- Real-time Payload Log Stream -->
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Real-Time Request Stream</span>
-              <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Waiting</span>
+            <div class="kpi-card">
+              <div class="kpi-title">
+                <span>Evaluated Transaction Value</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-volume">$0.00</span>
+                <span class="kpi-trend positive" id="kpi-volume-trend">+0%</span>
+              </div>
+              <div class="kpi-subtext" id="kpi-volume-sub">Processed payload USD total</div>
             </div>
-            <div class="panel-body" style="padding: 14px;">
-              <div class="log-stream" id="log-stream-container">
-                <div class="log-row">
-                  <span class="log-method method-get">IDLE</span>
-                  <span class="log-path">Awaiting Policy Guard configuration...</span>
-                  <span class="log-latency">--</span>
+
+            <div class="kpi-card">
+              <div class="kpi-title">
+                <span>P99 Gateway Latency Overhead</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-latency" style="color: var(--accent-magenta);">0ms</span>
+                <span class="kpi-trend positive" style="background: rgba(96, 54, 225, 0.2); color: #a78bfa;">P99</span>
+              </div>
+              <div class="kpi-subtext">Computed roundtrip delay overhead</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">
+                <span>Policy Interceptions</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-interceptions">0</span>
+                <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
+              </div>
+              <div class="kpi-subtext">Blocked / Redacted proxy payloads</div>
+            </div>
+          </section>
+
+          <!-- Dynamic Chart & Live Log Terminal -->
+          <section class="telemetry-split">
+            <div class="panel">
+              <div class="panel-header">
+                <span class="panel-title">Throughput & Middleware Traffic Analysis</span>
+                <span id="chart-avg-rps" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Live Stream</span>
+              </div>
+              <div class="panel-body">
+                <div class="chart-container" id="chart-container">
+                  <svg class="traffic-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#D83DC2" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="#D83DC2" stop-opacity="0.0"/>
+                      </linearGradient>
+                    </defs>
+                    <path class="chart-area" id="chart-area-path" d="M 0 150 L 500 150 Z" />
+                    <path class="chart-line" id="chart-line-path" d="M 0 150 L 500 150" />
+                  </svg>
                 </div>
               </div>
             </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <span class="panel-title">Real-Time Request Stream</span>
+                <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-warning); letter-spacing: 1px; text-transform: uppercase;">● Waiting</span>
+              </div>
+              <div class="panel-body" style="padding: 14px;">
+                <div class="log-stream" id="log-stream-container">
+                  <div class="log-row">
+                    <span class="log-method method-get">IDLE</span>
+                    <span class="log-path">Awaiting Policy Guard configuration...</span>
+                    <span class="log-latency">--</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Managed Target Routes Table -->
+          <section class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Managed Gateway Providers & Downstream Routes</span>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Route Name</th>
+                    <th>Downstream Target</th>
+                    <th>Policy Rule Set</th>
+                    <th>Volume</th>
+                    <th>P99 Latency</th>
+                    <th>Health Status</th>
+                  </tr>
+                </thead>
+                <tbody id="routes-table-body">
+                  <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Connection offline. Initialize Policy Guard to load routes.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: POLICY GUARD SETUP TAB             -->
+        <!-- ========================================== -->
+        <div id="view-policy" class="view-section">
+          
+          <div style="margin-bottom: 8px;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 4px;">Policy Engine Configuration</h2>
+            <p style="color: var(--text-secondary); font-size: 13px;">Attach your product logic and payment processor defaults directly to the KOMNI intercept layer.</p>
           </div>
 
-        </section>
+          <div class="policy-setup-grid">
+            
+            <!-- Main Configuration Panel -->
+            <div class="panel">
+              <div class="panel-header">
+                <span class="panel-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-magenta)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  Processor Authentication
+                </span>
+              </div>
+              <div class="panel-body">
+                
+                <div class="secure-note">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <div>
+                    <strong style="display: block; color: var(--text-primary); margin-bottom: 2px;">End-to-End Encrypted</strong>
+                    All entered keys are symmetrically encrypted at rest and securely managed within the KOMNI isolated enterprise zone.
+                  </div>
+                </div>
 
-        <!-- Managed Target Routes Table -->
-        <section class="panel">
-          <div class="panel-header">
-            <span class="panel-title">Managed Gateway Providers & Downstream Routes</span>
+                <div class="form-group">
+                  <label class="form-label">Business Issuance Key</label>
+                  <input type="text" id="issuanceKey" class="setup-input" placeholder="e.g. ik_live_09x...">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Stripe Secret Key</label>
+                  <input type="password" id="stripeSk" class="setup-input" placeholder="sk_live_...">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Target Product ID</label>
+                  <input type="text" id="productId" class="setup-input" placeholder="prod_xYZ123...">
+                </div>
+
+                <div style="margin-top: 30px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                  <button class="btn-premium" style="width: 100%;" onclick="saveSetupAndConnect()">
+                    Initialize & Connect Gateway Interface
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Help / Status Panel -->
+            <div class="panel">
+              <div class="panel-header">
+                <span class="panel-title">Connection Status</span>
+              </div>
+              <div class="panel-body" style="display: flex; flex-direction: column; gap: 20px;">
+                
+                <div class="info-card">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <div id="policy-status-dot" style="width: 12px; height: 12px; border-radius: 50%; background: var(--status-warning);"></div>
+                    <strong id="policy-status-text" style="color: var(--text-primary); font-size: 14px;">Awaiting Configuration</strong>
+                  </div>
+                  <p>Once keys are provided, KOMNI will establish a secure handshake with the Firestore registry and automatically start polling the telemetry interceptor.</p>
+                </div>
+
+                <div class="info-card">
+                  <h4>What happens during initialization?</h4>
+                  <ul>
+                    <li>Keys are stored and indexed by Issuance ID.</li>
+                    <li>Proxy API token is dynamically issued.</li>
+                    <li>Live WebSocket/Polling sync is established.</li>
+                    <li>Traffic charts and route tables will populate.</li>
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+
           </div>
-          <div class="data-table-wrapper">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Route Name</th>
-                  <th>Downstream Target</th>
-                  <th>Policy Rule Set</th>
-                  <th>Volume</th>
-                  <th>P99 Latency</th>
-                  <th>Health Status</th>
-                </tr>
-              </thead>
-              <tbody id="routes-table-body">
-                <tr>
-                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Connection offline. Initialize Policy Guard to load routes.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+
+        </div>
 
       </div>
     </main>
 
-  </div>
-
-  <!-- Setup Processor & Policy Guard Modal -->
-  <div class="modal-overlay" id="setupModal">
-    <div class="modal-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h3 style="font-size:14px; font-weight:700;">Configure Policy Guard & Processor</h3>
-        <span style="cursor:pointer; color:var(--text-muted);" onclick="closeSetupModal()">✕</span>
-      </div>
-      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
-        Create a product to attach to KOMNI and configure your payment processor (Stripe Default). 
-      </p>
-      
-      <div class="secure-note">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-        Rest assured, all entered keys are strictly encrypted and securely managed by KOMNI.
-      </div>
-
-      <input type="text" id="issuanceKey" class="setup-input" placeholder="Business Issuance Key (e.g. ik_live_...)">
-      <input type="password" id="stripeSk" class="setup-input" placeholder="Stripe Secret Key (sk_live_...)">
-      <input type="text" id="productId" class="setup-input" placeholder="Product ID (prod_...)">
-      
-      <button class="btn-premium" style="width:100%; margin-top:8px;" onclick="saveSetupAndConnect()">Initialize & Connect Gateway</button>
-    </div>
   </div>
 
   <script>
@@ -1047,16 +1151,27 @@
       }
     }
 
-    // Modal Control Logic
-    function openSetupModal() {
-      document.getElementById('setupModal').classList.add('active');
+    // ==========================================
+    // TAB VIEW SWITCHING LOGIC
+    // ==========================================
+    function switchTab(tabId) {
+      // 1. Hide all views
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      // 2. Remove active state from nav items
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      // 3. Show selected view
+      const selectedView = document.getElementById(`view-${tabId}`);
+      if(selectedView) selectedView.classList.add('active');
+      
+      // 4. Highlight selected nav item
+      const selectedNav = document.getElementById(`nav-${tabId}`);
+      if(selectedNav) selectedNav.classList.add('active');
     }
 
-    function closeSetupModal() {
-      document.getElementById('setupModal').classList.remove('active');
-    }
-
-    // Policy Setup & Gateway Connection Logic
+    // ==========================================
+    // POLICY SETUP & CONNECTION LOGIC
+    // ==========================================
     async function saveSetupAndConnect() {
       const issuanceKey = document.getElementById('issuanceKey').value.trim();
       const stripeSk = document.getElementById('stripeSk').value.trim();
@@ -1081,17 +1196,24 @@
         isConnected = true;
 
         alert(`Processor Configured Successfully.\nYour issued Interceptor API Key: ${komniApiKey}\nConnecting to telemetry feeds now...`);
-        closeSetupModal();
 
-        // Update UI Top Bar
+        // Update UI Indicators
         document.getElementById('system-status-text').innerText = 'Live Gateway Sync (Active)';
         document.getElementById('system-pulse').classList.remove('offline');
         document.getElementById('stream-status-badge').innerText = '● Syncing';
+        document.getElementById('stream-status-badge').style.color = 'var(--status-success)';
+        
+        // Update Policy Status panel in the setup tab
+        document.getElementById('policy-status-dot').style.background = 'var(--status-success)';
+        document.getElementById('policy-status-text').innerText = 'Gateway Connected & Synced';
 
         // Kickoff the telemetry loop
         fetchTelemetry();
         if (telemetryInterval) clearInterval(telemetryInterval);
         telemetryInterval = setInterval(fetchTelemetry, 3000);
+
+        // Switch user back to Overview tab automatically to see telemetry
+        switchTab('overview');
 
       } catch (error) {
         console.error("Firestore Registry Error:", error);
@@ -1099,7 +1221,9 @@
       }
     }
 
-    // Telemetry Polling Fetch
+    // ==========================================
+    // TELEMETRY POLLING FETCH
+    // ==========================================
     async function fetchTelemetry() {
       if (!isConnected) return; // Prevent polling until setup is complete
 
