@@ -628,13 +628,13 @@
         }
 
         /* ==========================================================================
-           4. FULLSCREEN WELCOME OVERLAY
+           4. FULLSCREEN WELCOME OVERLAY — REDESIGNED
            ========================================================================== */
         .welcome-overlay {
             position: fixed;
             inset: 0;
             z-index: 999;
-            background: radial-gradient(circle at 50% 30%, #0d0722 0%, #020205 100%);
+            background: #020205;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -642,125 +642,301 @@
             padding: 40px;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.9s var(--ease-expensive);
+            transition: opacity 1.2s var(--ease-expensive);
+            overflow: hidden;
         }
         .welcome-overlay.is-visible {
             opacity: 1;
             pointer-events: auto;
         }
-        .welcome-overlay .glow-orb {
+
+        /* Atmospheric glow */
+        .welcome-overlay .atmos-glow {
             position: absolute;
-            width: 70vw;
-            height: 70vw;
+            width: 80vw;
+            height: 80vw;
+            max-width: 1200px;
+            max-height: 1200px;
             border-radius: 50%;
             filter: blur(180px);
-            opacity: 0.08;
+            opacity: 0.06;
             pointer-events: none;
-            top: 10%;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -60%);
             background: var(--logo-gradient);
+            transition: opacity 1.8s var(--ease-expensive);
+        }
+        .welcome-overlay.is-visible .atmos-glow {
+            opacity: 0.10;
         }
 
+        /* Subtle grid background */
+        .welcome-overlay .grid-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.025;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            background-position: center center;
+        }
+
+        /* Top-left system label */
+        .welcome-overlay .sys-label-top {
+            position: absolute;
+            top: 40px;
+            left: 48px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 0.8s var(--ease-expensive);
+        }
+        .welcome-overlay.is-visible .sys-label-top {
+            opacity: 1;
+            transition-delay: 0.2s;
+        }
+
+        /* Top-right status indicator */
+        .welcome-overlay .status-indicator {
+            position: absolute;
+            top: 40px;
+            right: 48px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.8s var(--ease-expensive);
+        }
+        .welcome-overlay.is-visible .status-indicator {
+            opacity: 1;
+            transition-delay: 0.35s;
+        }
+        .welcome-overlay .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 16px rgba(34, 197, 94, 0.5);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        /* Main content */
         .welcome-content {
             position: relative;
             z-index: 10;
             text-align: center;
             max-width: 720px;
-            animation: welcomeRise 1.2s var(--ease-expensive) both;
-            animation-delay: 0.3s;
+            padding: 20px;
         }
 
-        @keyframes welcomeRise {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.96);
-                filter: blur(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                filter: blur(0);
-            }
-        }
-
-        .welcome-content .logo-mark {
-            font-size: clamp(3rem, 8vw, 6rem);
+        /* KOMNI wordmark — small, system-like */
+        .welcome-content .wordmark {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(12px, 1.2vw, 16px);
             font-weight: 800;
-            letter-spacing: -0.04em;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 48px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.9s var(--ease-expensive);
+        }
+        .welcome-overlay.is-visible .welcome-content .wordmark {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.15s;
+        }
+
+        /* Main headline */
+        .welcome-content .headline {
+            font-size: clamp(2.6rem, 6vw, 4.8rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            transition: all 1s var(--ease-expensive);
+        }
+        .welcome-overlay.is-visible .welcome-content .headline {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition-delay: 0.35s;
+        }
+        .welcome-content .headline .gradient-text {
             background: var(--logo-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.2em;
-            line-height: 1;
+            background-clip: text;
         }
 
-        .welcome-content .welcome-headline {
-            font-size: clamp(1.6rem, 3vw, 2.6rem);
-            font-weight: 600;
-            color: #fff;
-            letter-spacing: -0.02em;
-            margin-top: 8px;
-        }
-
-        .welcome-content .welcome-sub {
-            font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+        /* Supporting copy */
+        .welcome-content .sub-copy {
+            font-size: clamp(0.95rem, 1.2vw, 1.15rem);
             color: var(--text-secondary);
             font-weight: 400;
             max-width: 480px;
-            margin: 16px auto 28px;
+            margin: 8px auto 32px;
             line-height: 1.6;
+            letter-spacing: 0.01em;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: all 0.9s var(--ease-expensive);
+        }
+        .welcome-overlay.is-visible .welcome-content .sub-copy {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.55s;
         }
 
-        .welcome-identity {
+        /* Divider line */
+        .welcome-content .divider-line {
+            width: 60px;
+            height: 1px;
+            background: var(--border-strong);
+            margin: 0 auto 28px;
+            opacity: 0;
+            transition: opacity 0.8s var(--ease-expensive);
+        }
+        .welcome-overlay.is-visible .welcome-content .divider-line {
+            opacity: 1;
+            transition-delay: 0.7s;
+        }
+
+        /* Identity card */
+        .welcome-content .identity-card {
             display: inline-flex;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            padding: 10px 20px;
+            gap: 6px;
+            padding: 14px 28px;
             border: 1px solid var(--border-subtle);
-            border-radius: 100px;
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            margin-bottom: 36px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.015);
+            backdrop-filter: blur(8px);
+            margin-bottom: 40px;
             font-family: var(--font-mono);
-            font-size: 11px;
-            letter-spacing: 0.08em;
-            color: var(--text-secondary);
+            opacity: 0;
+            transform: translateY(14px);
+            transition: all 0.9s var(--ease-expensive);
         }
-        .welcome-identity .id-label {
+        .welcome-overlay.is-visible .welcome-content .identity-card {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.75s;
+        }
+        .welcome-content .identity-card .id-label {
+            font-size: 9px;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            opacity: 0.5;
+            color: var(--text-muted);
         }
-        .welcome-identity .id-value {
-            color: #fff;
+        .welcome-content .identity-card .id-value {
+            font-size: clamp(13px, 1.1vw, 16px);
             font-weight: 500;
-            letter-spacing: 0.12em;
+            color: #fff;
+            letter-spacing: 0.06em;
+        }
+        .welcome-content .identity-card .id-status {
+            font-size: 9px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #22c55e;
+            margin-top: 2px;
         }
 
-        .welcome-continue-btn {
-            background: #fff;
-            border: none;
+        /* CTA button */
+        .welcome-content .cta-btn {
+            position: relative;
+            background: transparent;
+            border: 1px solid var(--border-strong);
             border-radius: 6px;
-            padding: 14px 48px;
+            padding: 14px 44px 14px 36px;
+            font-family: var(--font-main);
             font-size: 13px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            color: #000;
+            color: #fff;
             cursor: pointer;
-            transition: all 0.3s var(--ease-expensive);
-            position: relative;
+            transition: all 0.4s var(--ease-expensive);
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: all 0.9s var(--ease-expensive), border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
             overflow: hidden;
         }
-        .welcome-continue-btn:hover {
-            background: rgba(255, 255, 255, 0.9);
-            transform: scale(1.02);
+        .welcome-overlay.is-visible .welcome-content .cta-btn {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.95s;
         }
-        .welcome-continue-btn:active {
+        .welcome-content .cta-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 6px;
+            background: var(--logo-gradient);
+            opacity: 0;
+            transition: opacity 0.4s var(--ease-expensive);
+            z-index: -1;
+        }
+        .welcome-content .cta-btn:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 0 40px rgba(96, 54, 225, 0.12);
+        }
+        .welcome-content .cta-btn:hover::before {
+            opacity: 0.08;
+        }
+        .welcome-content .cta-btn:active {
             transform: scale(0.97);
         }
+        .welcome-content .cta-btn .arrow {
+            display: inline-block;
+            transition: transform 0.4s var(--ease-expensive);
+            font-size: 16px;
+            line-height: 1;
+        }
+        .welcome-content .cta-btn:hover .arrow {
+            transform: translateX(4px);
+        }
 
-        /* Responsiveness */
+        /* Bottom metadata */
+        .welcome-overlay .sys-label-bottom {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 0.8s var(--ease-expensive);
+        }
+        .welcome-overlay.is-visible .sys-label-bottom {
+            opacity: 1;
+            transition-delay: 1.0s;
+        }
+
+        /* Small screen adjustments */
         @media (max-width: 1024px) {
             .app-viewport {
                 grid-template-columns: 1fr;
@@ -773,11 +949,28 @@
                 height: 100vh;
                 padding: 30px 20px;
             }
-            .welcome-content .logo-mark {
-                font-size: clamp(2.8rem, 12vw, 4.5rem);
+            .welcome-content .headline {
+                font-size: clamp(2.2rem, 8vw, 3.4rem);
             }
-            .welcome-content .welcome-headline {
-                font-size: clamp(1.4rem, 5vw, 2rem);
+            .welcome-overlay .sys-label-top {
+                top: 24px;
+                left: 24px;
+                font-size: 9px;
+            }
+            .welcome-overlay .status-indicator {
+                top: 24px;
+                right: 24px;
+                font-size: 9px;
+            }
+            .welcome-overlay .sys-label-bottom {
+                bottom: 24px;
+                font-size: 8px;
+            }
+            .welcome-content .wordmark {
+                margin-bottom: 32px;
+            }
+            .welcome-content .identity-card {
+                padding: 12px 20px;
             }
         }
 
@@ -794,15 +987,80 @@
                 height: 140px;
                 font-size: 10px;
             }
-            .welcome-identity {
-                flex-wrap: wrap;
-                justify-content: center;
-                padding: 10px 16px;
+            .welcome-content .headline {
+                font-size: clamp(1.8rem, 10vw, 2.6rem);
+            }
+            .welcome-content .sub-copy {
+                font-size: 0.9rem;
+            }
+            .welcome-content .identity-card .id-value {
+                font-size: 12px;
+            }
+            .welcome-content .cta-btn {
+                padding: 12px 28px 12px 24px;
+                font-size: 12px;
+            }
+            .welcome-overlay .sys-label-top {
+                top: 16px;
+                left: 16px;
+                font-size: 8px;
+            }
+            .welcome-overlay .status-indicator {
+                top: 16px;
+                right: 16px;
+                font-size: 8px;
+            }
+            .welcome-overlay .sys-label-bottom {
+                bottom: 16px;
+                font-size: 7px;
+            }
+            .welcome-content .wordmark {
+                margin-bottom: 24px;
                 font-size: 10px;
             }
-            .welcome-continue-btn {
-                padding: 12px 32px;
-                font-size: 12px;
+            .welcome-content .divider-line {
+                width: 40px;
+                margin-bottom: 20px;
+            }
+            .welcome-content .identity-card {
+                margin-bottom: 28px;
+                padding: 10px 16px;
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .welcome-overlay.is-visible .welcome-content .wordmark,
+            .welcome-overlay.is-visible .welcome-content .headline,
+            .welcome-overlay.is-visible .welcome-content .sub-copy,
+            .welcome-overlay.is-visible .welcome-content .divider-line,
+            .welcome-overlay.is-visible .welcome-content .identity-card,
+            .welcome-overlay.is-visible .welcome-content .cta-btn,
+            .welcome-overlay.is-visible .sys-label-top,
+            .welcome-overlay.is-visible .status-indicator,
+            .welcome-overlay.is-visible .sys-label-bottom {
+                opacity: 1;
+                transform: none;
+                transition-delay: 0s;
+            }
+            .welcome-overlay .atmos-glow {
+                opacity: 0.06;
+            }
+            .welcome-overlay.is-visible .atmos-glow {
+                opacity: 0.10;
+            }
+            .welcome-content .cta-btn:hover .arrow {
+                transform: none;
+            }
+            .welcome-content .cta-btn:hover {
+                transform: none;
             }
         }
     </style>
@@ -966,22 +1224,57 @@
     </div>
 
     <!-- ============================================================
-    FULLSCREEN WELCOME OVERLAY
+    FULLSCREEN WELCOME OVERLAY — REDESIGNED
     ============================================================ -->
-    <div class="welcome-overlay" id="welcomeOverlay">
-        <div class="glow-orb"></div>
+    <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcome-headline">
+        <!-- Atmospheric glow -->
+        <div class="atmos-glow"></div>
+        <!-- Subtle grid -->
+        <div class="grid-bg"></div>
+
+        <!-- Top-left system label -->
+        <div class="sys-label-top">KOMNI / SECURE ENTRY</div>
+
+        <!-- Top-right status -->
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span>Verified</span>
+        </div>
+
+        <!-- Main content -->
         <div class="welcome-content">
-            <div class="logo-mark">KOMNI</div>
-            <h2 class="welcome-headline">Welcome to KOMNI</h2>
-            <p class="welcome-sub">
-                Your issuance key has been verified. Your KOMNI workspace is ready.
+            <!-- KOMNI wordmark (small) -->
+            <div class="wordmark">KOMNI SYSTEM</div>
+
+            <!-- Headline -->
+            <h1 class="headline" id="welcome-headline">
+                Welcome to <span class="gradient-text">KOMNI</span>
+            </h1>
+
+            <!-- Supporting copy -->
+            <p class="sub-copy">
+                Your issuance identity has been verified. Your workspace is ready.
             </p>
-            <div class="welcome-identity">
+
+            <!-- Divider -->
+            <div class="divider-line"></div>
+
+            <!-- Identity card -->
+            <div class="identity-card">
                 <span class="id-label">Issuance Identity</span>
                 <span class="id-value" id="welcomeIdentityDisplay">••••••••••••</span>
+                <span class="id-status">● Authorized</span>
             </div>
-            <button class="welcome-continue-btn" id="welcomeContinueBtn">Continue</button>
+
+            <!-- CTA -->
+            <button class="cta-btn" id="welcomeContinueBtn">
+                Enter KOMNI
+                <span class="arrow">→</span>
+            </button>
         </div>
+
+        <!-- Bottom metadata -->
+        <div class="sys-label-bottom">Secure Workspace Entry</div>
     </div>
 
     <!-- ============================================================
@@ -1001,8 +1294,19 @@
             measurementId: "G-SKLPK0NHFZ"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        let firestoreAvailable = false;
+        let db = null;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            // Enable offline persistence for better resilience
+            db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+            firestoreAvailable = true;
+        } catch (e) {
+            console.warn('Firebase initialization failed:', e);
+            firestoreAvailable = false;
+        }
 
         // ================================================================
         // CONSTANTS
@@ -1056,7 +1360,6 @@
             if (!raw) return '••••••••••••';
             const trimmed = raw.trim();
             if (trimmed.length <= 6) return '••••••••••••';
-            // Show first 3 and last 3 chars, dots in between
             const first = trimmed.slice(0, 3);
             const last = trimmed.slice(-3);
             return first + '••••••••' + last;
@@ -1081,7 +1384,6 @@
             [loginCard, validationCard, setupCard].forEach(el => {
                 if (el === card) {
                     el.style.display = 'block';
-                    // re-trigger animation by removing/adding class
                     el.classList.remove('is-active');
                     void el.offsetWidth;
                     el.classList.add('is-active');
@@ -1111,26 +1413,50 @@
         }
 
         // ================================================================
-        // WELCOME OVERLAY
+        // WELCOME OVERLAY — SHOW WITH CINEMATIC STAGGER
         // ================================================================
         function showWelcome(verifiedKey) {
             const masked = maskKey(verifiedKey);
             welcomeIdentityDisplay.textContent = masked;
-            welcomeOverlay.classList.add('is-visible');
 
-            // Animate in with GSAP for extra polish
-            gsap.fromTo('.welcome-content', {
-                opacity: 0,
-                y: 40,
-                scale: 0.96
-            }, {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 0.9,
-                ease: 'power3.out',
-                delay: 0.2
+            // Ensure overlay is visible but starts hidden
+            welcomeOverlay.classList.remove('is-visible');
+            // Force reflow
+            void welcomeOverlay.offsetWidth;
+
+            // Use GSAP for the cinematic reveal
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    welcomeOverlay.classList.add('is-visible');
+                }
             });
+
+            // Fade in the overlay background
+            tl.to(welcomeOverlay, {
+                opacity: 1,
+                duration: 1.2,
+                ease: 'power3.inOut',
+                onStart: () => {
+                    welcomeOverlay.style.pointerEvents = 'auto';
+                }
+            });
+
+            // The staggered elements are handled by CSS transitions with delays,
+            // but we need to ensure the overlay is visible first.
+            // We'll add the class after the background fades in slightly.
+            tl.call(() => {
+                welcomeOverlay.classList.add('is-visible');
+            }, [], 0.3);
+
+            // Small extra polish: pulse the glow slightly
+            tl.to('.atmos-glow', {
+                opacity: 0.12,
+                duration: 2.0,
+                ease: 'sine.inOut',
+            }, 0.5);
+
+            // Store the key on the button for later use
+            welcomeContinueBtn.dataset.key = verifiedKey;
         }
 
         // ================================================================
@@ -1206,7 +1532,6 @@
         // AUTHENTICATION PROGRESS (repurposed loading bar)
         // ================================================================
         function runAuthProgress(verifiedKey) {
-            let stepIndex = 0;
             let progress = 0;
             let lastPct = 0;
 
@@ -1218,11 +1543,9 @@
             setupProgressStatus.innerText = 'Initiating…';
             setupProgressPct.innerText = '0%';
 
-            // Disable the auth button while progress runs
             authBtn.disabled = true;
 
             const interval = setInterval(() => {
-                // Advance progress
                 progress += 4;
                 if (progress > 100) progress = 100;
 
@@ -1231,16 +1554,13 @@
                 for (let i = AUTH_STAGES.length - 1; i >= 0; i--) {
                     if (progress >= AUTH_STAGES[i].pct) {
                         stageLabel = AUTH_STAGES[i].label;
-                        stepIndex = i;
                         break;
                     }
                 }
 
-                // Update UI
                 setupProgressBar.style.width = progress + '%';
                 setupProgressPct.innerText = progress + '%';
 
-                // Update status text with stage transitions
                 if (progress >= 25 && lastPct < 25) {
                     setupTerminal.innerHTML += `<span class="terminal-line accent">> Verifying issuance key signature…</span>`;
                     setupStatusPill.innerText = 'Verifying';
@@ -1268,7 +1588,7 @@
 
                     clearInterval(interval);
 
-                    // --- Check Firebase for onboarding state ---
+                    // --- Check onboarding state with Firebase fallback ---
                     checkOnboardingState(verifiedKey);
                 }
 
@@ -1281,10 +1601,22 @@
         }
 
         // ================================================================
-        // FIREBASE ONBOARDING PERSISTENCE
+        // FIREBASE ONBOARDING PERSISTENCE — with graceful fallback
         // ================================================================
         async function checkOnboardingState(verifiedKey) {
             const docId = hashKey(verifiedKey);
+
+            // If Firestore is not available, treat as new user and show welcome
+            if (!firestoreAvailable || !db) {
+                setupTerminal.innerHTML +=
+                    `<span class="terminal-line dim">> Firestore unavailable — proceeding to welcome.</span>`;
+                setTimeout(() => {
+                    showWelcome(verifiedKey);
+                    welcomeContinueBtn.dataset.key = verifiedKey;
+                }, 500);
+                return;
+            }
+
             try {
                 const docRef = db.collection('users').doc(docId);
                 const docSnap = await docRef.get();
@@ -1308,13 +1640,14 @@
 
                     setTimeout(() => {
                         showWelcome(verifiedKey);
-                        // Store the verified key on the continue button so we can save it
                         welcomeContinueBtn.dataset.key = verifiedKey;
                     }, 500);
                 }
             } catch (err) {
                 // Firestore error: fallback to welcome (safe path)
                 console.warn('Firestore check failed, falling back to welcome:', err);
+                setupTerminal.innerHTML +=
+                    `<span class="terminal-line dim">> Firestore unavailable — proceeding to welcome.</span>`;
                 setTimeout(() => {
                     showWelcome(verifiedKey);
                     welcomeContinueBtn.dataset.key = verifiedKey;
@@ -1323,7 +1656,7 @@
         }
 
         // ================================================================
-        // WELCOME CONTINUE HANDLER
+        // WELCOME CONTINUE HANDLER — with Firebase fallback
         // ================================================================
         welcomeContinueBtn.addEventListener('click', async function() {
             const key = this.dataset.key;
@@ -1332,25 +1665,27 @@
                 return;
             }
 
-            // Mark onboarding complete in Firestore
-            const docId = hashKey(key);
-            try {
-                await db.collection('users').doc(docId).set({
-                    onboardingComplete: true,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    // store a masked reference only — never the raw key
-                    identityRef: 'ik-' + docId.slice(0, 8)
-                }, { merge: true });
-            } catch (err) {
-                console.warn('Failed to save onboarding state:', err);
-                // Continue anyway — don't block the user
+            // Mark onboarding complete in Firestore (if available)
+            if (firestoreAvailable && db) {
+                const docId = hashKey(key);
+                try {
+                    await db.collection('users').doc(docId).set({
+                        onboardingComplete: true,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        identityRef: 'ik-' + docId.slice(0, 8)
+                    }, { merge: true });
+                } catch (err) {
+                    console.warn('Failed to save onboarding state:', err);
+                    // Continue anyway — don't block the user
+                }
             }
 
-            // Transition to dashboard
+            // Transition out and redirect
             welcomeOverlay.classList.remove('is-visible');
+            // Small delay to let the fade-out happen
             setTimeout(() => {
                 window.location.href = 'dashboard.html#issued';
-            }, 400);
+            }, 500);
         });
 
         // ================================================================
@@ -1498,6 +1833,13 @@
                 welcomeContinueBtn.click();
             }
         });
+
+        // ================================================================
+        // HANDLE FIRESTORE UNAVAILABLE GRACEFULLY
+        // ================================================================
+        // If Firestore fails to initialize, we still want the app to work.
+        // The checkOnboardingState function already handles this with fallback.
+        console.log('KOMNI Login System ready. Firestore available:', firestoreAvailable);
     </script>
 </body>
 </html>
