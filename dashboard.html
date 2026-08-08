@@ -9,10 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Firebase Compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
   <style>
     /* ==========================================================================
        1. ENTERPRISE DESIGN SYSTEM VARIABLES & RESET
@@ -684,117 +680,9 @@
       padding: 24px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     }
-
-    /* ==========================================================================
-       4. WELCOME WIZARD OVERLAY
-       ========================================================================== */
-    #welcomeWizard {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at 50% 50%, #120930 0%, #030308 100%);
-      transition: opacity 0.8s ease;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #welcomeWizard .wizard-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      padding: 40px 60px;
-      max-width: 600px;
-      text-align: center;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-      transform: scale(0.9);
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
-      opacity: 0;
-    }
-
-    #welcomeWizard .wizard-card h1 {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      background: var(--logo-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-
-    #welcomeWizard .wizard-card .wizard-key-label {
-      color: var(--text-secondary);
-      margin: 16px 0 8px;
-      font-size: 14px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    #welcomeWizard .wizard-card .wizard-key-display {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 24px;
-      font-weight: 600;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 12px 24px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      display: inline-block;
-      margin-bottom: 16px;
-      word-break: break-all;
-    }
-
-    #welcomeWizard .wizard-card .wizard-owner {
-      color: var(--text-secondary);
-      font-size: 13px;
-    }
-
-    #welcomeWizard .wizard-card .wizard-tier {
-      color: var(--text-muted);
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    #welcomeWizard .wizard-card .wizard-launch-btn {
-      margin-top: 28px;
-      background: var(--logo-gradient);
-      border: none;
-      color: #fff;
-      font-weight: 600;
-      padding: 12px 32px;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 0 20px var(--accent-violet-glow);
-      transition: all 0.2s ease;
-    }
-
-    #welcomeWizard .wizard-card .wizard-launch-btn:hover {
-      box-shadow: 0 0 30px var(--accent-magenta-glow);
-      transform: translateY(-2px);
-    }
   </style>
 </head>
 <body>
-
-  <!-- ================================================================ -->
-  <!-- WELCOME WIZARD OVERLAY                                           -->
-  <!-- ================================================================ -->
-  <div id="welcomeWizard">
-    <div class="wizard-card">
-      <h1>Welcome Back</h1>
-      <div class="wizard-key-label">Issuance Key</div>
-      <div class="wizard-key-display" id="wizardKeyDisplay"></div>
-      <div class="wizard-owner" id="wizardOwnerDisplay"></div>
-      <div class="wizard-tier" id="wizardTierDisplay"></div>
-      <button class="wizard-launch-btn" onclick="dismissWizard()">Launch Dashboard</button>
-    </div>
-  </div>
-  <!-- ================================================================ -->
 
   <div class="app-container">
     
@@ -1063,23 +951,10 @@
   </div>
 
   <script>
-    // ===================== FIREBASE CONFIGURATION =====================
-    const firebaseConfig = {
-      apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
-      authDomain: "komni-2439f.firebaseapp.com",
-      projectId: "komni-2439f",
-      storageBucket: "komni-2439f.firebasestorage.app",
-      messagingSenderId: "1005791374529",
-      appId: "1:1005791374529:web:e1735b735f4c8c420eb840",
-      measurementId: "G-SKLPK0NHFZ"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
     const INTERCEPTOR_URL = 'https://komni-backend.vercel.app/api/interceptor';
     
     // Smooth buffer for live visualizer graph
-    let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, 0];
+    let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, trafficVal(0)];
 
     function trafficVal(volume) {
       return Math.min(130, Math.max(10, (volume * 2.5) + 20));
@@ -1177,76 +1052,6 @@
       }
     }
 
-    // ===================== WELCOME WIZARD LOGIC =====================
-    async function showWelcomeWizard() {
-      const key = localStorage.getItem('komni_issuance_key');
-      if (!key) {
-        window.location.href = 'login.html';
-        return;
-      }
-
-      const wizard = document.getElementById('welcomeWizard');
-      const keyDisplay = document.getElementById('wizardKeyDisplay');
-      const ownerDisplay = document.getElementById('wizardOwnerDisplay');
-      const tierDisplay = document.getElementById('wizardTierDisplay');
-
-      // Try to fetch from Firestore first
-      let userData = null;
-      try {
-        const doc = await db.collection('users').doc(key).get();
-        if (doc.exists) {
-          userData = doc.data();
-          localStorage.setItem('komni_user_metadata', JSON.stringify(userData));
-        }
-      } catch (e) {
-        console.warn('Firestore fetch failed, using localStorage fallback', e);
-      }
-
-      // Fallback to localStorage if Firestore failed or no doc
-      if (!userData) {
-        const stored = localStorage.getItem('komni_user_metadata');
-        if (stored) {
-          try {
-            userData = JSON.parse(stored);
-          } catch (e) {
-            userData = null;
-          }
-        }
-      }
-
-      if (!userData) {
-        // No data at all – redirect to login
-        window.location.href = 'login.html';
-        return;
-      }
-
-      // Populate wizard
-      keyDisplay.textContent = key;
-      ownerDisplay.textContent = `Owner: ${userData.owner || '—'}`;
-      tierDisplay.textContent = `Tier: ${userData.tier || '—'}`;
-
-      // Show wizard with animation
-      const card = wizard.querySelector('.wizard-card');
-      wizard.style.opacity = '1';
-      wizard.style.pointerEvents = 'auto';
-      // Force reflow for transition
-      requestAnimationFrame(() => {
-        card.style.opacity = '1';
-        card.style.transform = 'scale(1)';
-      });
-    }
-
-    function dismissWizard() {
-      const wizard = document.getElementById('welcomeWizard');
-      const card = wizard.querySelector('.wizard-card');
-      card.style.opacity = '0';
-      card.style.transform = 'scale(0.9)';
-      wizard.style.opacity = '0';
-      wizard.style.pointerEvents = 'none';
-      // Dashboard is now fully accessible
-    }
-    // ================================================================
-
     function openPolicyModal() {
       document.getElementById('policyModal').classList.add('active');
     }
@@ -1255,15 +1060,9 @@
       document.getElementById('policyModal').classList.remove('active');
     }
 
-    // ===================== INITIALIZATION =====================
-    document.addEventListener('DOMContentLoaded', async () => {
-      // First show the welcome wizard (will redirect if no session)
-      await showWelcomeWizard();
-
-      // Then start telemetry polling (runs in background)
-      fetchTelemetry();
-      setInterval(fetchTelemetry, 3000);
-    });
+    // Initialize telemetry polling cycle (Every 3 seconds)
+    fetchTelemetry();
+    setInterval(fetchTelemetry, 3000);
   </script>
 </body>
 </html>
