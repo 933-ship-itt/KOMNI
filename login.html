@@ -16,7 +16,6 @@
 
   <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -36,7 +35,6 @@
       --font-mono: 'JetBrains Mono', monospace;
       --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
 
-      /* Advert & Login Variables */
       --bg-black: #030308;
       --accent-violet: #6036E1;
       --accent-magenta: #D83DC2;
@@ -308,7 +306,7 @@
     }
 
     /* ==========================================================================
-       3. ISSUANCE KEY LOGIN TERMINAL & CARDS
+       3. ISSUANCE KEY LOGIN TERMINAL
        ========================================================================== */
     .login-side {
       position: relative;
@@ -469,193 +467,42 @@
       flex-shrink: 0;
     }
 
-    /* Dynamic Multi-Step Login Cards */
-    .validation-card, .survey-card, .setup-card {
+    /* ==========================================================================
+       4. VALIDATION STATUS (embedded in login card)
+       ========================================================================== */
+    .validation-status {
+      margin-top: 16px;
       display: none;
-      width: 100%;
-      max-width: 420px;
-      background: transparent;
-      border: none;
-      position: relative;
-    }
-
-    .validation-card.is-active,
-    .survey-card.is-active,
-    .setup-card.is-active {
-      animation: cardLiftIn 0.5s var(--ease-expensive) both;
-    }
-
-    @keyframes cardLiftIn {
-      from {
-        opacity: 0;
-        transform: translateY(18px) scale(0.97);
-        filter: blur(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-    }
-
-    .auth-status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text-secondary);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      width: fit-content;
-    }
-
-    .auth-status-pill::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent-magenta);
-      box-shadow: 0 0 12px rgba(216, 61, 194, 0.85);
-    }
-
-    .auth-status-pill.is-success {
-      color: #fff;
-      border-color: rgba(34, 197, 94, 0.35);
-      background: rgba(34, 197, 94, 0.08);
-    }
-
-    .auth-status-pill.is-success::before {
-      background: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.95);
-    }
-
-    .auth-status-pill.is-error {
-      color: #ef4444;
-      border-color: rgba(239, 68, 68, 0.35);
-      background: rgba(239, 68, 68, 0.08);
-    }
-
-    .auth-status-pill.is-error::before {
-      background: #ef4444;
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.95);
-    }
-
-    .terminal-box {
-      background: #030308;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      line-height: 1.6;
-      color: var(--text-secondary);
-      margin: 20px 0;
-      height: 180px;
-      overflow-y: auto;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-    }
-    
-    .terminal-line {
-      display: block;
-      margin-bottom: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .terminal-line.info { color: #8A8A8A; }
-    .terminal-line.success { color: #22c55e; }
-    .terminal-line.error { color: #ef4444; }
-    .terminal-line.accent { color: var(--accent-magenta); }
-
-    /* Custom Radio Buttons */
-    .custom-survey-group { margin-bottom: 20px; }
-    .survey-question {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      margin-bottom: 10px;
-      display: block;
-    }
-    .survey-options { display: flex; flex-direction: column; gap: 8px; }
-    .survey-option {
-      display: flex;
-      align-items: center;
-      position: relative;
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px;
       border-radius: 6px;
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: all 0.3s var(--ease-expensive);
-    }
-    .survey-option:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.02);
-    }
-    .survey-option input[type="radio"] { position: absolute; opacity: 0; cursor: pointer; }
-    .option-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      margin-right: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-    .survey-option input[type="radio"]:checked ~ .option-dot {
-      border-color: var(--accent-magenta);
-      box-shadow: 0 0 8px var(--accent-magenta);
-    }
-    .survey-option input[type="radio"]:checked ~ .option-dot::after {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent-magenta);
-    }
-    .option-text { font-size: 12px; color: var(--text-secondary); transition: color 0.3s ease; }
-    .survey-option input[type="radio"]:checked ~ .option-text { color: #fff; font-weight: 500; }
-
-    /* Progress Setup Box */
-    .setup-progress-container { margin: 24px 0; }
-    .progress-bar-wrapper {
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--logo-gradient);
-      border-radius: 10px;
-      box-shadow: 0 0 10px var(--accent-magenta);
-    }
-    .progress-label-group {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
+      color: var(--text-secondary);
     }
-    .progress-status-text { color: var(--text-secondary); }
-    .progress-percentage { color: var(--accent-magenta); font-weight: 600; }
 
-    /* Responsiveness */
+    .validation-status.is-visible {
+      display: block;
+    }
+
+    .validation-status .status-line {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .validation-status .status-line.success { color: #22c55e; }
+    .validation-status .status-line.error { color: #ef4444; }
+    .validation-status .status-line.accent { color: var(--accent-magenta); }
+
+    .retry-button {
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* ==========================================================================
+       5. RESPONSIVENESS
+       ========================================================================== */
     @media (max-width: 1024px) {
       .app-viewport { grid-template-columns: 1fr; overflow-y: auto; }
       .advert-side { display: none; }
@@ -737,7 +584,7 @@
     <!-- RIGHT SIDE: CLEAN ISSUANCE KEY LOGIN TERMINAL -->
     <div class="login-side">
       
-      <!-- 1. INITIAL LOGIN CARD -->
+      <!-- LOGIN CARD -->
       <div class="login-card" id="loginCard">
         <div class="brand-header">
           <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
@@ -764,117 +611,28 @@
           </button>
         </form>
 
+        <!-- Validation status area (hidden by default) -->
+        <div class="validation-status" id="validationStatus">
+          <span class="status-line" id="statusLine1"></span>
+          <span class="status-line" id="statusLine2"></span>
+          <span class="status-line" id="statusLine3"></span>
+          <div class="retry-button" id="retryButtonContainer">
+            <button class="submit-btn" onclick="resetLoginCard();" style="margin-top:8px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid var(--border-subtle);">
+              <span>Try Another Key</span>
+            </button>
+          </div>
+        </div>
+
         <div class="security-notice">
           <div class="shield-dot"></div>
           <div class="security-notice-text">System authorization required. Node session activity is permanently hash-chained.</div>
         </div>
       </div>
 
-      <!-- 2. VALIDATION CARD -->
-      <div class="validation-card" id="validationCard">
-        <div class="brand-header">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title" id="validationTitle">Verifying Issuance Registry</h2>
-          <p class="login-subtitle">Establishing connection to the secure Firebase gatekeeper...</p>
-          <div class="auth-status-pill" id="validationStatusPill">Awaiting registry handshake</div>
-        </div>
-        
-        <div class="terminal-box" id="validationTerminal"></div>
-
-        <div id="retryButtonContainer" style="display: none; margin-top: 15px;">
-          <button class="submit-btn" onclick="resetLoginCard();">
-            <span>Try Another Key</span>
-          </button>
-        </div>
-
-        <div class="security-notice">
-          <div class="shield-dot"></div>
-          <div class="security-notice-text">Out-of-band HSM verification in progress.</div>
-        </div>
-      </div>
-
-      <!-- 3. SURVEY CARD -->
-      <div class="survey-card" id="surveyCard">
-        <div class="brand-header">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title">Configure Client Preferences</h2>
-          <p class="login-subtitle">Key validated. Confirm the issued workspace preferences before the dashboard loads.</p>
-          <div class="auth-status-pill" id="surveyStatusPill">Preference profile required</div>
-        </div>
-
-        <form id="surveyForm" onsubmit="handleSurveySubmit(event);">
-          <div class="custom-survey-group">
-            <span class="survey-question">Preferred Operating Posture</span>
-            <div class="survey-options">
-              <label class="survey-option">
-                <input type="radio" name="govProfile" value="strict" checked>
-                <div class="option-dot"></div>
-                <div class="option-text">Strict issuance controls</div>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="govProfile" value="balanced">
-                <div class="option-dot"></div>
-                <div class="option-text">Balanced operations</div>
-              </label>
-            </div>
-          </div>
-
-          <div class="custom-survey-group">
-            <span class="survey-question">Notification Cadence</span>
-            <div class="survey-options">
-              <label class="survey-option">
-                <input type="radio" name="endpoint" value="email" checked>
-                <div class="option-dot"></div>
-                <div class="option-text">Email summaries</div>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="endpoint" value="console">
-                <div class="option-dot"></div>
-                <div class="option-text">Console-only updates</div>
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" class="submit-btn">
-            <span>Finalize Preference Profile</span>
-          </button>
-        </form>
-      </div>
-
-      <!-- 4. SETUP CARD -->
-      <div class="setup-card" id="setupCard">
-        <div class="brand-header">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title">Provisioning Issued Workspace</h2>
-          <p class="login-subtitle">Firebase registry verified. Preparing the dashboard shell and neutral telemetry.</p>
-          <div class="auth-status-pill" id="setupStatusPill">Building dashboard shell</div>
-        </div>
-
-        <div class="terminal-box" id="setupTerminal"></div>
-
-        <div class="setup-progress-container">
-          <div class="progress-bar-wrapper">
-            <div class="progress-bar-fill" id="setupProgressBar"></div>
-          </div>
-          <div class="progress-label-group">
-            <span class="progress-status-text" id="setupProgressStatus">Extracting packages...</span>
-            <span class="progress-percentage" id="setupProgressPercentage">0%</span>
-          </div>
-        </div>
-
-        <button class="submit-btn" id="launchDashboardBtn" style="display: none;" onclick="launchDashboard();">
-          <span>Enter Issued Dashboard</span>
-        </button>
-      </div>
-
     </div>
   </div>
 
-  <!-- SCRIPT ENGINE -->
   <script>
-    // Live Backend Vercel Endpoint
-    const VERCEL_BACKEND_URL = 'https://komni-backend.vercel.app/api/verify_key';
-
     // ===================== FIREBASE CONFIGURATION =====================
     // Replace with your own Firebase project credentials
     const firebaseConfig = {
@@ -890,8 +648,10 @@
     const db = firebase.firestore();
     // =================================================================
 
+    const VERCEL_BACKEND_URL = 'https://komni-backend.vercel.app/api/verify_key';
+
+    // --- Background Particle Engine (unchanged) ---
     document.addEventListener('DOMContentLoaded', () => {
-      // Background Dynamic Particle Engine
       class DynamicParticle {
         constructor(canvasRef) { 
           this.canvas = canvasRef;
@@ -1024,58 +784,59 @@
       initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
     });
 
-    // Integrated Authentication with Vercel Python Backend
+    // ===================== AUTH HANDLING =====================
     async function handleAuthSubmit(e) {
       e.preventDefault();
       
       let rawKey = document.getElementById('issuanceKeyInput').value.trim();
       if (!rawKey) return;
 
-      // Convenience mapping: convert 'test' to demo test key format
+      // Normalise key
       let formattedKey = rawKey;
       if (rawKey.toLowerCase() === 'test') {
         formattedKey = 'ik_test_demo';
       } else if (rawKey.toUpperCase().startsWith('IK-')) {
-        // Standardize IK- keys to lower case prefix for backend matching
         formattedKey = 'ik_' + rawKey.substring(3);
       }
 
-      document.getElementById('loginCard').style.display = 'none';
-      const valCard = document.getElementById('validationCard');
-      valCard.style.display = 'block';
-      valCard.classList.add('is-active');
+      // Disable the submit button to prevent double-clicks
+      const btn = document.getElementById('authBtn');
+      btn.disabled = true;
+      btn.querySelector('span').textContent = 'Verifying...';
 
-      const term = document.getElementById('validationTerminal');
-      const pill = document.getElementById('validationStatusPill');
-      
-      pill.className = 'auth-status-pill';
-      pill.innerText = 'Connecting to Gateway...';
-      document.getElementById('retryButtonContainer').style.display = 'none';
+      // Show validation status area
+      const statusDiv = document.getElementById('validationStatus');
+      statusDiv.classList.add('is-visible');
+      const line1 = document.getElementById('statusLine1');
+      const line2 = document.getElementById('statusLine2');
+      const line3 = document.getElementById('statusLine3');
+      const retryContainer = document.getElementById('retryButtonContainer');
+      retryContainer.style.display = 'none';
 
-      term.innerHTML = `<span class="terminal-line info">> Initializing HSM Handshake for key: ${rawKey}</span>`;
+      line1.textContent = `> Initializing HSM Handshake for key: ${rawKey}`;
+      line1.className = 'status-line';
+      line2.textContent = '> Querying Vercel Serverless Backend...';
+      line2.className = 'status-line accent';
+      line3.textContent = '';
 
       try {
-        term.innerHTML += '<span class="terminal-line accent">> Querying Vercel Serverless Backend...</span>';
-        
         const response = await fetch(VERCEL_BACKEND_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: formattedKey })
         });
 
         const data = await response.json();
 
         if (response.ok && data.valid) {
-          term.innerHTML += `<span class="terminal-line success">> Backend Signature: VERIFIED [200 OK]</span>`;
+          line2.textContent = '> Backend Signature: VERIFIED [200 OK]';
+          line2.className = 'status-line success';
           if (data.metadata && data.metadata.owner) {
-            term.innerHTML += `<span class="terminal-line info">> Registered Owner: ${data.metadata.owner}</span>`;
+            line3.textContent = `> Registered Owner: ${data.metadata.owner}`;
+            line3.className = 'status-line info';
           }
-          pill.classList.add('is-success');
-          pill.innerText = 'Handshake Complete';
 
-          // ========== SAVE TO FIRESTORE & LOCAL STORAGE ==========
+          // --- Save to Firebase and localStorage ---
           try {
             const userData = {
               owner: data.metadata.owner || '—',
@@ -1084,14 +845,13 @@
               status: data.metadata.status || 'active',
               lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             };
-            // Use the formatted key as document ID
             await db.collection('users').doc(formattedKey).set(userData);
-            // Also store in localStorage for dashboard
             localStorage.setItem('komni_issuance_key', formattedKey);
             localStorage.setItem('komni_user_metadata', JSON.stringify(userData));
+            console.log('✅ User data saved to Firebase & localStorage');
           } catch (firestoreError) {
-            console.warn('Firestore write failed, but continuing with localStorage fallback', firestoreError);
-            // Fallback: store only in localStorage
+            console.warn('⚠️ Firestore write failed, but continuing with localStorage fallback', firestoreError);
+            // Still store in localStorage so dashboard can work
             localStorage.setItem('komni_issuance_key', formattedKey);
             localStorage.setItem('komni_user_metadata', JSON.stringify({
               owner: data.metadata.owner || '—',
@@ -1100,76 +860,53 @@
               status: data.metadata.status || 'active'
             }));
           }
-          // ========================================================
 
+          // Update button to show success and redirect after a moment
+          btn.querySelector('span').textContent = '✔ Authenticated!';
+          btn.style.background = '#22c55e';
+          btn.style.color = '#fff';
+          btn.disabled = true;
+
+          // Redirect to dashboard after 1.5 seconds
           setTimeout(() => {
-            valCard.style.display = 'none';
-            const surCard = document.getElementById('surveyCard');
-            surCard.style.display = 'block';
-            surCard.classList.add('is-active');
-          }, 1800);
+            window.location.href = 'dashboard.html';
+          }, 1500);
 
         } else {
-          term.innerHTML += `<span class="terminal-line error">> AUTHENTICATION REJECTED: ${data.reason || 'Invalid Key'}</span>`;
-          pill.classList.add('is-error');
-          pill.innerText = 'Authentication Failed';
-          document.getElementById('retryButtonContainer').style.display = 'block';
+          // Authentication failed
+          line2.textContent = `> AUTHENTICATION REJECTED: ${data.reason || 'Invalid Key'}`;
+          line2.className = 'status-line error';
+          line3.textContent = '';
+          btn.querySelector('span').textContent = 'Retry';
+          btn.disabled = false;
+          btn.style.background = '#ef4444';
+          btn.style.color = '#fff';
+          retryContainer.style.display = 'block';
         }
 
       } catch (err) {
-        term.innerHTML += `<span class="terminal-line error">> NETWORK ERROR: Unable to reach backend gateway.</span>`;
-        pill.classList.add('is-error');
-        pill.innerText = 'Gateway Error';
-        document.getElementById('retryButtonContainer').style.display = 'block';
+        console.error('Network error:', err);
+        line2.textContent = '> NETWORK ERROR: Unable to reach backend gateway.';
+        line2.className = 'status-line error';
+        line3.textContent = '';
+        btn.querySelector('span').textContent = 'Retry';
+        btn.disabled = false;
+        btn.style.background = '#ef4444';
+        btn.style.color = '#fff';
+        retryContainer.style.display = 'block';
       }
     }
 
     function resetLoginCard() {
-      document.getElementById('validationCard').style.display = 'none';
-      const loginCard = document.getElementById('loginCard');
-      loginCard.style.display = 'block';
+      const btn = document.getElementById('authBtn');
+      btn.disabled = false;
+      btn.querySelector('span').textContent = 'Authenticate Session';
+      btn.style.background = '#FFFFFF';
+      btn.style.color = '#000000';
+      document.getElementById('validationStatus').classList.remove('is-visible');
       document.getElementById('issuanceKeyInput').value = '';
       document.getElementById('issuanceKeyInput').focus();
-    }
-
-    function handleSurveySubmit(e) {
-      e.preventDefault();
-      document.getElementById('surveyCard').style.display = 'none';
-      const setupCard = document.getElementById('setupCard');
-      setupCard.style.display = 'block';
-      setupCard.classList.add('is-active');
-
-      let progress = 0;
-      const bar = document.getElementById('setupProgressBar');
-      const pct = document.getElementById('setupProgressPercentage');
-      const status = document.getElementById('setupProgressStatus');
-      const term = document.getElementById('setupTerminal');
-
-      term.innerHTML = '<span class="terminal-line info">> Provisioning workspace environment...</span>';
-
-      const interval = setInterval(() => {
-        progress += 10;
-        bar.style.width = progress + '%';
-        pct.innerText = progress + '%';
-
-        if (progress === 40) {
-          status.innerText = 'Binding telemetry sockets...';
-          term.innerHTML += '<span class="terminal-line accent">> Telemetry channel established.</span>';
-        } else if (progress === 80) {
-          status.innerText = 'Applying client preferences...';
-          term.innerHTML += '<span class="terminal-line info">> Governance posture attached.</span>';
-        } else if (progress >= 100) {
-          clearInterval(interval);
-          status.innerText = 'Workspace Ready';
-          term.innerHTML += '<span class="terminal-line success">> Shell compiled successfully.</span>';
-          document.getElementById('launchDashboardBtn').style.display = 'block';
-        }
-      }, 300);
-    }
-
-    function launchDashboard() {
-      // Redirect to dashboard (no hash needed)
-      window.location.href = 'dashboard.html';
+      document.getElementById('retryButtonContainer').style.display = 'none';
     }
   </script>
 </body>
