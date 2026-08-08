@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (kept for future use, but not actively populating) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -309,6 +309,12 @@
             border: 1px solid rgba(34, 197, 94, 0.35);
         }
 
+        .badge-env.unconfigured {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
         .select-input {
             background-color: var(--bg-panel);
             border: 1px solid var(--border-color);
@@ -351,15 +357,19 @@
         .pulse-dot {
             width: 8px;
             height: 8px;
-            background-color: var(--status-success);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--status-success);
+            background-color: var(--text-muted);
             transition: all 0.3s ease;
         }
 
         .pulse-dot.offline {
             background-color: var(--status-danger);
             box-shadow: 0 0 10px var(--status-danger);
+        }
+
+        .pulse-dot.idle {
+            background-color: var(--text-muted);
+            box-shadow: none;
         }
 
         /* ==========================================================================
@@ -387,7 +397,7 @@
         }
 
         /* ==========================================================================
-           4. METRICS AND TELEMETRY PANELS (Overview - same as before)
+           4. METRICS AND TELEMETRY PANELS (Overview - reset)
            ========================================================================== */
         .metrics-header-grid {
             display: grid;
@@ -455,17 +465,19 @@
             font-family: var(--font-sans);
         }
 
+        .kpi-value.placeholder {
+            color: var(--text-muted);
+            font-size: 22px;
+        }
+
         .kpi-trend {
             font-family: var(--font-mono);
             font-size: 11px;
             padding: 2px 7px;
             border-radius: 4px;
             font-weight: 600;
-        }
-
-        .kpi-trend.positive {
-            color: var(--status-success);
-            background: var(--status-success-bg);
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .kpi-subtext {
@@ -522,25 +534,27 @@
             width: 100%;
             height: 200px;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 14px;
         }
 
-        svg.traffic-chart {
+        .chart-container svg {
             width: 100%;
             height: 100%;
-            overflow: visible;
         }
 
-        .chart-line {
-            fill: none;
-            stroke: var(--accent-magenta);
-            stroke-width: 2.5;
-            transition: d 0.4s ease;
-            filter: drop-shadow(0 0 8px var(--accent-magenta-glow));
-        }
-
-        .chart-area {
-            fill: url(#chartGradient);
-            transition: d 0.4s ease;
+        .chart-container .placeholder-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-family: var(--font-sans);
+            pointer-events: none;
         }
 
         .log-stream {
@@ -552,6 +566,7 @@
             max-height: 200px;
             overflow-y: auto;
             padding-right: 4px;
+            color: var(--text-muted);
         }
 
         .log-row {
@@ -562,55 +577,29 @@
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 6px;
-            transition: all 0.2s ease;
-            animation: fadeIn 0.25s ease;
         }
 
-        .log-row:hover {
-            border-color: rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-3px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .log-method {
+        .log-row .log-method {
             font-weight: 700;
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 9px;
             letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        .method-post {
-            background: rgba(96, 54, 225, 0.25);
-            color: #b794f4;
-            border: 1px solid rgba(96, 54, 225, 0.4);
-        }
-        .method-get {
-            background: var(--status-success-bg);
-            color: var(--status-success);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        .log-path {
-            color: var(--text-secondary);
+        .log-row .log-path {
             flex: 1;
             margin: 0 10px;
+            color: var(--text-muted);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .log-latency {
+        .log-row .log-latency {
             color: var(--text-muted);
             font-size: 10px;
         }
@@ -667,22 +656,10 @@
             text-transform: uppercase;
         }
 
-        .badge-status.active {
-            background-color: var(--status-success-bg);
-            color: var(--status-success);
-            border: 1px solid rgba(34, 197, 94, 0.25);
-        }
-
-        .badge-status.expired {
-            background-color: var(--status-danger-bg);
-            color: var(--status-danger);
-            border: 1px solid rgba(239, 68, 68, 0.25);
-        }
-
-        .badge-status.revoked {
-            background-color: rgba(255, 255, 255, 0.05);
+        .badge-status.inactive {
+            background-color: rgba(255, 255, 255, 0.04);
             color: var(--text-muted);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .btn-premium {
@@ -721,15 +698,6 @@
         .btn-premium.small {
             padding: 4px 10px;
             font-size: 10px;
-        }
-
-        .btn-premium.danger {
-            background: var(--status-danger);
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
-        }
-
-        .btn-premium.danger:hover {
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
         }
 
         /* ==========================================================================
@@ -1019,32 +987,30 @@
             <!-- Top Control Header -->
             <header class="top-bar">
                 <div class="context-selector">
-                    <span class="badge-env production">Production</span>
+                    <span class="badge-env unconfigured">Unconfigured</span>
                     <select class="select-input">
-                        <option>Org: Enterprise Financial Mesh</option>
-                        <option>Org: Sandbox Testing Environment</option>
+                        <option>Org: Not Set</option>
                     </select>
                     <select class="select-input">
-                        <option>Timeframe: Live Polling (3s)</option>
-                        <option>Timeframe: Last 24 Hours</option>
+                        <option>Timeframe: N/A</option>
                     </select>
                 </div>
 
                 <div class="top-actions">
                     <div class="system-health">
-                        <span class="pulse-dot" id="system-pulse"></span>
-                        <span id="system-status-text">Firestore Synced</span>
+                        <span class="pulse-dot idle" id="system-pulse"></span>
+                        <span id="system-status-text">Awaiting Configuration</span>
                     </div>
                 </div>
             </header>
 
             <!-- ======================================================================
-            VIEW: OVERVIEW (default)
+            VIEW: OVERVIEW (default) — Fully reset
             ====================================================================== -->
             <div class="view-container active" id="view-overview">
                 <div class="dashboard-viewport">
 
-                    <!-- Key Metrics Cards -->
+                    <!-- Key Metrics Cards — all zero / placeholder -->
                     <section class="metrics-header-grid">
 
                         <div class="kpi-card">
@@ -1053,10 +1019,10 @@
                                 <i class="fas fa-chart-line" style="color: var(--text-muted);"></i>
                             </div>
                             <div class="kpi-value-row">
-                                <span class="kpi-value" id="kpi-requests">0</span>
-                                <span class="kpi-trend positive" id="kpi-requests-trend">+100%</span>
+                                <span class="kpi-value placeholder">—</span>
+                                <span class="kpi-trend">0%</span>
                             </div>
-                            <div class="kpi-subtext" id="kpi-requests-sub">Live middleware requests processed</div>
+                            <div class="kpi-subtext">No data configured</div>
                         </div>
 
                         <div class="kpi-card">
@@ -1065,10 +1031,10 @@
                                 <i class="fas fa-dollar-sign" style="color: var(--text-muted);"></i>
                             </div>
                             <div class="kpi-value-row">
-                                <span class="kpi-value" id="kpi-volume">$0.00</span>
-                                <span class="kpi-trend positive" id="kpi-volume-trend">+100%</span>
+                                <span class="kpi-value placeholder">$0.00</span>
+                                <span class="kpi-trend">0%</span>
                             </div>
-                            <div class="kpi-subtext" id="kpi-volume-sub">Processed payload USD total</div>
+                            <div class="kpi-subtext">No data configured</div>
                         </div>
 
                         <div class="kpi-card">
@@ -1077,10 +1043,10 @@
                                 <i class="fas fa-stopwatch" style="color: var(--text-muted);"></i>
                             </div>
                             <div class="kpi-value-row">
-                                <span class="kpi-value" id="kpi-latency" style="color: var(--accent-magenta);">0ms</span>
-                                <span class="kpi-trend positive" style="background: rgba(96, 54, 225, 0.2); color: #a78bfa;">P99</span>
+                                <span class="kpi-value placeholder" style="color: var(--text-muted);">—</span>
+                                <span class="kpi-trend">P99</span>
                             </div>
-                            <div class="kpi-subtext">Computed roundtrip delay overhead</div>
+                            <div class="kpi-subtext">No data configured</div>
                         </div>
 
                         <div class="kpi-card">
@@ -1089,34 +1055,35 @@
                                 <i class="fas fa-ban" style="color: var(--text-muted);"></i>
                             </div>
                             <div class="kpi-value-row">
-                                <span class="kpi-value" id="kpi-interceptions">0</span>
-                                <span class="kpi-trend" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">0%</span>
+                                <span class="kpi-value placeholder">0</span>
+                                <span class="kpi-trend">0%</span>
                             </div>
-                            <div class="kpi-subtext">Blocked / Redacted proxy payloads</div>
+                            <div class="kpi-subtext">No data configured</div>
                         </div>
 
                     </section>
 
-                    <!-- Dynamic Chart & Live Log Terminal -->
+                    <!-- Dynamic Chart & Live Log Terminal — both empty / placeholder -->
                     <section class="telemetry-split">
 
                         <div class="panel">
                             <div class="panel-header">
                                 <span class="panel-title">Throughput & Middleware Traffic Analysis</span>
-                                <span id="chart-avg-rps" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">Live Stream</span>
+                                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Idle</span>
                             </div>
                             <div class="panel-body">
-                                <div class="chart-container" id="chart-container">
+                                <div class="chart-container">
                                     <svg class="traffic-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
                                         <defs>
                                             <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stop-color="#D83DC2" stop-opacity="0.35"/>
-                                                <stop offset="100%" stop-color="#D83DC2" stop-opacity="0.0"/>
+                                                <stop offset="0%" stop-color="#555" stop-opacity="0.1"/>
+                                                <stop offset="100%" stop-color="#555" stop-opacity="0.0"/>
                                             </linearGradient>
                                         </defs>
                                         <path class="chart-area" id="chart-area-path" d="M 0 150 L 500 150 Z" />
-                                        <path class="chart-line" id="chart-line-path" d="M 0 150 L 500 150" />
+                                        <path class="chart-line" id="chart-line-path" d="M 0 150 L 500 150" stroke="#555" stroke-width="1.5" fill="none" />
                                     </svg>
+                                    <div class="placeholder-text">Awaiting data stream</div>
                                 </div>
                             </div>
                         </div>
@@ -1124,16 +1091,16 @@
                         <div class="panel">
                             <div class="panel-header">
                                 <span class="panel-title">Real-Time Request Stream</span>
-                                <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">
-                                    <i class="fas fa-circle" style="font-size: 8px; color: var(--status-success);"></i> Syncing
+                                <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase;">
+                                    <i class="fas fa-circle" style="font-size: 8px; color: var(--text-muted);"></i> Idle
                                 </span>
                             </div>
                             <div class="panel-body" style="padding: 14px;">
                                 <div class="log-stream" id="log-stream-container">
                                     <div class="log-row">
-                                        <span class="log-method method-get">SYNC</span>
-                                        <span class="log-path">Awaiting transactions...</span>
-                                        <span class="log-latency">--</span>
+                                        <span class="log-method">IDLE</span>
+                                        <span class="log-path">No requests received</span>
+                                        <span class="log-latency">—</span>
                                     </div>
                                 </div>
                             </div>
@@ -1141,7 +1108,7 @@
 
                     </section>
 
-                    <!-- Managed Target Routes Table -->
+                    <!-- Managed Target Routes Table — empty -->
                     <section class="panel">
                         <div class="panel-header">
                             <span class="panel-title">Managed Gateway Providers & Downstream Routes</span>
@@ -1161,7 +1128,9 @@
                                 </thead>
                                 <tbody id="routes-table-body">
                                     <tr>
-                                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading routes from Firestore...</td>
+                                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                                            <i class="fas fa-info-circle"></i> No routes configured
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1251,7 +1220,7 @@
 
     <script>
         // ===========================================================================
-        // 1. FIREBASE INITIALIZATION (kept for routes & system status)
+        // 1. FIREBASE INITIALIZATION (kept for future use, but not actively populating)
         // ===========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAFWiEwg5Ouhs2UZlWmGphpaLvPkrE6eD4",
@@ -1263,7 +1232,7 @@
             measurementId: "G-SKLPK0NHFZ"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // We are not reading or writing any data to keep everything unconfigured.
 
         // ===========================================================================
         // 2. NAVIGATION
@@ -1296,101 +1265,14 @@
         });
 
         // ===========================================================================
-        // 4. DASHBOARD TELEMETRY (unchanged, uses Firestore for routes + simulated metrics)
+        // 4. DASHBOARD — Completely idle, no simulation, everything zero/unconfigured
         // ===========================================================================
-        function initDashboard() {
-            // Simulated metrics update
-            let requests = 0;
-            let volume = 0.0;
-            let interceptions = 0;
-            let latencies = [];
+        // We intentionally do not set any intervals or listeners.
+        // All values are already static placeholders in HTML.
+        // The chart remains a flat line.
 
-            setInterval(() => {
-                requests += Math.floor(Math.random() * 15) + 5;
-                volume += Math.random() * 100 + 20;
-                interceptions += Math.random() > 0.85 ? 1 : 0;
-                latencies.push(Math.floor(Math.random() * 40) + 10);
-                if (latencies.length > 50) latencies.shift();
-
-                document.getElementById('kpi-requests').innerText = requests.toLocaleString();
-                document.getElementById('kpi-volume').innerText = `$${volume.toFixed(2)}`;
-                document.getElementById('kpi-latency').innerText =
-                    `${latencies.length > 0 ? Math.max(...latencies) : 0}ms`;
-                document.getElementById('kpi-interceptions').innerText = interceptions;
-
-                // Update log stream
-                const logs = document.getElementById('log-stream-container');
-                const items = ['Payment processed', 'Webhook received', 'Refund initiated', 'Charge succeeded',
-                    'Payment failed'
-                ];
-                const newLog = `
-                    <div class="log-row">
-                        <span class="log-method ${Math.random() > 0.5 ? 'method-post' : 'method-get'}">${Math.random() > 0.5 ? 'POST' : 'GET'}</span>
-                        <span class="log-path">${items[Math.floor(Math.random() * items.length)]} ($${(Math.random() * 200 + 10).toFixed(2)})</span>
-                        <span class="log-latency">${Math.floor(Math.random() * 50) + 5}ms</span>
-                    </div>
-                `;
-                if (logs.children.length > 10) logs.removeChild(logs.lastChild);
-                logs.insertAdjacentHTML('afterbegin', newLog);
-
-                // Update chart
-                const history = [];
-                for (let i = 0; i < 10; i++) {
-                    history.push(Math.min(130, Math.max(10, (requests / 100) * (i + 1) + 20)));
-                }
-                renderSVGChart(history);
-
-            }, 3000);
-
-            // Load routes from Firestore
-            db.collection('routes').onSnapshot(snapshot => {
-                const tbody = document.getElementById('routes-table-body');
-                if (snapshot.empty) {
-                    tbody.innerHTML =
-                        `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;"><i class="fas fa-info-circle"></i> No routes configured.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = snapshot.docs.map(doc => {
-                    const r = doc.data();
-                    return `
-                        <tr>
-                            <td><strong>${r.name || 'Unnamed'}</strong></td>
-                            <td style="font-family: var(--font-mono); color: var(--text-muted);">${r.target || 'N/A'}</td>
-                            <td><span style="color: var(--accent-magenta); font-family: var(--font-mono);">${r.policy || 'Default'}</span></td>
-                            <td style="font-family: var(--font-mono); color: var(--text-primary);">${r.volume || '$0'}</td>
-                            <td style="font-family: var(--font-mono);">${r.latency || '0ms'}</td>
-                            <td><span class="badge-status active"><i class="fas fa-circle" style="font-size:6px;"></i> ${r.status || 'active'}</span></td>
-                        </tr>
-                    `;
-                }).join('');
-            });
-        }
-
-        function renderSVGChart(history) {
-            const width = 500,
-                height = 150;
-            const step = width / (history.length - 1);
-            const points = history.map((val, idx) => `${idx * step},${height - val}`);
-            const lineD = `M ${points.join(' L ')}`;
-            const areaD = `M 0,${height} L ${points.join(' L ')} L ${width},${height} Z`;
-            const linePath = document.getElementById('chart-line-path');
-            const areaPath = document.getElementById('chart-area-path');
-            if (linePath && areaPath) {
-                linePath.setAttribute('d', lineD);
-                areaPath.setAttribute('d', areaD);
-            }
-        }
-
-        // ===========================================================================
-        // 5. INIT
-        // ===========================================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('system-status-text').innerHTML =
-                '<i class="fas fa-database" style="color: var(--status-success);"></i> Firestore Connected';
-            initDashboard();
-        });
-
-        console.log('🧹 Policy Engine workspace has been cleared. Ready for fresh implementation.');
+        console.log('🧹 KOMNI dashboard has been fully reset. All values are zero/unconfigured.');
+        console.log('🔧 Ready for fresh implementation.');
     </script>
 </body>
 </html>
