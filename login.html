@@ -872,210 +872,120 @@
 
   <!-- SCRIPT ENGINE -->
   <script>
-    // Live Backend Vercel Endpoint
+    // Integrated Authentication with Vercel Python Backend
     const VERCEL_BACKEND_URL = 'https://komni-backend.vercel.app/api/verify_key';
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // Background Dynamic Particle Engine
-      class DynamicParticle {
-        constructor(canvasRef) { 
-          this.canvas = canvasRef;
-          this.reset(true); 
-        }
-        reset(init = false) {
-          const w = this.canvas.width || 800;
-          const h = this.canvas.height || 450;
-          this.x = (Math.random() - 0.5) * w * 3;
-          this.y = (Math.random() - 0.5) * h * 3;
-          this.z = init ? Math.random() * 1800 : 1800;
-          this.pz = this.z;
-          this.size = Math.random() * 2 + 1;
-          this.color = Math.random() > 0.4 ? '#6036E1' : '#D83DC2';
-        }
-        update(speed) {
-          this.pz = this.z;
-          this.z -= speed;
-          if (this.z < 1) this.reset();
-        }
-        draw(ctx, speedFactor) {
-          const w = this.canvas.width || 800;
-          const h = this.canvas.height || 450;
-          const s = 600 / this.z;
-          const ps = 600 / this.pz;
-          const x = this.x * s + w / 2;
-          const y = this.y * s + h / 2;
-          const px = this.x * ps + w / 2;
-          const py = this.y * ps + h / 2;
-
-          const alpha = Math.min(0.8, (1800 - this.z) / 1000);
-          if (alpha <= 0.01) return;
-          ctx.strokeStyle = this.color === '#6036E1' ? `rgba(96, 54, 225, ${alpha})` : `rgba(216, 61, 194, ${alpha})`;
-          ctx.lineWidth = this.size * s * (speedFactor * 0.2);
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(px, py);
-          ctx.stroke();
-        }
-      }
-
-      function initAdvertEngine(canvasId, containerSelector) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return null;
-        
-        const ctx = canvas.getContext('2d');
-        const container = canvas.closest(containerSelector);
-        const scenes = container.querySelectorAll('.scene-content');
-        const finaleStage = container.querySelector('.finale-stage');
-        
-        let width = 0, height = 0, currentScene = 0, frame = 0;
-        const SCENE_DURATION = 160; 
-        let isActive = true;
-        let currentSpeed = 12;
-
-        function resize() {
-          width = canvas.width = container.clientWidth;
-          height = canvas.height = container.clientHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        const particles = Array.from({ length: 350 }, () => new DynamicParticle(canvas));
-
-        function cycleScenes() {
-          if (!isActive) return;
-          const current = scenes[currentScene];
-          currentScene = (currentScene + 1) % (scenes.length + 1);
-
-          if (currentScene === scenes.length) {
-            current.classList.remove('active');
-            current.classList.add('exit');
-            finaleStage.classList.add('active');
-            
-            gsap.to({ speed: 12 }, { 
-              speed: 45, 
-              duration: 1.5, 
-              onUpdate: function() { currentSpeed = this.targets()[0].speed; },
-              onComplete: () => {
-                setTimeout(() => {
-                  if (!isActive) return;
-                  finaleStage.classList.remove('active');
-                  gsap.to({ speed: 45 }, { 
-                    speed: 12, 
-                    duration: 1.5, 
-                    onUpdate: function() { currentSpeed = this.targets()[0].speed; } 
-                  });
-                  
-                  scenes.forEach(s => s.classList.remove('active', 'exit'));
-                  currentScene = 0;
-                  scenes[0].classList.add('active');
-                }, 2500);
-              }
-            });
-          } else {
-            const prev = container.querySelector('.scene-content.active');
-            if (prev) {
-              prev.classList.remove('active');
-              prev.classList.add('exit');
-              setTimeout(() => prev.classList.remove('exit'), 1000);
-            }
-            scenes[currentScene].classList.add('active');
-          }
-        }
-
-        function render() {
-          if (!isActive) return;
-          frame++;
-          if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
-            frame = 0;
-            cycleScenes();
-          }
-
-          ctx.fillStyle = 'rgba(3, 3, 8, 0.25)'; 
-          ctx.fillRect(0, 0, width, height);
-
-          ctx.lineCap = 'round';
-          const speedFactor = currentSpeed / 12;
-          particles.forEach(p => {
-            p.update(currentSpeed);
-            p.draw(ctx, speedFactor);
-          });
-
-          requestAnimationFrame(render);
-        }
-
-        render();
-      }
-
-      initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
-    });
-
-    // Integrated Authentication with Vercel Python Backend
     async function handleAuthSubmit(e) {
       e.preventDefault();
-      
-      let rawKey = document.getElementById('issuanceKeyInput').value.trim();
+
+      const rawKey = document.getElementById('issuanceKeyInput').value.trim();
       if (!rawKey) return;
 
-      // Convenience mapping: convert 'test' to demo test key format
-      let formattedKey = rawKey;
-      if (rawKey.toLowerCase() === 'test') {
-        formattedKey = 'ik_test_demo';
-      } else if (rawKey.toUpperCase().startsWith('IK-')) {
-        // Standardize IK- keys to lower case prefix for backend matching
-        formattedKey = 'ik_' + rawKey.substring(3);
-      }
-
       document.getElementById('loginCard').style.display = 'none';
+
       const valCard = document.getElementById('validationCard');
       valCard.style.display = 'block';
       valCard.classList.add('is-active');
 
       const term = document.getElementById('validationTerminal');
       const pill = document.getElementById('validationStatusPill');
-      
+
       pill.className = 'auth-status-pill';
       pill.innerText = 'Connecting to Gateway...';
       document.getElementById('retryButtonContainer').style.display = 'none';
 
-      term.innerHTML = `<span class="terminal-line info">> Initializing HSM Handshake for key: ${rawKey}</span>`;
+      // Escape untrusted input before putting it into innerHTML.
+      const safeKeyPreview = rawKey
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+      term.innerHTML =
+        `<span class="terminal-line info">> Initializing issuance verification for key: ${safeKeyPreview}</span>`;
 
       try {
-        term.innerHTML += '<span class="terminal-line accent">> Querying Vercel Serverless Backend...</span>';
-        
+        term.innerHTML +=
+          '<span class="terminal-line accent">> Querying KOMNI authorization backend...</span>';
+
         const response = await fetch(VERCEL_BACKEND_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ key: formattedKey })
+          body: JSON.stringify({ key: rawKey })
         });
 
-        const data = await response.json();
+        let data = {};
+        try {
+          data = await response.json();
+        } catch (_) {
+          data = {};
+        }
 
-        if (response.ok && data.valid) {
-          term.innerHTML += `<span class="terminal-line success">> Backend Signature: VERIFIED [200 OK]</span>`;
+        if (response.ok && data.valid === true) {
+          term.innerHTML +=
+            '<span class="terminal-line success">> Issuance Key: VERIFIED [200 OK]</span>';
+
           if (data.metadata && data.metadata.owner) {
-            term.innerHTML += `<span class="terminal-line info">> Registered Owner: ${data.metadata.owner}</span>`;
+            const safeOwner = String(data.metadata.owner)
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
+
+            term.innerHTML +=
+              `<span class="terminal-line info">> Registered Owner: ${safeOwner}</span>`;
           }
+
+          if (data.firestore && data.firestore.saved === true) {
+            term.innerHTML +=
+              '<span class="terminal-line success">> Firestore Registry: SESSION SAVED</span>';
+          }
+
           pill.classList.add('is-success');
           pill.innerText = 'Handshake Complete';
+
+          // Keep only non-secret session metadata in browser storage.
+          // Never store the raw issuance key.
+          try {
+            sessionStorage.setItem('komni_issuance_session', JSON.stringify({
+              issuance_key_id: data.metadata?.issuance_key_id || null,
+              owner: data.metadata?.owner || null,
+              business_id: data.metadata?.business_id || null,
+              workspace_id: data.metadata?.workspace_id || null,
+              tier: data.metadata?.tier || null,
+              environment: data.metadata?.environment || null,
+              authenticated_at: new Date().toISOString()
+            }));
+          } catch (_) {}
 
           setTimeout(() => {
             valCard.style.display = 'none';
             const surCard = document.getElementById('surveyCard');
             surCard.style.display = 'block';
             surCard.classList.add('is-active');
-          }, 1800);
+          }, 1200);
 
         } else {
-          term.innerHTML += `<span class="terminal-line error">> AUTHENTICATION REJECTED: ${data.reason || 'Invalid Key'}</span>`;
+          term.innerHTML +=
+            `<span class="terminal-line error">> AUTHENTICATION REJECTED: ${
+              data.reason || 'Invalid Issuance Key'
+            }</span>`;
+
           pill.classList.add('is-error');
           pill.innerText = 'Authentication Failed';
           document.getElementById('retryButtonContainer').style.display = 'block';
         }
 
       } catch (err) {
-        term.innerHTML += `<span class="terminal-line error">> NETWORK ERROR: Unable to reach backend gateway.</span>`;
+        console.error('[KOMNI] verify_key request failed:', err);
+
+        term.innerHTML +=
+          '<span class="terminal-line error">> NETWORK ERROR: Unable to reach authorization backend.</span>';
+
         pill.classList.add('is-error');
         pill.innerText = 'Gateway Error';
         document.getElementById('retryButtonContainer').style.display = 'block';
