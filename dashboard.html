@@ -801,6 +801,34 @@
       transform: translateY(-1px);
     }
 
+    /* Premium fullscreen Policy Engine wizard */
+    .policy-wizard-overlay{position:fixed;inset:0;z-index:5000;display:none;background:#000;color:var(--text-primary)}
+    .policy-wizard-overlay.active{display:flex}
+    .policy-wizard-shell{width:100%;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(96,54,225,.11),transparent 38%),radial-gradient(circle at 85% 100%,rgba(216,61,194,.06),transparent 32%),#020204}
+    .policy-wizard-shell:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:56px 56px}
+    .policy-wizard-topbar{height:72px;flex:0 0 72px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 32px;border-bottom:1px solid var(--border-color);background:rgba(0,0,0,.55);backdrop-filter:blur(18px);position:relative;z-index:2}
+    .wizard-brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;letter-spacing:2px;font-size:14px}
+    .wizard-brand-mark{width:22px;height:22px;display:flex;align-items:center;justify-content:center;gap:2px;border-radius:6px;background:var(--logo-gradient)}
+    .wizard-brand-mark span{width:2px;height:8px;border-radius:2px;background:white}.wizard-brand-mark span:nth-child(2){height:12px}.wizard-brand-mark span:nth-child(3){height:6px}
+    .wizard-progress{display:flex;align-items:center;justify-content:center;gap:7px}.wizard-step-dot{width:7px;height:7px;border-radius:50%;background:#26262d;border:1px solid #3a3a42}.wizard-step-dot.active,.wizard-step-dot.complete{background:var(--accent-magenta);border-color:var(--accent-magenta);box-shadow:0 0 10px var(--accent-magenta-glow)}.wizard-progress-line{width:26px;height:1px;background:rgba(255,255,255,.1)}
+    .wizard-skip{justify-self:end;border:0;background:transparent;color:var(--text-muted);font-family:var(--font-mono);font-size:10px;cursor:pointer;padding:8px}.wizard-skip:hover{color:var(--text-primary)}
+    .wizard-content{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:48px 32px;position:relative;z-index:1}
+    .wizard-slide{width:min(760px,100%);display:none;text-align:center;animation:wizardIn .45s var(--ease-expensive)}.wizard-slide.active{display:block}
+    @keyframes wizardIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .wizard-eyebrow{font-family:var(--font-mono);color:var(--accent-magenta);font-size:10px;font-weight:700;letter-spacing:1.8px;margin-bottom:16px}
+    .wizard-slide h2{max-width:720px;margin:0 auto 20px;font-family:var(--font-display);font-size:clamp(32px,4.4vw,58px);line-height:1.03;letter-spacing:-2px;font-weight:800;background:var(--logo-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .wizard-slide p{max-width:620px;margin:7px auto;color:var(--text-secondary);font-size:15px;line-height:1.65}
+    .wizard-visual{height:180px;display:flex;align-items:center;justify-content:center;margin-bottom:26px;position:relative}.wizard-visual.compact{height:120px}
+    .wizard-visual-ring{position:absolute;border:1px solid rgba(96,54,225,.22);border-radius:50%;animation:wizardPulse 3s ease-in-out infinite}.ring-one{width:140px;height:140px}.ring-two{width:220px;height:220px;border-color:rgba(216,61,194,.1)}
+    @keyframes wizardPulse{0%,100%{transform:scale(.96);opacity:.55}50%{transform:scale(1.03);opacity:1}}
+    .wizard-visual-core{width:76px;height:76px;display:grid;place-items:center;border-radius:22px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);box-shadow:0 0 80px rgba(96,54,225,.16);z-index:1;font-size:30px;background-image:var(--logo-gradient);color:white}
+    .flow-diagram{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}.flow-node,.key-card,.processor-card{border:1px solid var(--border-color);background:rgba(255,255,255,.035);border-radius:10px;padding:14px 18px;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--text-secondary)}.flow-node.komni-node{border-color:rgba(216,61,194,.35);color:var(--text-primary);box-shadow:0 0 30px rgba(96,54,225,.12)}.flow-arrow{color:var(--accent-magenta);font-size:18px}
+    .benefit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(700px,100%)}.benefit-card{text-align:left;padding:16px;min-height:100px;border:1px solid var(--border-color);border-radius:10px;background:rgba(255,255,255,.025);display:flex;flex-direction:column;gap:7px}.benefit-card strong{font-size:12px;color:var(--text-primary)}.benefit-card small{color:var(--text-muted);line-height:1.45;font-size:10px}.benefit-card span{color:var(--accent-magenta);font-family:var(--font-mono);font-size:9px}
+    .key-card,.processor-card{width:min(520px,100%);display:flex;align-items:center;gap:16px;text-align:left;padding:18px 20px}.key-card-icon,.processor-logo{width:42px;height:42px;display:grid;place-items:center;flex:0 0 42px;border-radius:10px;background:var(--logo-gradient);color:white;font-weight:800;font-size:17px}.key-card span,.processor-card span:not(.processor-badge){display:block;color:var(--text-muted);font-family:var(--font-mono);font-size:8px;letter-spacing:1px;margin-bottom:4px}.key-card strong,.processor-card strong{color:var(--text-primary);font-size:13px}.key-card-status,.processor-badge{margin-left:auto;color:var(--status-success);font-family:var(--font-mono);font-size:8px;border:1px solid rgba(34,197,94,.25);background:var(--status-success-bg);border-radius:999px;padding:5px 8px}.processor-logo{background:#fff;color:#111;font-size:21px}
+    .final-visual{height:150px}.final-check{width:76px;height:76px;display:grid;place-items:center;border-radius:50%;font-size:30px;color:white;background:var(--logo-gradient);box-shadow:0 0 70px rgba(216,61,194,.18)}.wizard-coming-soon{display:inline-block;margin-top:24px;padding:8px 12px;border:1px solid rgba(216,61,194,.25);border-radius:999px;color:var(--accent-magenta);background:rgba(216,61,194,.07);font-family:var(--font-mono);font-size:9px;letter-spacing:1px}
+    .wizard-footer{height:88px;flex:0 0 88px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-top:1px solid var(--border-color);background:rgba(0,0,0,.55);position:relative;z-index:2}.wizard-counter{color:var(--text-muted);font-family:var(--font-mono);font-size:10px;letter-spacing:1px}.wizard-actions{display:flex;align-items:center;gap:10px}.wizard-back,.wizard-next{border-radius:7px;padding:10px 16px;font-family:var(--font-sans);font-size:11px;font-weight:600;cursor:pointer}.wizard-back{border:1px solid var(--border-color);background:rgba(255,255,255,.025);color:var(--text-secondary)}.wizard-next{border:0;background:var(--logo-gradient);color:white;min-width:100px;box-shadow:0 0 16px var(--accent-violet-glow)}
+    @media(max-width:700px){.policy-wizard-topbar{grid-template-columns:auto 1fr auto;padding:0 16px}.wizard-progress{gap:4px}.wizard-progress-line{width:12px}.wizard-content{padding:28px 18px}.wizard-slide h2{letter-spacing:-1px}.benefit-grid{grid-template-columns:1fr}.wizard-footer{padding:0 16px}}
+
     /* Modal Scaffolding */
     .modal-overlay {
       position: fixed;
@@ -1088,56 +1116,93 @@
           <div class="policy-engine-landing">
             <div class="policy-engine-orb" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none">
-                <path d="M24 43s16-8 16-20V9L24 3 8 9v14c0 12 16 20 16 20Z"
-                      stroke="url(#policyShieldGradient)" stroke-width="1.6"/>
-                <path d="M18 24.5 22 28l8-9"
-                      stroke="url(#policyShieldGradient)" stroke-width="1.8"
-                      stroke-linecap="round" stroke-linejoin="round"/>
-                <defs>
-                  <linearGradient id="policyShieldGradient" x1="8" y1="3" x2="40" y2="43">
-                    <stop offset="0%" stop-color="#6036E1"/>
-                    <stop offset="100%" stop-color="#D83DC2"/>
-                  </linearGradient>
-                </defs>
+                <path d="M24 43s16-8 16-20V9L24 3 8 9v14c0 12 16 20 16 20Z" stroke="url(#policyShieldGradient)" stroke-width="1.6"/>
+                <path d="M18 24.5 22 28l8-9" stroke="url(#policyShieldGradient)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs><linearGradient id="policyShieldGradient" x1="8" y1="3" x2="40" y2="43"><stop offset="0%" stop-color="#6036E1"/><stop offset="100%" stop-color="#D83DC2"/></linearGradient></defs>
               </svg>
             </div>
-
             <div class="policy-engine-eyebrow">KOMNI / INTELLIGENCE & POLICY</div>
             <h1>Policy Engine</h1>
-            <p class="policy-engine-description">
-              Define the decision layer that evaluates financial payloads before
-              they continue through the KOMNI middleware mesh.
-            </p>
-
-            <div class="policy-engine-status">
-              <span class="status-indicator"></span>
-              <span>Policy workspace ready</span>
-            </div>
-
-            <button class="btn-premium policy-start-button" type="button" onclick="openPolicyModal()">
-              Get Started
-              <span>→</span>
-            </button>
-
-            <div class="policy-engine-footnote">
-              No policies configured yet · Start by creating your first rule set
-            </div>
+            <p class="policy-engine-description">The decision layer for your business transaction flow. Create the connection that lets KOMNI sit between your systems and payment infrastructure.</p>
+            <div class="policy-engine-status"><span class="status-indicator"></span><span>Workspace ready</span></div>
+            <button class="btn-premium policy-start-button" type="button" onclick="startPolicyWizard()">Get Started <span>→</span></button>
+            <div class="policy-engine-footnote">Guided setup · A few short steps</div>
           </div>
         </div>
       </section>
+
     </main>
 
   </div>
 
-  <!-- Modal Component Scaffold -->
-  <div class="modal-overlay" id="policyModal">
-    <div class="modal-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h3 style="font-size:14px; font-weight:700;">Add Middleware Route Policy</h3>
-        <span style="cursor:pointer; color:var(--text-muted);" onclick="closePolicyModal()">✕</span>
+  <!-- Policy Engine Guided Setup Wizard -->
+  <div class="policy-wizard-overlay" id="policyWizard" aria-hidden="true">
+    <div class="policy-wizard-shell" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+      <div class="policy-wizard-topbar">
+        <div class="wizard-brand"><div class="wizard-brand-mark"><span></span><span></span><span></span></div><span>KOMNI</span></div>
+        <div class="wizard-progress">
+          <span class="wizard-step-dot active" data-dot="0"></span><span class="wizard-progress-line"></span>
+          <span class="wizard-step-dot" data-dot="1"></span><span class="wizard-progress-line"></span>
+          <span class="wizard-step-dot" data-dot="2"></span><span class="wizard-progress-line"></span>
+          <span class="wizard-step-dot" data-dot="3"></span><span class="wizard-progress-line"></span>
+          <span class="wizard-step-dot" data-dot="4"></span>
+        </div>
+        <button class="wizard-skip" type="button" onclick="skipPolicyWizard()">Skip all</button>
       </div>
-      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Configure rules to route transaction payloads through KOMNI proxy targets.</p>
-      <button class="btn-premium" style="width:100%;" onclick="closePolicyModal()">Save Policy Rule</button>
+
+      <div class="wizard-content">
+        <div class="wizard-slide active" data-slide="0">
+          <div class="wizard-visual"><div class="wizard-visual-ring ring-one"></div><div class="wizard-visual-ring ring-two"></div><div class="wizard-visual-core">◈</div></div>
+          <div class="wizard-eyebrow">01 / WELCOME TO KOMNI</div>
+          <h2 id="wizardTitle">Let's set up your KOMNI experience.</h2>
+          <p>KOMNI sits in the middle of your transaction flow.</p><p>It helps your business see more, protect more, and understand more.</p>
+        </div>
+
+        <div class="wizard-slide" data-slide="1">
+          <div class="wizard-visual compact"><div class="flow-diagram"><div class="flow-node">YOUR BUSINESS</div><div class="flow-arrow">→</div><div class="flow-node komni-node">KOMNI</div><div class="flow-arrow">→</div><div class="flow-node">PAYMENT PROCESSOR</div></div></div>
+          <div class="wizard-eyebrow">02 / WHAT KOMNI DOES</div>
+          <h2>KOMNI is not your payment processor.</h2>
+          <p>KOMNI does not replace Stripe or your payment provider.</p><p>It is middleware that can intercept business transactions as they move through your infrastructure.</p>
+        </div>
+
+        <div class="wizard-slide" data-slide="2">
+          <div class="wizard-visual compact"><div class="benefit-grid">
+            <div class="benefit-card"><span>01</span><strong>Security</strong><small>More control around transaction flows.</small></div>
+            <div class="benefit-card"><span>02</span><strong>Detailed logs</strong><small>Understand what passed through your systems.</small></div>
+            <div class="benefit-card"><span>03</span><strong>Financial intelligence</strong><small>Turn transaction activity into useful operational insight.</small></div>
+          </div></div>
+          <div class="wizard-eyebrow">03 / WHY THE MIDDLEWARE LAYER</div>
+          <h2>One layer. More visibility.</h2>
+          <p>KOMNI is designed to give your business a richer view of its financial operations.</p>
+        </div>
+
+        <div class="wizard-slide" data-slide="3">
+          <div class="wizard-visual compact"><div class="key-card"><div class="key-card-icon">⌁</div><div><span>CONNECTION</span><strong>KOMNI API KEY</strong></div><div class="key-card-status">READY</div></div></div>
+          <div class="wizard-eyebrow">04 / YOUR CONNECTION</div>
+          <h2>Your API key connects the experience.</h2>
+          <p>This setup will create the API key used to connect your business transaction flow to KOMNI.</p><p>It will be associated with your payment infrastructure connection.</p>
+        </div>
+
+        <div class="wizard-slide" data-slide="4">
+          <div class="wizard-visual compact"><div class="processor-card"><div class="processor-logo">S</div><div><span>DEVELOPMENT ROUTE</span><strong>Stripe</strong></div><span class="processor-badge">DEFAULT</span></div></div>
+          <div class="wizard-eyebrow">05 / DEVELOPMENT PHASE</div>
+          <h2>Stripe is your starting point.</h2>
+          <p>For now, KOMNI will route this setup to Stripe by default.</p><p>This is temporary while the platform is in development.</p><p>Later, KOMNI can support major payment processors and other indirect configurations across banking and financial infrastructure.</p>
+        </div>
+
+        <div class="wizard-slide" data-slide="5">
+          <div class="wizard-visual final-visual"><div class="final-check">✓</div></div>
+          <div class="wizard-eyebrow">KOMNI / SETUP BRIEFING COMPLETE</div>
+          <h2>You're ready for the next step.</h2>
+          <p>The next part of the setup is still under development.</p><p>For now, you've seen how KOMNI will connect your business transaction flow, payment infrastructure, and intelligence layer.</p>
+          <div class="wizard-coming-soon">NEXT STEP · UNDER DEVELOPMENT</div>
+        </div>
+      </div>
+
+      <div class="wizard-footer">
+        <div class="wizard-counter" id="wizardCounter">01 / 06</div>
+        <div class="wizard-actions"><button class="wizard-back" id="wizardBack" type="button" onclick="previousPolicyWizardStep()">Back</button><button class="wizard-next" id="wizardNext" type="button" onclick="nextPolicyWizardStep()">Next <span>→</span></button></div>
+      </div>
     </div>
   </div>
 
@@ -1217,13 +1282,63 @@
       }
     }
 
-    function openPolicyModal() {
-      document.getElementById('policyModal').classList.add('active');
+    let policyWizardStep = 0;
+    const POLICY_WIZARD_LAST_STEP = 5;
+
+    function renderPolicyWizardStep() {
+      document.querySelectorAll('.wizard-slide').forEach(slide => {
+        slide.classList.toggle('active', Number(slide.dataset.slide) === policyWizardStep);
+      });
+      document.querySelectorAll('.wizard-step-dot').forEach(dot => {
+        const step = Number(dot.dataset.dot);
+        dot.classList.toggle('active', step === policyWizardStep);
+        dot.classList.toggle('complete', step < policyWizardStep);
+      });
+      document.getElementById('wizardCounter').innerText = `${String(policyWizardStep + 1).padStart(2, '0')} / 06`;
+      document.getElementById('wizardBack').style.visibility = policyWizardStep === 0 ? 'hidden' : 'visible';
+      document.getElementById('wizardNext').innerHTML = policyWizardStep === POLICY_WIZARD_LAST_STEP ? 'Finish <span>✓</span>' : 'Next <span>→</span>';
     }
 
-    function closePolicyModal() {
-      document.getElementById('policyModal').classList.remove('active');
+    function startPolicyWizard() {
+      policyWizardStep = 0;
+      const wizard = document.getElementById('policyWizard');
+      wizard.classList.add('active');
+      wizard.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      renderPolicyWizardStep();
     }
+
+    function nextPolicyWizardStep() {
+      if (policyWizardStep >= POLICY_WIZARD_LAST_STEP) return closePolicyWizard();
+      policyWizardStep++;
+      renderPolicyWizardStep();
+    }
+
+    function previousPolicyWizardStep() {
+      if (policyWizardStep > 0) {
+        policyWizardStep--;
+        renderPolicyWizardStep();
+      }
+    }
+
+    function skipPolicyWizard() {
+      closePolicyWizard();
+    }
+
+    function closePolicyWizard() {
+      const wizard = document.getElementById('policyWizard');
+      wizard.classList.remove('active');
+      wizard.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', event => {
+      const wizard = document.getElementById('policyWizard');
+      if (!wizard.classList.contains('active')) return;
+      if (event.key === 'Escape') closePolicyWizard();
+      if (event.key === 'ArrowRight') nextPolicyWizardStep();
+      if (event.key === 'ArrowLeft') previousPolicyWizardStep();
+    });
 
     // Initial render: no backend/interceptor calls.
     setLocalWorkspaceStatus();
