@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KOMNI — Premium Access Terminal</title>
+    <title>KOMNI — Enterprise Access Terminal</title>
     <meta name="description" content="KOMNI Enterprise Access Node - Authenticate session via Google OAuth." />
 
     <!-- Fonts -->
@@ -295,7 +295,7 @@
         }
 
         /* ======================================================================
-             3. RIGHT SIDE — LOGIN + WELCOME WIZARD
+             3. RIGHT SIDE — LOGIN / VALIDATION
              ====================================================================== */
         .login-side {
             position: relative;
@@ -308,7 +308,6 @@
             overflow-y: auto;
         }
 
-        /* ---- Shared card container ---- */
         .card-container {
             width: 100%;
             max-width: 440px;
@@ -325,12 +324,6 @@
         .login-card .brand-header {
             margin-bottom: 36px;
             text-align: left;
-        }
-        .main-logo-icon {
-            height: 32px;
-            width: auto;
-            margin-bottom: 24px;
-            filter: drop-shadow(0 0 8px rgba(96, 54, 225, 0.25));
         }
         .login-title {
             font-size: 24px;
@@ -413,7 +406,6 @@
             flex-shrink: 0;
         }
 
-        /* ---- Auth Status Pill ---- */
         .auth-status-pill {
             display: inline-flex;
             align-items: center;
@@ -457,7 +449,6 @@
             box-shadow: 0 0 12px rgba(239, 68, 68, 0.95);
         }
 
-        /* ---- Terminal Box ---- */
         .terminal-box {
             background: #030308;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -483,24 +474,12 @@
         .terminal-line.error { color: #ef4444; }
         .terminal-line.accent { color: var(--accent-magenta); }
 
-        /* ---- Validation Card ---- */
         .validation-card {
             display: none;
             background: transparent;
             border: none;
         }
         .validation-card.is-active {
-            animation: cardLiftIn 0.5s var(--ease-expensive) both;
-        }
-
-        /* ---- WELCOME WIZARD ---- */
-        .wizard-card {
-            display: none;
-            background: transparent;
-            border: none;
-            width: 100%;
-        }
-        .wizard-card.is-active {
             animation: cardLiftIn 0.5s var(--ease-expensive) both;
         }
 
@@ -517,31 +496,85 @@
             }
         }
 
-        /* Wizard progress dots */
+        /* ======================================================================
+             4. FULLSCREEN WELCOME WIZARD OVERLAY
+             ====================================================================== */
+        .wizard-card {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            background: radial-gradient(circle at 50% 30%, #0d0722 0%, #020205 100%);
+            padding: 40px 24px;
+            overflow-y: auto;
+        }
+        .wizard-card.is-active {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            animation: fullScreenWizardIn 0.6s var(--ease-expensive) both;
+        }
+
+        @keyframes fullScreenWizardIn {
+            from {
+                opacity: 0;
+                transform: scale(1.03);
+                filter: blur(12px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .wizard-brand-bar {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .wizard-content-box {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(10, 6, 24, 0.65);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 40px;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(96, 54, 225, 0.15);
+            margin: auto;
+        }
+
         .wizard-progress {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin: 24px 0 20px 0;
+            gap: 12px;
+            margin-bottom: 28px;
         }
         .wizard-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.12);
             transition: all 0.4s var(--ease-expensive);
-            cursor: pointer;
         }
         .wizard-dot.active {
             background: var(--accent-magenta);
-            box-shadow: 0 0 16px rgba(216, 61, 194, 0.55);
+            box-shadow: 0 0 16px rgba(216, 61, 194, 0.75);
             transform: scale(1.25);
         }
         .wizard-dot.completed {
             background: var(--accent-violet);
         }
 
-        /* Wizard step container */
         .wizard-step {
             display: none;
             animation: fadeStep 0.5s var(--ease-expensive) both;
@@ -552,7 +585,7 @@
         @keyframes fadeStep {
             from {
                 opacity: 0;
-                transform: translateY(12px);
+                transform: translateY(14px);
             }
             to {
                 opacity: 1;
@@ -561,30 +594,29 @@
         }
 
         .wizard-step .step-label {
-            font-size: 10px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--text-muted);
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         .wizard-step .step-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             letter-spacing: -0.02em;
             color: var(--text-primary);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .wizard-step .step-desc {
             font-size: 13px;
             color: var(--text-secondary);
             line-height: 1.5;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        /* Wizard form elements */
         .wizard-form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
         .wizard-form-group label {
             display: block;
@@ -593,16 +625,16 @@
             letter-spacing: 0.5px;
             text-transform: uppercase;
             color: var(--text-secondary);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .wizard-form-group input,
         .wizard-form-group select {
             width: 100%;
-            height: 42px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            padding: 0 14px;
+            height: 46px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 0 16px;
             font-family: var(--font-main);
             font-size: 13px;
             color: #fff;
@@ -614,42 +646,41 @@
         }
         .wizard-form-group input:focus,
         .wizard-form-group select:focus {
-            border-color: rgba(216, 61, 194, 0.5);
-            background: rgba(255, 255, 255, 0.04);
-            box-shadow: 0 0 12px rgba(216, 61, 194, 0.15);
+            border-color: rgba(216, 61, 194, 0.6);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 16px rgba(216, 61, 194, 0.2);
         }
         .wizard-form-group select {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8A8A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 14px center;
+            background-position: right 16px center;
             color: #fff;
         }
         .wizard-form-group select option {
-            background: #1a1a2e;
+            background: #0d0722;
             color: #fff;
         }
 
-        /* Wizard radio group */
         .wizard-radio-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
         .wizard-radio-option {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 6px;
-            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 14px 16px;
             cursor: pointer;
             transition: all 0.3s var(--ease-expensive);
         }
         .wizard-radio-option:hover {
-            border-color: rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.04);
         }
         .wizard-radio-option input[type="radio"] {
             position: absolute;
@@ -657,10 +688,10 @@
             pointer-events: none;
         }
         .wizard-radio-option .radio-dot {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -669,12 +700,12 @@
         }
         .wizard-radio-option input[type="radio"]:checked ~ .radio-dot {
             border-color: var(--accent-magenta);
-            box-shadow: 0 0 10px rgba(216, 61, 194, 0.4);
+            box-shadow: 0 0 12px rgba(216, 61, 194, 0.5);
         }
         .wizard-radio-option input[type="radio"]:checked ~ .radio-dot::after {
             content: "";
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: var(--accent-magenta);
         }
@@ -688,17 +719,16 @@
             font-weight: 500;
         }
 
-        /* Wizard buttons */
         .wizard-btn-group {
             display: flex;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 14px;
+            margin-top: 28px;
         }
         .wizard-btn {
             flex: 1;
-            height: 44px;
+            height: 48px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-family: var(--font-main);
             font-size: 12px;
             font-weight: 600;
@@ -714,38 +744,31 @@
         .wizard-btn-primary:hover {
             background: rgba(255, 255, 255, 0.88);
             transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
         }
         .wizard-btn-secondary {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-secondary);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .wizard-btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
         }
-        .wizard-btn:disabled {
-            opacity: 0.5;
-            cursor: wait;
-            transform: none !important;
-            box-shadow: none !important;
-        }
 
-        /* Step 1 — Welcome Avatar */
         .welcome-avatar {
-            width: 72px;
-            height: 72px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: var(--logo-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 16px;
-            box-shadow: 0 0 40px rgba(96, 54, 225, 0.25);
+            margin-bottom: 20px;
+            box-shadow: 0 0 50px rgba(96, 54, 225, 0.3);
             overflow: hidden;
         }
         .welcome-avatar img {
@@ -755,7 +778,7 @@
         }
 
         .welcome-greeting {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.03em;
             margin-bottom: 4px;
@@ -763,7 +786,7 @@
         .welcome-email {
             font-size: 13px;
             color: var(--text-secondary);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .welcome-badge {
             display: inline-block;
@@ -776,24 +799,22 @@
             border: 1px solid rgba(216, 61, 194, 0.2);
             padding: 4px 12px;
             border-radius: 100px;
-            margin-top: 4px;
         }
 
-        /* Step 4: Complete */
         .complete-icon {
-            width: 72px;
-            height: 72px;
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
             background: var(--logo-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
-            margin: 0 auto 16px auto;
-            box-shadow: 0 0 50px rgba(96, 54, 225, 0.35);
+            font-size: 38px;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 0 60px rgba(96, 54, 225, 0.4);
         }
         .complete-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             text-align: center;
             letter-spacing: -0.03em;
@@ -802,8 +823,17 @@
             text-align: center;
             color: var(--text-secondary);
             font-size: 13px;
-            margin-top: 6px;
+            margin-top: 8px;
             line-height: 1.5;
+        }
+
+        .wizard-footer-note {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-align: center;
+            margin-top: 20px;
         }
 
         /* Responsive UI */
@@ -819,28 +849,20 @@
                 height: 100vh;
                 padding: 30px 20px;
             }
-            .card-container {
-                max-width: 400px;
-            }
         }
         @media (max-width: 480px) {
-            .login-side {
-                padding: 20px 16px;
-            }
-            .wizard-step .step-title {
-                font-size: 18px;
+            .wizard-content-box {
+                padding: 24px;
             }
             .wizard-btn-group {
                 flex-direction: column;
-            }
-            .wizard-btn {
-                height: 48px;
             }
         }
     </style>
 </head>
 <body>
 
+    <!-- MAIN LOGIN STAGE -->
     <div class="app-viewport">
         <div class="viewport-glow glow-left"></div>
 
@@ -910,20 +932,18 @@
             </div>
         </div>
 
-        <!-- RIGHT: LOGIN / WIZARD -->
+        <!-- RIGHT: LOGIN / VALIDATION CONTAINER -->
         <div class="login-side">
-
             <div class="card-container">
 
-                <!-- ============================================================
-                1. LOGIN CARD
-                ============================================================ -->
+                <!-- 1. LOGIN CARD -->
                 <div class="login-card" id="loginCard">
                     <div class="brand-header">
                         <h2 class="login-title">Sign into <span class="brand-word">KOMNI</span></h2>
-                        <p class="login-subtitle">Use your Google account to securely authenticate and enter the KOMNI workspace.</p>
+                        <p class="login-subtitle">Authenticate via full-screen Google OAuth to access your KOMNI workspace.</p>
                     </div>
 
+                    <!-- Direct Fullscreen Google Sign In Trigger -->
                     <button type="button" class="google-signin-btn" id="googleSignInBtn" onclick="handleGoogleSignIn();">
                         <span class="google-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" width="19" height="19">
@@ -938,13 +958,11 @@
 
                     <div class="security-notice">
                         <div class="shield-dot"></div>
-                        <div class="security-notice-text">Authentication is handled securely by Firebase. Your Google credentials never pass through KOMNI.</div>
+                        <div class="security-notice-text">Uses Google Fullscreen OAuth redirect. Your credentials never pass through KOMNI.</div>
                     </div>
                 </div>
 
-                <!-- ============================================================
-                2. VALIDATION CARD
-                ============================================================ -->
+                <!-- 2. VALIDATION CARD -->
                 <div class="validation-card" id="validationCard">
                     <div class="brand-header">
                         <h2 class="login-title" id="validationTitle">Verifying Access Credentials</h2>
@@ -955,175 +973,175 @@
                     <div id="retryButtonContainer" style="display:none; margin-top:15px;">
                         <button class="wizard-btn wizard-btn-primary" onclick="resetLoginCard();" style="width:100%;">Try Again</button>
                     </div>
-                    <div class="security-notice">
-                        <div class="shield-dot"></div>
-                        <div class="security-notice-text">Out-of-band HSM verification &amp; B2B client sync in progress.</div>
-                    </div>
                 </div>
-
-                <!-- ============================================================
-                3. WELCOME WIZARD CARD
-                ============================================================ -->
-                <div class="wizard-card" id="wizardCard">
-
-                    <!-- Progress Dots -->
-                    <div class="wizard-progress" id="wizardProgress">
-                        <span class="wizard-dot active" data-step="0"></span>
-                        <span class="wizard-dot" data-step="1"></span>
-                        <span class="wizard-dot" data-step="2"></span>
-                        <span class="wizard-dot" data-step="3"></span>
-                    </div>
-
-                    <!-- STEP 1: Welcome -->
-                    <div class="wizard-step active" data-step="0">
-                        <div class="welcome-avatar" id="wizardAvatar">
-                            <span id="avatarInitial">K</span>
-                        </div>
-                        <div class="step-label">Step 1 of 4</div>
-                        <div class="step-title welcome-greeting" id="wizardGreeting">Welcome, <span id="wizardName">Associate</span></div>
-                        <div class="step-desc welcome-email" id="wizardEmail">user@example.com</div>
-                        <div class="welcome-badge">Active B2B Client</div>
-
-                        <div style="margin-top: 20px; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 16px; border: 1px solid rgba(255,255,255,0.04);">
-                            <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
-                                Welcome to the KOMNI enterprise platform. Your Google identity has been successfully authenticated and indexed to Firestore.
-                                Let's configure your client workspace posture.
-                            </p>
-                        </div>
-
-                        <div class="wizard-btn-group">
-                            <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 2: Enterprise Organization -->
-                    <div class="wizard-step" data-step="1">
-                        <div class="step-label">Step 2 of 4</div>
-                        <div class="step-title">Enterprise Profile</div>
-                        <div class="step-desc">Tell us about your organization to align system governance and settlement controls.</div>
-
-                        <div class="wizard-form-group">
-                            <label for="wizCompany">Organization / Company Name</label>
-                            <input type="text" id="wizCompany" placeholder="e.g. Acme Corp / Global Labs" autocomplete="organization" />
-                        </div>
-
-                        <div class="wizard-form-group">
-                            <label for="wizIndustry">Industry Sector</label>
-                            <select id="wizIndustry">
-                                <option value="">Select industry sector…</option>
-                                <option value="fintech">Fintech &amp; Blockchain</option>
-                                <option value="banking">Banking &amp; Financial Services</option>
-                                <option value="healthcare">Healthcare &amp; Life Sciences</option>
-                                <option value="retail">E-Commerce &amp; Retail</option>
-                                <option value="technology">Software / SaaS Technology</option>
-                                <option value="logistics">Logistics &amp; Supply Chain</option>
-                                <option value="energy">Energy &amp; Infrastructure</option>
-                                <option value="education">Education &amp; EdTech</option>
-                                <option value="government">Public Sector / Government</option>
-                                <option value="other">Other Enterprise Sector</option>
-                            </select>
-                        </div>
-
-                        <div class="wizard-form-group">
-                            <label for="wizRole">Your Associate Role</label>
-                            <input type="text" id="wizRole" placeholder="e.g. Chief Risk Officer, Lead Engineer" autocomplete="job-title" />
-                        </div>
-
-                        <div class="wizard-btn-group">
-                            <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev()">← Back</button>
-                            <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 3: Workspace Preferences -->
-                    <div class="wizard-step" data-step="2">
-                        <div class="step-label">Step 3 of 4</div>
-                        <div class="step-title">Workspace Governance</div>
-                        <div class="step-desc">Select operating preferences for transactional controls and reporting alerts.</div>
-
-                        <div class="wizard-form-group">
-                            <label>Operating Governance Posture</label>
-                            <div class="wizard-radio-group">
-                                <label class="wizard-radio-option">
-                                    <input type="radio" name="wizPosture" value="strict" checked />
-                                    <span class="radio-dot"></span>
-                                    <span class="radio-label">Strict — Maximum compliance oversight &amp; dual signing</span>
-                                </label>
-                                <label class="wizard-radio-option">
-                                    <input type="radio" name="wizPosture" value="balanced" />
-                                    <span class="radio-dot"></span>
-                                    <span class="radio-label">Balanced — Standard operational speed with logging</span>
-                                </label>
-                                <label class="wizard-radio-option">
-                                    <input type="radio" name="wizPosture" value="agile" />
-                                    <span class="radio-dot"></span>
-                                    <span class="radio-label">Agile — Unrestricted real-time integration mode</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="wizard-form-group">
-                            <label>Notification Cadence</label>
-                            <div class="wizard-radio-group">
-                                <label class="wizard-radio-option">
-                                    <input type="radio" name="wizNotify" value="email" checked />
-                                    <span class="radio-dot"></span>
-                                    <span class="radio-label">Email updates &amp; transaction digests</span>
-                                </label>
-                                <label class="wizard-radio-option">
-                                    <input type="radio" name="wizNotify" value="console" />
-                                    <span class="radio-dot"></span>
-                                    <span class="radio-label">In-console notifications only</span>
-                                </label>
-                                <label class="wizard-radio-option">
-                                    <input type="radio" name="wizNotify" value="both" />
-                                    <span class="radio-dot"></span>
-                                    <span class="radio-label">Real-time dual channel dispatch</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="wizard-btn-group">
-                            <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev()">← Back</button>
-                            <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 4: Launch Dashboard -->
-                    <div class="wizard-step" data-step="3">
-                        <div class="complete-icon">✓</div>
-                        <div class="step-label" style="text-align:center;">Step 4 of 4</div>
-                        <div class="complete-title">Setup Complete, <span id="completeName">Associate</span>!</div>
-                        <div class="complete-desc">Your profile has been indexed to Firestore. Your workspace is provisioned and ready for access.</div>
-
-                        <div style="margin-top:20px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.18); border-radius:8px; padding:14px; text-align:center;">
-                            <span style="font-size:12px; color:#22c55e; font-weight:600;">✓ Active Client Document Synced to Firestore</span>
-                            <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Redirecting you directly to /dashboard.</span>
-                        </div>
-
-                        <div class="wizard-btn-group">
-                            <button class="wizard-btn wizard-btn-primary" id="wizardLaunchBtn" onclick="launchDashboard();" style="width:100%;">
-                                Launch Dashboard →
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-                <!-- end wizard-card -->
 
             </div>
-            <!-- end card-container -->
-
         </div>
-        <!-- end login-side -->
-
     </div>
-    <!-- end app-viewport -->
 
 
     <!-- ======================================================================
-    SCRIPT ENGINE
-    ====================================================================== -->
+         5. FULLSCREEN WELCOME WIZARD OVERLAY (Completely leaves login screen)
+         ====================================================================== -->
+    <div class="wizard-card" id="wizardCard">
+        <div class="wizard-brand-bar">
+            <div class="brand-pill">
+                <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Emblem" />
+                <span>KOMNI</span>
+            </div>
+            <div class="sys-badge">FULLSCREEN SETUP STAGE</div>
+        </div>
+
+        <div class="wizard-content-box">
+            <!-- Progress Dots -->
+            <div class="wizard-progress" id="wizardProgress">
+                <span class="wizard-dot active" data-step="0"></span>
+                <span class="wizard-dot" data-step="1"></span>
+                <span class="wizard-dot" data-step="2"></span>
+                <span class="wizard-dot" data-step="3"></span>
+            </div>
+
+            <!-- STEP 1: Welcome -->
+            <div class="wizard-step active" data-step="0">
+                <div class="welcome-avatar" id="wizardAvatar">
+                    <span id="avatarInitial">K</span>
+                </div>
+                <div class="step-label">Step 1 of 4</div>
+                <div class="step-title welcome-greeting" id="wizardGreeting">Welcome, <span id="wizardName">Associate</span></div>
+                <div class="step-desc welcome-email" id="wizardEmail">user@example.com</div>
+                <div class="welcome-badge">Active B2B Client</div>
+
+                <div style="margin-top: 20px; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 18px; border: 1px solid rgba(255,255,255,0.05);">
+                    <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+                        Your Google identity has been verified and registered into Firestore. Complete this brief workspace posture configuration to enter your dashboard.
+                    </p>
+                </div>
+
+                <div class="wizard-btn-group">
+                    <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Enterprise Organization -->
+            <div class="wizard-step" data-step="1">
+                <div class="step-label">Step 2 of 4</div>
+                <div class="step-title">Enterprise Profile</div>
+                <div class="step-desc">Tell us about your organization to align system governance and settlement controls.</div>
+
+                <div class="wizard-form-group">
+                    <label for="wizCompany">Organization / Company Name</label>
+                    <input type="text" id="wizCompany" placeholder="e.g. Acme Corp / Global Labs" autocomplete="organization" />
+                </div>
+
+                <div class="wizard-form-group">
+                    <label for="wizIndustry">Industry Sector</label>
+                    <select id="wizIndustry">
+                        <option value="">Select industry sector…</option>
+                        <option value="fintech">Fintech &amp; Blockchain</option>
+                        <option value="banking">Banking &amp; Financial Services</option>
+                        <option value="healthcare">Healthcare &amp; Life Sciences</option>
+                        <option value="retail">E-Commerce &amp; Retail</option>
+                        <option value="technology">Software / SaaS Technology</option>
+                        <option value="logistics">Logistics &amp; Supply Chain</option>
+                        <option value="energy">Energy &amp; Infrastructure</option>
+                        <option value="education">Education &amp; EdTech</option>
+                        <option value="government">Public Sector / Government</option>
+                        <option value="other">Other Enterprise Sector</option>
+                    </select>
+                </div>
+
+                <div class="wizard-form-group">
+                    <label for="wizRole">Your Associate Role</label>
+                    <input type="text" id="wizRole" placeholder="e.g. Chief Risk Officer, Lead Engineer" autocomplete="job-title" />
+                </div>
+
+                <div class="wizard-btn-group">
+                    <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev()">← Back</button>
+                    <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Workspace Preferences -->
+            <div class="wizard-step" data-step="2">
+                <div class="step-label">Step 3 of 4</div>
+                <div class="step-title">Workspace Governance</div>
+                <div class="step-desc">Select operating preferences for transactional controls and reporting alerts.</div>
+
+                <div class="wizard-form-group">
+                    <label>Operating Governance Posture</label>
+                    <div class="wizard-radio-group">
+                        <label class="wizard-radio-option">
+                            <input type="radio" name="wizPosture" value="strict" checked />
+                            <span class="radio-dot"></span>
+                            <span class="radio-label">Strict — Maximum compliance oversight &amp; dual signing</span>
+                        </label>
+                        <label class="wizard-radio-option">
+                            <input type="radio" name="wizPosture" value="balanced" />
+                            <span class="radio-dot"></span>
+                            <span class="radio-label">Balanced — Standard operational speed with logging</span>
+                        </label>
+                        <label class="wizard-radio-option">
+                            <input type="radio" name="wizPosture" value="agile" />
+                            <span class="radio-dot"></span>
+                            <span class="radio-label">Agile — Unrestricted real-time integration mode</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="wizard-form-group">
+                    <label>Notification Cadence</label>
+                    <div class="wizard-radio-group">
+                        <label class="wizard-radio-option">
+                            <input type="radio" name="wizNotify" value="email" checked />
+                            <span class="radio-dot"></span>
+                            <span class="radio-label">Email updates &amp; transaction digests</span>
+                        </label>
+                        <label class="wizard-radio-option">
+                            <input type="radio" name="wizNotify" value="console" />
+                            <span class="radio-dot"></span>
+                            <span class="radio-label">In-console notifications only</span>
+                        </label>
+                        <label class="wizard-radio-option">
+                            <input type="radio" name="wizNotify" value="both" />
+                            <span class="radio-dot"></span>
+                            <span class="radio-label">Real-time dual channel dispatch</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="wizard-btn-group">
+                    <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev()">← Back</button>
+                    <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
+                </div>
+            </div>
+
+            <!-- STEP 4: Launch Dashboard -->
+            <div class="wizard-step" data-step="3">
+                <div class="complete-icon">✓</div>
+                <div class="step-label" style="text-align:center;">Step 4 of 4</div>
+                <div class="complete-title">Setup Complete, <span id="completeName">Associate</span>!</div>
+                <div class="complete-desc">Your workspace preferences have been saved to Firestore. You are ready to launch.</div>
+
+                <div style="margin-top:24px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.18); border-radius:8px; padding:16px; text-align:center;">
+                    <span style="font-size:12px; color:#22c55e; font-weight:600;">✓ Client Document Synced to Firestore</span>
+                    <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Redirecting directly to /dashboard.</span>
+                </div>
+
+                <div class="wizard-btn-group">
+                    <button class="wizard-btn wizard-btn-primary" id="wizardLaunchBtn" onclick="launchDashboard();" style="width:100%;">
+                        Launch Dashboard →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wizard-footer-note">KOMNI FINANCIAL TECHNOLOGIES // FULLSCREEN WORKSPACE ENVIRONMENT</div>
+    </div>
+
+
+    <!-- ======================================================================
+         SCRIPT ENGINE
+         ====================================================================== -->
     <script>
         /* ====================================================================
            FIREBASE CONFIG
@@ -1165,10 +1183,9 @@
         const wizardCard = document.getElementById('wizardCard');
         const validationTerminal = document.getElementById('validationTerminal');
         const validationStatusPill = document.getElementById('validationStatusPill');
-        const retryContainer = document.getElementById('retryButtonContainer');
 
         /* ====================================================================
-           ADVERT ENGINE (background particles)
+           ADVERT ENGINE
            ==================================================================== */
         document.addEventListener('DOMContentLoaded', () => {
             class DynamicParticle {
@@ -1220,10 +1237,7 @@
                 const container = canvas.closest(containerSelector);
                 const scenes = container.querySelectorAll('.scene-content');
                 const finaleStage = container.querySelector('.finale-stage');
-                let width = 0,
-                    height = 0,
-                    currentScene = 0,
-                    frame = 0;
+                let width = 0, height = 0, currentScene = 0, frame = 0;
                 const SCENE_DURATION = 160;
                 let isActive = true;
                 let currentSpeed = 12;
@@ -1298,17 +1312,16 @@
 
             initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
 
-            // Setup auth listener
-            setupAuthListener();
-
-            // Catch any pending redirect auth response
+            // Listen for redirect authentication results upon landing
             if (firebaseAuth) {
                 firebaseAuth.getRedirectResult().then((result) => {
                     if (result.user && !authHandled) {
-                        console.log('Redirect result user detected:', result.user.uid);
+                        console.log('Redirect result user authenticated:', result.user.uid);
                     }
-                }).catch(err => console.warn('Redirect result warning:', err));
+                }).catch(err => console.warn('Redirect auth warning:', err));
             }
+
+            setupAuthListener();
         });
 
         /* ====================================================================
@@ -1327,7 +1340,6 @@
                         showValidationCard(user);
                         await indexUserInFirestore(user);
 
-                        // Cache auth details
                         sessionStorage.setItem('komniAuthUser', JSON.stringify({
                             uid: user.uid,
                             displayName: user.displayName || '',
@@ -1342,7 +1354,7 @@
                     authHandled = false;
                     loginCard.style.display = 'block';
                     validationCard.style.display = 'none';
-                    wizardCard.style.display = 'none';
+                    wizardCard.classList.remove('is-active');
                     
                     const btn = document.getElementById('googleSignInBtn');
                     const txt = document.getElementById('googleSignInText');
@@ -1353,18 +1365,19 @@
         }
 
         /* ====================================================================
-           GOOGLE SIGN-IN (Popup with Fallback to Redirect)
+           FULLSCREEN GOOGLE AUTH (signInWithRedirect)
            ==================================================================== */
         async function handleGoogleSignIn() {
             const button = document.getElementById('googleSignInBtn');
             const text = document.getElementById('googleSignInText');
+
             if (!firebaseAuth) {
                 showAuthError('Firebase auth unavailable.');
                 return;
             }
 
             button.disabled = true;
-            text.textContent = 'Authenticating with Google…';
+            text.textContent = 'Redirecting to Google…';
 
             const provider = new firebase.auth.GoogleAuthProvider();
             provider.addScope('email');
@@ -1372,30 +1385,17 @@
             provider.setCustomParameters({ prompt: 'select_account' });
 
             try {
-                const result = await firebaseAuth.signInWithPopup(provider);
-                if (result.user) {
-                    console.log('Popup authentication successful.');
-                }
+                // Directly trigger full screen Google sign-in redirect
+                await firebaseAuth.signInWithRedirect(provider);
             } catch (err) {
-                console.warn('Popup sign-in error/blocked, falling back to redirect:', err);
-                if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
-                    try {
-                        await firebaseAuth.signInWithRedirect(provider);
-                    } catch (redirectErr) {
-                        button.disabled = false;
-                        text.textContent = 'Sign in with Google';
-                        showAuthError(redirectErr?.message || 'Unable to open Google Sign-In.');
-                    }
-                } else {
-                    button.disabled = false;
-                    text.textContent = 'Sign in with Google';
-                    showAuthError(err?.message || 'Authentication error occurred.');
-                }
+                button.disabled = false;
+                text.textContent = 'Sign in with Google';
+                showAuthError(err?.message || 'Authentication error occurred.');
             }
         }
 
         /* ====================================================================
-           FIRESTORE INDEXING (Active Registered Client + Enterprise Metadata)
+           FIRESTORE INDEXING
            ==================================================================== */
         async function indexUserInFirestore(user) {
             if (!firestore || !user) return;
@@ -1408,7 +1408,6 @@
                 const userDoc = await userRef.get();
                 const exists = userDoc.exists;
 
-                // Google Metadata Extraction
                 const googleMeta = {
                     authProvider: user.providerData?.[0]?.providerId || 'google.com',
                     emailVerified: user.emailVerified || true,
@@ -1438,7 +1437,6 @@
                 if (exists) {
                     await userRef.update(baseUserData);
                     wizardUserData = { ...userDoc.data(), ...baseUserData };
-                    console.log('Updated active associate user in Firestore.');
                 } else {
                     const newUserData = {
                         ...baseUserData,
@@ -1452,10 +1450,8 @@
                     };
                     await userRef.set(newUserData);
                     wizardUserData = newUserData;
-                    console.log('Indexed new active client user in Firestore.');
                 }
 
-                // Index in 'clients' collection as an active B2B registered associate/client
                 await clientRef.set({
                     uid: user.uid,
                     email: user.email || '',
@@ -1468,7 +1464,7 @@
                     createdAt: exists ? (userDoc.data()?.createdAt || now) : now
                 }, { merge: true });
 
-                console.log('Client collection successfully synced.');
+                console.log('User & Client collection successfully synced in Firestore.');
 
             } catch (err) {
                 console.error('Firestore indexing error:', err);
@@ -1477,30 +1473,15 @@
         }
 
         /* ====================================================================
-           SHOW VALIDATION CARD -> WIZARD
+           VALIDATION CARD & TRANSITION TO FULLSCREEN WIZARD
            ==================================================================== */
-        function showValidationCard(user, error = null) {
+        function showValidationCard(user) {
             loginCard.style.display = 'none';
             validationCard.style.display = 'block';
             validationCard.classList.add('is-active');
 
             const pill = validationStatusPill;
             const term = validationTerminal;
-
-            if (error) {
-                pill.className = 'auth-status-pill is-error';
-                pill.innerText = 'Sync Warning';
-                term.innerHTML =
-                    '<span class="terminal-line info">> Authentication completed with sync warning.</span>' +
-                    `<span class="terminal-line error">> Error: ${escapeHtml(error.message || 'Unknown error')}</span>` +
-                    '<span class="terminal-line info">> Proceeding to workspace onboarding…</span>';
-                
-                setTimeout(() => {
-                    validationCard.style.display = 'none';
-                    launchWizard(user);
-                }, 2000);
-                return;
-            }
 
             pill.className = 'auth-status-pill is-success';
             pill.innerText = 'Google Authenticated';
@@ -1509,14 +1490,14 @@
             const name = user.displayName || 'Associate';
 
             term.innerHTML =
-                '<span class="terminal-line info">> Initiating Google OAuth Handshake…</span>' +
+                '<span class="terminal-line info">> Executing Google OAuth Redirect Verification…</span>' +
                 '<span class="terminal-line accent">> Verifying session tokens with Firebase Auth…</span>' +
                 `<span class="terminal-line success">> Authenticated: ${escapeHtml(email)}</span>` +
-                '<span class="terminal-line info">> Indexing user as active client in Firestore [/users & /clients]…</span>';
+                '<span class="terminal-line info">> Syncing active registered client record to Firestore…</span>';
 
             setTimeout(() => {
-                term.innerHTML += '<span class="terminal-line success">> Firestore registration &amp; Google metadata indexed ✓</span>';
-                term.innerHTML += `<span class="terminal-line accent">> Welcome Associate: ${escapeHtml(name)}</span>`;
+                term.innerHTML += '<span class="terminal-line success">> Firestore user metadata indexed ✓</span>';
+                term.innerHTML += `<span class="terminal-line accent">> Launching fullscreen onboarding wizard for ${escapeHtml(name)}…</span>`;
             }, 600);
 
             setTimeout(() => {
@@ -1526,10 +1507,10 @@
         }
 
         /* ====================================================================
-           LAUNCH WIZARD
+           LAUNCH FULLSCREEN WIZARD
            ==================================================================== */
         function launchWizard(user) {
-            wizardCard.style.display = 'block';
+            // Activate full-screen wizard overlay
             wizardCard.classList.add('is-active');
 
             const name = user.displayName || 'Associate';
@@ -1547,7 +1528,6 @@
                 avatarEl.innerHTML = `<span id="avatarInitial">${name.charAt(0).toUpperCase()}</span>`;
             }
 
-            // Populate existing values if returning user
             if (wizardUserData) {
                 if (wizardUserData.company) document.getElementById('wizCompany').value = wizardUserData.company;
                 if (wizardUserData.industry) document.getElementById('wizIndustry').value = wizardUserData.industry;
@@ -1656,7 +1636,6 @@
            ==================================================================== */
         function launchDashboard() {
             saveWizardData().finally(() => {
-                // Navigate to /dashboard as requested
                 window.location.href = '/dashboard';
             });
         }
@@ -1690,7 +1669,7 @@
 
         function resetLoginCard() {
             validationCard.style.display = 'none';
-            wizardCard.style.display = 'none';
+            wizardCard.classList.remove('is-active');
             loginCard.style.display = 'block';
 
             const button = document.getElementById('googleSignInBtn');
