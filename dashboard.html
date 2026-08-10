@@ -801,271 +801,6 @@
       transform: translateY(-1px);
     }
 
-
-    /* ==========================================================================
-       POLICY ENGINE — ISOLATED WORKSPACE LAYOUT
-       Explicitly scoped so dashboard/grid/flex rules cannot distort the hero.
-       ========================================================================== */
-    #policy-engine-workspace {
-      position: relative;
-      flex: 1 1 auto;
-      min-width: 0;
-      min-height: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    #policy-engine-workspace .policy-engine-viewport {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      min-width: 0;
-      min-height: 0;
-      flex: 1 1 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: auto;
-      padding: clamp(28px, 6vh, 72px) clamp(24px, 5vw, 80px);
-      isolation: isolate;
-      background:
-        radial-gradient(circle at 50% 36%, rgba(96,54,225,.14) 0%, rgba(216,61,194,.045) 25%, transparent 55%),
-        radial-gradient(circle at 18% 92%, rgba(96,54,225,.075), transparent 35%),
-        #030308;
-    }
-
-    #policy-engine-workspace .policy-engine-viewport::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,.72), transparent 88%);
-    }
-
-    #policy-engine-workspace .policy-engine-shell {
-      width: min(900px, 100%);
-      flex: 0 1 auto;
-      position: relative;
-      z-index: 1;
-      display: block;
-      margin: auto;
-    }
-
-    #policy-engine-workspace .policy-engine-hero {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 44px 32px 38px;
-    }
-
-    #policy-engine-workspace .policy-engine-orb {
-      width: 76px;
-      height: 76px;
-      flex: 0 0 76px;
-      margin: 0 0 24px;
-      border: 1px solid rgba(216,61,194,.28);
-      border-radius: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,.025);
-      box-shadow:
-        0 0 0 1px rgba(96,54,225,.08),
-        0 0 70px rgba(96,54,225,.14);
-      transform: translateZ(0);
-      animation: policyOrbFloat 5s ease-in-out infinite;
-    }
-
-    #policy-engine-workspace .policy-engine-orb svg {
-      display: block;
-      width: 38px;
-      height: 38px;
-      flex: 0 0 38px;
-    }
-
-    @keyframes policyOrbFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    #policy-engine-workspace .policy-engine-copy {
-      width: 100%;
-      max-width: 700px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-width: 0;
-    }
-
-    #policy-engine-workspace .policy-engine-eyebrow {
-      display: block;
-      width: 100%;
-      margin: 0 0 14px;
-      color: var(--accent-magenta);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      line-height: 1.4;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      white-space: normal;
-    }
-
-    #policy-engine-workspace h1 {
-      display: block;
-      width: 100%;
-      margin: 0 0 18px;
-      color: #ffffff;
-      background: none;
-      -webkit-background-clip: initial;
-      background-clip: initial;
-      -webkit-text-fill-color: initial;
-      font-family: var(--font-display);
-      font-size: clamp(42px, 6vw, 72px);
-      line-height: .98;
-      letter-spacing: -3px;
-      font-weight: 800;
-      text-align: center;
-      overflow: visible;
-      position: relative;
-      z-index: 2;
-    }
-
-    #policy-engine-workspace h1::after {
-      content: "";
-      display: block;
-      width: 74px;
-      height: 3px;
-      margin: 18px auto 0;
-      border-radius: 99px;
-      background: var(--logo-gradient);
-      box-shadow: 0 0 22px rgba(216,61,194,.22);
-    }
-
-    #policy-engine-workspace .policy-engine-description {
-      display: block;
-      width: min(590px, 100%);
-      margin: 0 auto;
-      color: var(--text-secondary);
-      font-family: var(--font-sans);
-      font-size: 14px;
-      line-height: 1.75;
-      text-align: center;
-      overflow: visible;
-    }
-
-    #policy-engine-workspace .policy-engine-status {
-      display: inline-flex;
-      width: fit-content;
-      max-width: 100%;
-      margin: 24px auto 0;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 7px 11px;
-      border: 1px solid var(--border-color);
-      border-radius: 999px;
-      background: rgba(255,255,255,.025);
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      line-height: 1.2;
-      white-space: nowrap;
-    }
-
-    #policy-engine-workspace .policy-engine-actions {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 28px;
-    }
-
-    #policy-engine-workspace .policy-start-button {
-      appearance: none;
-      -webkit-appearance: none;
-      width: auto;
-      min-width: 156px;
-      height: 46px;
-      margin: 0;
-      padding: 0 18px;
-      display: inline-flex;
-      flex: 0 0 auto;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      border: 0;
-      border-radius: 8px;
-      box-sizing: border-box;
-      white-space: nowrap;
-      line-height: 1;
-    }
-
-    #policy-engine-workspace .policy-start-button span {
-      display: inline-block;
-      width: auto;
-      height: auto;
-      margin: 0;
-      padding: 0;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    #policy-engine-workspace .policy-start-button .policy-arrow {
-      font-size: 16px;
-      line-height: 1;
-    }
-
-    #policy-engine-workspace .policy-engine-footnote {
-      display: block;
-      width: 100%;
-      margin: 14px 0 0;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      line-height: 1.5;
-      text-align: center;
-    }
-
-    @media (max-width: 700px) {
-      #policy-engine-workspace .policy-engine-viewport {
-        padding: 24px 16px;
-      }
-
-      #policy-engine-workspace .policy-engine-hero {
-        padding: 30px 16px;
-      }
-
-      #policy-engine-workspace h1 {
-        font-size: clamp(38px, 12vw, 56px);
-        letter-spacing: -2px;
-      }
-
-      #policy-engine-workspace .policy-engine-description {
-        font-size: 13px;
-      }
-
-      #policy-engine-workspace .policy-engine-status {
-        white-space: normal;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      #policy-engine-workspace .policy-engine-orb {
-        animation: none;
-      }
-    }
-
     /* Modal Scaffolding */
     .modal-overlay {
       position: fixed;
@@ -1090,6 +825,177 @@
       padding: 24px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     }
+
+    /* ============================================================
+       POLICY ENGINE UI FIX — scoped only to this workspace.
+       This does not alter Overview, telemetry, navigation, or modal
+       behavior. It only prevents the Policy Engine landing composition
+       from collapsing into narrow/overlapping columns.
+       ============================================================ */
+    #policy-engine-workspace {
+      position: relative;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #policy-engine-workspace .policy-engine-viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      padding: clamp(28px, 5vw, 64px);
+      isolation: isolate;
+    }
+
+    #policy-engine-workspace .policy-engine-landing {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex: 0 0 auto;
+      width: min(720px, 100%);
+      min-width: 0;
+      height: auto;
+      margin: auto;
+      padding: 42px 28px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    #policy-engine-workspace .policy-engine-orb {
+      display: flex;
+      flex: 0 0 72px;
+      width: 72px;
+      height: 72px;
+      margin: 0 0 26px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #policy-engine-workspace .policy-engine-orb svg {
+      display: block;
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+    }
+
+    #policy-engine-workspace .policy-engine-eyebrow {
+      display: block;
+      flex: 0 0 auto;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 0 14px;
+      text-align: center;
+      white-space: normal;
+      overflow: visible;
+    }
+
+    #policy-engine-workspace .policy-engine-landing h1 {
+      display: block;
+      flex: 0 0 auto;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 0 18px;
+      padding: 0;
+      text-align: center;
+      white-space: normal;
+      overflow: visible;
+      position: relative;
+      z-index: 2;
+      line-height: 1.02;
+    }
+
+    #policy-engine-workspace .policy-engine-description {
+      display: block;
+      flex: 0 0 auto;
+      width: min(560px, 100%);
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: center;
+      white-space: normal;
+      overflow: visible;
+      line-height: 1.75;
+    }
+
+    #policy-engine-workspace .policy-engine-status {
+      display: inline-flex;
+      flex: 0 0 auto;
+      width: fit-content;
+      max-width: 100%;
+      margin: 24px auto 0;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    #policy-engine-workspace .policy-start-button {
+      display: inline-flex;
+      flex: 0 0 auto;
+      width: auto;
+      min-width: 150px;
+      height: 42px;
+      margin: 28px auto 0;
+      padding: 10px 16px;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
+
+    #policy-engine-workspace .policy-start-button span {
+      display: inline-block;
+      flex: 0 0 auto;
+      width: auto;
+      margin: 0;
+      padding: 0;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    #policy-engine-workspace .policy-engine-footnote {
+      display: block;
+      flex: 0 0 auto;
+      width: 100%;
+      margin: 16px 0 0;
+      text-align: center;
+      white-space: normal;
+      overflow: visible;
+    }
+
+    @media (max-width: 700px) {
+      #policy-engine-workspace .policy-engine-viewport {
+        padding: 24px 16px;
+      }
+
+      #policy-engine-workspace .policy-engine-landing {
+        width: 100%;
+        padding: 30px 14px;
+      }
+
+      #policy-engine-workspace .policy-engine-landing h1 {
+        font-size: clamp(34px, 11vw, 52px);
+        letter-spacing: -1.8px;
+      }
+
+      #policy-engine-workspace .policy-engine-status {
+        white-space: normal;
+        text-align: center;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1350,48 +1256,42 @@
       <!-- Workspace: Policy Engine -->
       <section class="workspace-view" id="policy-engine-workspace" data-workspace="policy-engine" aria-hidden="true">
         <div class="policy-engine-viewport">
-          <div class="policy-engine-shell">
-            <div class="policy-engine-hero">
-              <div class="policy-engine-orb" aria-hidden="true">
-                <svg viewBox="0 0 48 48" fill="none">
-                  <path d="M24 43s16-8 16-20V9L24 3 8 9v14c0 12 16 20 16 20Z"
-                        stroke="url(#policyShieldGradient)" stroke-width="1.6"/>
-                  <path d="M18 24.5 22 28l8-9"
-                        stroke="url(#policyShieldGradient)" stroke-width="1.8"
-                        stroke-linecap="round" stroke-linejoin="round"/>
-                  <defs>
-                    <linearGradient id="policyShieldGradient" x1="8" y1="3" x2="40" y2="43">
-                      <stop offset="0%" stop-color="#6036E1"/>
-                      <stop offset="100%" stop-color="#D83DC2"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
+          <div class="policy-engine-landing">
+            <div class="policy-engine-orb" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none">
+                <path d="M24 43s16-8 16-20V9L24 3 8 9v14c0 12 16 20 16 20Z"
+                      stroke="url(#policyShieldGradient)" stroke-width="1.6"/>
+                <path d="M18 24.5 22 28l8-9"
+                      stroke="url(#policyShieldGradient)" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                  <linearGradient id="policyShieldGradient" x1="8" y1="3" x2="40" y2="43">
+                    <stop offset="0%" stop-color="#6036E1"/>
+                    <stop offset="100%" stop-color="#D83DC2"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
 
-              <div class="policy-engine-copy">
-                <div class="policy-engine-eyebrow">KOMNI / INTELLIGENCE & POLICY</div>
-                <h1>Policy Engine</h1>
-                <p class="policy-engine-description">
-                  Define the decision layer that evaluates financial payloads before
-                  they continue through the KOMNI middleware mesh.
-                </p>
+            <div class="policy-engine-eyebrow">KOMNI / INTELLIGENCE & POLICY</div>
+            <h1>Policy Engine</h1>
+            <p class="policy-engine-description">
+              Define the decision layer that evaluates financial payloads before
+              they continue through the KOMNI middleware mesh.
+            </p>
 
-                <div class="policy-engine-status">
-                  <span class="status-indicator"></span>
-                  <span>Policy workspace ready</span>
-                </div>
+            <div class="policy-engine-status">
+              <span class="status-indicator"></span>
+              <span>Policy workspace ready</span>
+            </div>
 
-                <div class="policy-engine-actions">
-                  <button class="btn-premium policy-start-button" type="button" onclick="openPolicyModal()">
-                    <span>Get Started</span>
-                    <span class="policy-arrow" aria-hidden="true">→</span>
-                  </button>
-                </div>
+            <button class="btn-premium policy-start-button" type="button" onclick="openPolicyModal()">
+              Get Started
+              <span>→</span>
+            </button>
 
-                <div class="policy-engine-footnote">
-                  No policies configured yet · Start by creating your first rule set
-                </div>
-              </div>
+            <div class="policy-engine-footnote">
+              No policies configured yet · Start by creating your first rule set
             </div>
           </div>
         </div>
@@ -1474,8 +1374,6 @@
         view.classList.toggle('active', isActive);
         view.setAttribute('aria-hidden', String(!isActive));
         view.style.display = isActive ? 'flex' : 'none';
-        view.style.visibility = isActive ? 'visible' : 'hidden';
-        view.style.pointerEvents = isActive ? 'auto' : 'none';
       });
 
       navItems.forEach(item => {
