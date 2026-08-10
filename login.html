@@ -20,8 +20,6 @@
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js">
     </script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js">
-    </script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js">
     </script>
 
@@ -1151,13 +1149,14 @@
 };
 
         let firebaseApp, firebaseAuth, firestore;
+        let authProcessed = false; // prevent duplicate handling
 
         try {
             firebaseApp = firebase.initializeApp(firebaseConfig);
             firebaseAuth = firebase.auth();
             firestore = firebase.firestore();
-            // Enable offline persistence
-            firestore.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+            // Optional: use new cache setting to avoid deprecation warning
+            // firestore.settings({ cache: 'persistent' }); // uncomment if needed
         } catch (e) {
             console.error("Firebase init error:", e);
         }
@@ -1167,7 +1166,7 @@
            ==================================================================== */
         let currentWizardStep = 0;
         const TOTAL_STEPS = 4;
-        let wizardUserData = null; // populated after auth
+        let wizardUserData = null;
 
         /* ====================================================================
            DOM REFS
@@ -1311,13 +1310,57 @@
 
             initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
 
-            // Check for redirect result on load
-            handleGoogleRedirectResult();
+            // Set up auth state listener AFTER DOM is ready
+            setupAuthListener();
         });
 
+        /* ====================================================================
+           AUTH STATE LISTENER (replaces redirect result handling)
+           ==================================================================== */
+        function setupAuthListener() {
+            if (!firebaseAuth) {
+                console.error('Firebase Auth not initialized');
+                return;
+            }
+
+            firebaseAuth.onAuthStateChanged(async (user) => {
+                if (authProcessed) return; // already handled
+                if (user) {
+                    console.log('Auth state changed: user signed in', user.uid);
+                    authProcessed = true;
+
+                    // 1. Index user in Firestore
+                    await indexUserInFirestore(user);
+
+                    // 2. Store session
+                    sessionStorage.setItem('komniAuthUser', JSON.stringify({
+                        uid: user.uid,
+                        displayName: user.displayName || '',
+                        email: user.email || '',
+                        photoURL: user.photoURL || ''
+                    }));
+
+                    // 3. Show validation card then wizard
+                    showValidationCard(user);
+
+                } else {
+                    // No user signed in, show login card (if not already shown)
+                    console.log('Auth state: no user');
+                    // Keep login visible, hide validation/wizard
+                    loginCard.style.display = 'block';
+                    validationCard.style.display = 'none';
+                    wizardCard.style.display = 'none';
+                    // Reset button state
+                    const btn = document.getElementById('googleSignInBtn');
+                    const txt = document.getElementById('googleSignInText');
+                    btn.disabled = false;
+                    txt.textContent = 'Sign in with Google';
+                }
+            });
+        }
 
         /* ====================================================================
-           GOOGLE SIGN-IN
+           GOOGLE SIGN-IN (redirect)
            ==================================================================== */
         async function handleGoogleSignIn() {
             const button = document.getElementById('googleSignInBtn');
@@ -1334,133 +1377,105 @@
                 provider.setCustomParameters({ prompt: 'select_account' });
                 await firebaseAuth.signInWithRedirect(provider);
             } catch (err) {
-                console.error(err);
+                console.error('Google sign-in error:', err);
                 button.disabled = false;
                 text.textContent = 'Sign in with Google';
                 showAuthError(err?.message || 'Unable to open Google sign-in.');
             }
         }
 
-
         /* ====================================================================
-           HANDLE REDIRECT RESULT + FIRESTORE INDEXING
-           ==================================================================== */
-        async function handleGoogleRedirectResult() {
-            if (!firebaseAuth) return;
-            try {
-                const result = await firebaseAuth.getRedirectResult();
-                const user = result && result.user;
-                if (!user) return;
-
-                // --- 1. Index / update user in Firestore ---
-                await indexUserInFirestore(user);
-
-                // --- 2. Store session ---
-                sessionStorage.setItem('komniAuthUser', JSON.stringify({
-                    uid: user.uid,
-                    displayName: user.displayName || '',
-                    email: user.email || '',
-                    photoURL: user.photoURL || ''
-                }));
-
-                // --- 3. Show validation -> then wizard ---
-                showValidationCard(user);
-
-            } catch (err) {
-                console.error('Redirect result error:', err);
-                showAuthError(err?.message || 'Unable to complete sign-in.');
-            }
-        }
-
-
-        /* ====================================================================
-           FIRESTORE INDEXING
+           FIRESTORE INDEXING (users + clients)
            ==================================================================== */
         async function indexUserInFirestore(user) {
-            if (!firestore || !user) return;
-
-            const userRef = firestore.collection('users').doc(user.uid);
-            const now = firebase.firestore.FieldValue.serverTimestamp();
-            const doc = await userRef.get();
-            const exists = doc.exists;
-
-            const baseData = {
-                uid: user.uid,
-                email: user.email || '',
-                displayName: user.displayName || '',
-                photoURL: user.photoURL || '',
-                lastSignInAt: now,
-                signInCount: firebase.firestore.FieldValue.increment(1),
-                status: 'active',
-                metadata: {
-                    authProvider: 'google',
-                    lastSignInAt: new Date().toISOString(),
-                    userAgent: navigator.userAgent || ''
-                }
-            };
-
-            if (exists) {
-                // Update existing
-                await userRef.update({
-                    ...baseData,
-                    // preserve enterprise fields if they exist
-                    company: doc.data().company || '',
-                    industry: doc.data().industry || '',
-                    department: doc.data().department || '',
-                    jobRole: doc.data().jobRole || '',
-                    operatingPosture: doc.data().operatingPosture || 'balanced',
-                    notificationCadence: doc.data().notificationCadence || 'email',
-                });
-                // Store for wizard prefill
-                wizardUserData = {
-                    ...doc.data(),
-                    ...baseData,
-                    isNew: false
-                };
-            } else {
-                // New user – create with defaults
-                const newData = {
-                    ...baseData,
-                    createdAt: now,
-                    company: '',
-                    industry: '',
-                    department: '',
-                    jobRole: '',
-                    operatingPosture: 'balanced',
-                    notificationCadence: 'email',
-                    isOnboarded: false,
-                    signInCount: 1
-                };
-                await userRef.set(newData);
-                wizardUserData = { ...newData, isNew: true };
+            if (!firestore || !user) {
+                console.warn('Firestore or user not available');
+                return;
             }
 
-            // Also store a "clients" collection for B2B indexing
-            const clientRef = firestore.collection('clients').doc(user.uid);
-            const clientDoc = await clientRef.get();
-            if (!clientDoc.exists) {
-                await clientRef.set({
+            try {
+                const userRef = firestore.collection('users').doc(user.uid);
+                const now = firebase.firestore.FieldValue.serverTimestamp();
+                const doc = await userRef.get();
+                const exists = doc.exists;
+
+                const baseData = {
                     uid: user.uid,
                     email: user.email || '',
                     displayName: user.displayName || '',
+                    photoURL: user.photoURL || '',
+                    lastSignInAt: now,
+                    signInCount: firebase.firestore.FieldValue.increment(1),
                     status: 'active',
-                    registeredAt: now,
-                    type: 'associate',
                     metadata: {
-                        source: 'google_oauth',
-                        registeredVia: 'login.komni.com'
+                        authProvider: 'google',
+                        lastSignInAt: new Date().toISOString(),
+                        userAgent: navigator.userAgent || ''
                     }
-                });
-            } else {
-                await clientRef.update({
-                    lastSeenAt: now,
-                    status: 'active'
-                });
+                };
+
+                if (exists) {
+                    await userRef.update({
+                        ...baseData,
+                        // preserve existing enterprise fields
+                        company: doc.data().company || '',
+                        industry: doc.data().industry || '',
+                        jobRole: doc.data().jobRole || '',
+                        operatingPosture: doc.data().operatingPosture || 'balanced',
+                        notificationCadence: doc.data().notificationCadence || 'email',
+                    });
+                    wizardUserData = {
+                        ...doc.data(),
+                        ...baseData,
+                        isNew: false
+                    };
+                    console.log('Updated existing user in Firestore');
+                } else {
+                    const newData = {
+                        ...baseData,
+                        createdAt: now,
+                        company: '',
+                        industry: '',
+                        jobRole: '',
+                        operatingPosture: 'balanced',
+                        notificationCadence: 'email',
+                        isOnboarded: false,
+                        signInCount: 1
+                    };
+                    await userRef.set(newData);
+                    wizardUserData = { ...newData, isNew: true };
+                    console.log('Created new user in Firestore');
+                }
+
+                // Also index in 'clients' collection
+                const clientRef = firestore.collection('clients').doc(user.uid);
+                const clientDoc = await clientRef.get();
+                if (!clientDoc.exists) {
+                    await clientRef.set({
+                        uid: user.uid,
+                        email: user.email || '',
+                        displayName: user.displayName || '',
+                        status: 'active',
+                        registeredAt: now,
+                        type: 'associate',
+                        metadata: {
+                            source: 'google_oauth',
+                            registeredVia: 'login.komni.com'
+                        }
+                    });
+                    console.log('Created client record');
+                } else {
+                    await clientRef.update({
+                        lastSeenAt: now,
+                        status: 'active'
+                    });
+                    console.log('Updated client record');
+                }
+            } catch (err) {
+                console.error('Firestore indexing error:', err);
+                // Still show validation, but log error
             }
-
-            return { exists, data: wizardUserData };
         }
-
 
         /* ====================================================================
            SHOW VALIDATION CARD → WIZARD
@@ -1486,8 +1501,6 @@
                 '<span class="terminal-line success">> Firebase session established [200 OK]</span>' +
                 '<span class="terminal-line info">> Indexing profile in Firestore…</span>';
 
-            // Firestore indexing already done in handleGoogleRedirectResult
-            // Add a small delay then show wizard
             setTimeout(() => {
                 term.innerHTML += '<span class="terminal-line success">> Firestore registration complete ✓</span>';
                 term.innerHTML += `<span class="terminal-line accent">> Welcome, ${escapeHtml(name)}</span>`;
@@ -1499,7 +1512,6 @@
             }, 1400);
         }
 
-
         /* ====================================================================
            LAUNCH WIZARD
            ==================================================================== */
@@ -1507,7 +1519,6 @@
             wizardCard.style.display = 'block';
             wizardCard.classList.add('is-active');
 
-            // Pre-fill user info
             const name = user.displayName || 'Guest';
             const email = user.email || 'user@example.com';
             const photo = user.photoURL || '';
@@ -1523,7 +1534,7 @@
                 avatarEl.innerHTML = `<span id="avatarInitial">${name.charAt(0).toUpperCase()}</span>`;
             }
 
-            // Pre-fill wizardUserData if we have it from Firestore
+            // Pre-fill wizardUserData if available
             if (wizardUserData) {
                 if (wizardUserData.company) document.getElementById('wizCompany').value = wizardUserData.company;
                 if (wizardUserData.industry) document.getElementById('wizIndustry').value = wizardUserData.industry;
@@ -1538,31 +1549,25 @@
                     const radio = document.querySelector(`input[name="wizNotify"][value="${cadence}"]`);
                     if (radio) radio.checked = true;
                 }
-                // If user already onboarded, skip to step 4?
-                if (wizardUserData.isOnboarded) {
-                    // Skip to step 4 directly
+                // If already onboarded, skip to step 4
+                if (wizardUserData.isOnboarded && wizardUserData.company) {
                     currentWizardStep = 3;
                     updateWizardUI();
+                    // Change launch button text
+                    document.getElementById('wizardLaunchBtn').textContent = 'Enter Dashboard →';
+                    return;
                 }
             }
 
+            // Start from step 0
             currentWizardStep = 0;
             updateWizardUI();
-
-            // Show "Enter Dashboard" if returning user with full profile
-            if (wizardUserData && wizardUserData.isOnboarded && wizardUserData.company) {
-                // They're already onboarded, let them skip
-                document.querySelector('.wizard-btn-group .wizard-btn-primary').textContent = 'Enter Dashboard →';
-                document.querySelector('.wizard-btn-group .wizard-btn-primary').onclick = launchDashboard;
-            }
         }
-
 
         /* ====================================================================
            WIZARD NAVIGATION
            ==================================================================== */
         function wizardNext() {
-            // Validate step
             if (currentWizardStep === 1) {
                 const company = document.getElementById('wizCompany').value.trim();
                 if (!company) {
@@ -1578,7 +1583,6 @@
             if (currentWizardStep < TOTAL_STEPS - 1) {
                 currentWizardStep++;
                 updateWizardUI();
-                // If we reached step 4, save data to Firestore
                 if (currentWizardStep === 3) {
                     saveWizardData();
                 }
@@ -1606,15 +1610,10 @@
                 else if (i < currentWizardStep) d.classList.add('completed');
             });
 
-            // Special: if step 4, update launch button text
             if (currentWizardStep === 3) {
-                const launchBtn = document.getElementById('wizardLaunchBtn');
-                if (launchBtn) {
-                    launchBtn.textContent = 'Enter Dashboard →';
-                }
+                document.getElementById('wizardLaunchBtn').textContent = 'Enter Dashboard →';
             }
         }
-
 
         /* ====================================================================
            SAVE WIZARD DATA TO FIRESTORE
@@ -1641,7 +1640,6 @@
 
             try {
                 await firestore.collection('users').doc(user.uid).update(payload);
-                // Also update client record
                 await firestore.collection('clients').doc(user.uid).update({
                     company,
                     industry,
@@ -1655,19 +1653,16 @@
             }
         }
 
-
         /* ====================================================================
            LAUNCH DASHBOARD
            ==================================================================== */
         function launchDashboard() {
-            // Save data one more time before redirect
             saveWizardData().then(() => {
                 window.location.href = 'dashboard.html#issued';
             }).catch(() => {
                 window.location.href = 'dashboard.html#issued';
             });
         }
-
 
         /* ====================================================================
            HELPERS
@@ -1718,6 +1713,7 @@
                 d.classList.toggle('active', i === 0);
                 d.classList.toggle('completed', false);
             });
+            authProcessed = false; // allow re-auth
         }
     </script>
 </body>
