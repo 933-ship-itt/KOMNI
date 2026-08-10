@@ -1149,16 +1149,17 @@
 };
 
         let firebaseApp, firebaseAuth, firestore;
-        let authProcessed = false; // prevent duplicate handling
+        let authHandled = false; // prevent duplicate processing
 
         try {
             firebaseApp = firebase.initializeApp(firebaseConfig);
             firebaseAuth = firebase.auth();
             firestore = firebase.firestore();
             // Optional: use new cache setting to avoid deprecation warning
-            // firestore.settings({ cache: 'persistent' }); // uncomment if needed
+            // firestore.settings({ cache: 'persistent' });
+            console.log('Firebase initialized successfully.');
         } catch (e) {
-            console.error("Firebase init error:", e);
+            console.error('Firebase init error:', e);
         }
 
         /* ====================================================================
@@ -1310,12 +1311,22 @@
 
             initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
 
-            // Set up auth state listener AFTER DOM is ready
+            // Set up auth state listener
             setupAuthListener();
+
+            // Also handle any pending redirect result (fallback)
+            if (firebaseAuth) {
+                firebaseAuth.getRedirectResult().then((result) => {
+                    if (result.user) {
+                        console.log('Redirect result detected user:', result.user.uid);
+                        // The auth listener will handle it, but just in case
+                    }
+                }).catch(err => console.warn('Redirect result error:', err));
+            }
         });
 
         /* ====================================================================
-           AUTH STATE LISTENER (replaces redirect result handling)
+           AUTH STATE LISTENER (primary)
            ==================================================================== */
         function setupAuthListener() {
             if (!firebaseAuth) {
@@ -1324,33 +1335,41 @@
             }
 
             firebaseAuth.onAuthStateChanged(async (user) => {
-                if (authProcessed) return; // already handled
+                console.log('Auth state changed. User:', user ? user.uid : 'null');
+                if (authHandled) {
+                    console.log('Auth already handled, skipping.');
+                    return;
+                }
+
                 if (user) {
-                    console.log('Auth state changed: user signed in', user.uid);
-                    authProcessed = true;
+                    authHandled = true;
+                    try {
+                        console.log('Processing authenticated user:', user.uid);
+                        await indexUserInFirestore(user);
 
-                    // 1. Index user in Firestore
-                    await indexUserInFirestore(user);
+                        // Store session
+                        sessionStorage.setItem('komniAuthUser', JSON.stringify({
+                            uid: user.uid,
+                            displayName: user.displayName || '',
+                            email: user.email || '',
+                            photoURL: user.photoURL || ''
+                        }));
 
-                    // 2. Store session
-                    sessionStorage.setItem('komniAuthUser', JSON.stringify({
-                        uid: user.uid,
-                        displayName: user.displayName || '',
-                        email: user.email || '',
-                        photoURL: user.photoURL || ''
-                    }));
-
-                    // 3. Show validation card then wizard
-                    showValidationCard(user);
-
+                        showValidationCard(user);
+                    } catch (err) {
+                        console.error('Error during auth processing:', err);
+                        // Still show validation with error message
+                        showValidationCard(user, err);
+                    }
                 } else {
-                    // No user signed in, show login card (if not already shown)
-                    console.log('Auth state: no user');
-                    // Keep login visible, hide validation/wizard
+                    // No user signed in
+                    authHandled = false; // allow future sign-in
+                    console.log('No user signed in.');
+                    // Show login card, hide others
                     loginCard.style.display = 'block';
                     validationCard.style.display = 'none';
                     wizardCard.style.display = 'none';
-                    // Reset button state
+                    // Reset button
                     const btn = document.getElementById('googleSignInBtn');
                     const txt = document.getElementById('googleSignInText');
                     btn.disabled = false;
@@ -1473,20 +1492,35 @@
                 }
             } catch (err) {
                 console.error('Firestore indexing error:', err);
-                // Still show validation, but log error
+                throw err; // rethrow so caller can handle
             }
         }
 
         /* ====================================================================
            SHOW VALIDATION CARD → WIZARD
            ==================================================================== */
-        function showValidationCard(user) {
+        function showValidationCard(user, error = null) {
             loginCard.style.display = 'none';
             validationCard.style.display = 'block';
             validationCard.classList.add('is-active');
 
             const pill = validationStatusPill;
             const term = validationTerminal;
+
+            if (error) {
+                pill.className = 'auth-status-pill is-error';
+                pill.innerText = 'Indexing Error';
+                term.innerHTML =
+                    '<span class="terminal-line info">> Authentication successful but Firestore indexing failed.</span>' +
+                    `<span class="terminal-line error">> Error: ${escapeHtml(error.message || 'Unknown error')}</span>` +
+                    '<span class="terminal-line info">> You can still proceed, but profile data may be incomplete.</span>';
+                // Show retry button? We'll just continue to wizard after a delay.
+                setTimeout(() => {
+                    validationCard.style.display = 'none';
+                    launchWizard(user);
+                }, 2500);
+                return;
+            }
 
             pill.className = 'auth-status-pill is-success';
             pill.innerText = 'Google Authentication Complete';
@@ -1553,7 +1587,6 @@
                 if (wizardUserData.isOnboarded && wizardUserData.company) {
                     currentWizardStep = 3;
                     updateWizardUI();
-                    // Change launch button text
                     document.getElementById('wizardLaunchBtn').textContent = 'Enter Dashboard →';
                     return;
                 }
@@ -1713,7 +1746,7 @@
                 d.classList.toggle('active', i === 0);
                 d.classList.toggle('completed', false);
             });
-            authProcessed = false; // allow re-auth
+            authHandled = false; // allow re-auth
         }
     </script>
 </body>
