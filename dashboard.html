@@ -351,9 +351,154 @@
       box-shadow: 0 0 10px var(--status-danger);
     }
 
+    /* Switchable Full-Screen Workspaces */
+    .workspace-view {
+      display: none !important;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .workspace-view.active {
+      display: flex !important;
+      flex-direction: column;
+    }
+
+    .policy-engine-viewport {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      position: relative;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(96, 54, 225, 0.13) 0%, rgba(216, 61, 194, 0.04) 24%, transparent 55%),
+        radial-gradient(circle at 15% 100%, rgba(96, 54, 225, 0.07), transparent 38%),
+        #030308;
+    }
+
+    .policy-engine-viewport::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 85%);
+    }
+
+    .policy-engine-landing {
+      width: min(720px, 100%);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      padding: 54px 32px;
+    }
+
+    .policy-engine-orb {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 28px;
+      border: 1px solid rgba(216, 61, 194, 0.25);
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.025);
+      box-shadow:
+        0 0 0 1px rgba(96,54,225,0.08),
+        0 0 70px rgba(96,54,225,0.13);
+    }
+
+    .policy-engine-orb svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .policy-engine-eyebrow {
+      font-family: var(--font-mono);
+      color: var(--accent-magenta);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .policy-engine-landing h1 {
+      font-family: var(--font-display);
+      font-size: clamp(34px, 4vw, 52px);
+      line-height: 1;
+      letter-spacing: -1.8px;
+      margin-bottom: 18px;
+      background: var(--logo-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .policy-engine-description {
+      max-width: 560px;
+      margin: 0 auto;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .policy-engine-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      padding: 7px 11px;
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.025);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+
+    .status-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--status-success);
+      box-shadow: 0 0 8px rgba(34,197,94,0.6);
+    }
+
+    .policy-start-button {
+      margin: 28px auto 0;
+      min-width: 150px;
+      padding: 10px 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .policy-start-button span {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .policy-engine-footnote {
+      margin-top: 16px;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-family: var(--font-mono);
+    }
+
     /* Dashboard View Area */
     .dashboard-viewport {
-      flex: 1;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
       overflow-y: auto;
       padding: 28px;
       display: flex;
@@ -700,8 +845,8 @@
 
       <div class="nav-section-title">Telemetry & Routing</div>
       <ul class="nav-menu">
-        <li class="nav-item active">
-          <a href="#">
+        <li class="nav-item active" data-nav="overview">
+          <a href="#overview" onclick="switchWorkspace('overview'); return false;">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Overview
           </a>
@@ -728,8 +873,8 @@
 
       <div class="nav-section-title">Intelligence & Policy</div>
       <ul class="nav-menu">
-        <li class="nav-item">
-          <a href="#">
+        <li class="nav-item" data-nav="policy-engine">
+          <a href="#policy-engine" onclick="switchWorkspace('policy-engine'); return false;">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Policy Engine
           </a>
@@ -801,13 +946,14 @@
         <div class="top-actions">
           <div class="system-health">
             <span class="pulse-dot" id="system-pulse"></span>
-            <span id="system-status-text">Connecting to Vercel Node...</span>
+            <span id="system-status-text">Local workspace mode</span>
           </div>
         </div>
       </header>
 
-      <!-- Dashboard Main Viewport -->
-      <div class="dashboard-viewport">
+      <!-- Workspace: Overview -->
+      <section class="workspace-view active" id="overview-workspace" data-workspace="overview" aria-hidden="false">
+        <div class="dashboard-viewport">
         
         <!-- Key Metrics Cards -->
         <section class="metrics-header-grid">
@@ -821,7 +967,7 @@
               <span class="kpi-value" id="kpi-requests">0</span>
               <span class="kpi-trend positive" id="kpi-requests-trend">+100%</span>
             </div>
-            <div class="kpi-subtext" id="kpi-requests-sub">Live middleware requests processed</div>
+            <div class="kpi-subtext" id="kpi-requests-sub">Local workspace telemetry</div>
           </div>
 
           <div class="kpi-card">
@@ -833,7 +979,7 @@
               <span class="kpi-value" id="kpi-volume">$0.00</span>
               <span class="kpi-trend positive" id="kpi-volume-trend">+100%</span>
             </div>
-            <div class="kpi-subtext" id="kpi-volume-sub">Processed payload USD total</div>
+            <div class="kpi-subtext" id="kpi-volume-sub">Local transaction value</div>
           </div>
 
           <div class="kpi-card">
@@ -891,13 +1037,13 @@
           <div class="panel">
             <div class="panel-header">
               <span class="panel-title">Real-Time Request Stream</span>
-              <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Syncing</span>
+              <span id="stream-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--status-success); letter-spacing: 1px; text-transform: uppercase;">● Local</span>
             </div>
             <div class="panel-body" style="padding: 14px;">
               <div class="log-stream" id="log-stream-container">
                 <div class="log-row">
                   <span class="log-method method-get">SYNC</span>
-                  <span class="log-path">Polling KOMNI telemetry feed...</span>
+                  <span class="log-path">Local telemetry feed ready.</span>
                   <span class="log-latency">--</span>
                 </div>
               </div>
@@ -926,14 +1072,59 @@
               </thead>
               <tbody id="routes-table-body">
                 <tr>
-                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading active routes from Vercel interceptor...</td>
+                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No live telemetry connected — local workspace mode.</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
 
-      </div>
+        </div>
+      </section>
+
+      <!-- Workspace: Policy Engine -->
+      <section class="workspace-view" id="policy-engine-workspace" data-workspace="policy-engine" aria-hidden="true">
+        <div class="policy-engine-viewport">
+          <div class="policy-engine-landing">
+            <div class="policy-engine-orb" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none">
+                <path d="M24 43s16-8 16-20V9L24 3 8 9v14c0 12 16 20 16 20Z"
+                      stroke="url(#policyShieldGradient)" stroke-width="1.6"/>
+                <path d="M18 24.5 22 28l8-9"
+                      stroke="url(#policyShieldGradient)" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                  <linearGradient id="policyShieldGradient" x1="8" y1="3" x2="40" y2="43">
+                    <stop offset="0%" stop-color="#6036E1"/>
+                    <stop offset="100%" stop-color="#D83DC2"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <div class="policy-engine-eyebrow">KOMNI / INTELLIGENCE & POLICY</div>
+            <h1>Policy Engine</h1>
+            <p class="policy-engine-description">
+              Define the decision layer that evaluates financial payloads before
+              they continue through the KOMNI middleware mesh.
+            </p>
+
+            <div class="policy-engine-status">
+              <span class="status-indicator"></span>
+              <span>Policy workspace ready</span>
+            </div>
+
+            <button class="btn-premium policy-start-button" type="button" onclick="openPolicyModal()">
+              Get Started
+              <span>→</span>
+            </button>
+
+            <div class="policy-engine-footnote">
+              No policies configured yet · Start by creating your first rule set
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
   </div>
@@ -951,10 +1142,15 @@
   </div>
 
   <script>
-    const INTERCEPTOR_URL = 'https://komni-backend.vercel.app/api/interceptor';
-    
-    // Smooth buffer for live visualizer graph
-    let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, trafficVal(0)];
+    /*
+     * KOMNI dashboard — local workspace mode
+     *
+     * The dashboard is intentionally disconnected from the interceptor/backend
+     * while the UI and Policy Engine workspace are being built.
+     * No network requests are made from this page.
+     */
+
+    let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, 25];
 
     function trafficVal(volume) {
       return Math.min(130, Math.max(10, (volume * 2.5) + 20));
@@ -983,72 +1179,41 @@
       }
     }
 
-    async function fetchTelemetry() {
+    function setLocalWorkspaceStatus() {
       const pulseDot = document.getElementById('system-pulse');
       const statusText = document.getElementById('system-status-text');
+      const streamBadge = document.getElementById('stream-status-badge');
 
-      try {
-        const response = await fetch(INTERCEPTOR_URL, { method: 'GET' });
-        
-        if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
-        
-        const data = await response.json();
-        
-        // 1. Update Top-Bar System Health Indicator
-        pulseDot.classList.remove('offline');
-        statusText.innerText = 'Live Gateway Sync (Active)';
+      if (pulseDot) pulseDot.classList.remove('offline');
+      if (statusText) statusText.innerText = 'Local workspace mode';
+      if (streamBadge) {
+        streamBadge.innerText = '● Local';
+        streamBadge.style.color = 'var(--text-muted)';
+      }
+    }
 
-        // 2. Update KPI Metrics Cards
-        const metrics = data.metrics || {};
-        document.getElementById('kpi-requests').innerText = (metrics.total_requests || 0).toLocaleString();
-        document.getElementById('kpi-volume').innerText = `$${(metrics.total_volume || 0).toFixed(2)}`;
-        document.getElementById('kpi-latency').innerText = `${metrics.p99_latency_ms || 0}ms`;
-        document.getElementById('kpi-interceptions').innerText = metrics.policy_interceptions || 0;
+    function switchWorkspace(workspaceName) {
+      const views = document.querySelectorAll('.workspace-view');
+      const navItems = document.querySelectorAll('.nav-item[data-nav]');
 
-        // 3. Update Real-Time Request Stream Panel
-        const logsContainer = document.getElementById('log-stream-container');
-        if (logsContainer && data.recent_logs && data.recent_logs.length > 0) {
-          logsContainer.innerHTML = data.recent_logs.map(log => `
-            <div class="log-row">
-              <span class="log-method ${log.method === 'POST' ? 'method-post' : 'method-get'}">${log.method}</span>
-              <span class="log-path" title="${log.buyer}">${log.item || log.path} ($${log.amount})</span>
-              <span class="log-latency">${log.latency || '15ms'}</span>
-            </div>
-          `).join('');
-        } else if (logsContainer && (!data.recent_logs || data.recent_logs.length === 0)) {
-          logsContainer.innerHTML = `
-            <div class="log-row">
-              <span class="log-method method-get">IDLE</span>
-              <span class="log-path">Awaiting payment executions from store.html...</span>
-              <span class="log-latency">0ms</span>
-            </div>
-          `;
-        }
+      // Hard guarantee: only the requested workspace is rendered.
+      views.forEach(view => {
+        const isActive = view.dataset.workspace === workspaceName;
 
-        // 4. Update Managed Gateway Routes Table
-        const tableBody = document.getElementById('routes-table-body');
-        if (tableBody && data.routes && data.routes.length > 0) {
-          tableBody.innerHTML = data.routes.map(route => `
-            <tr>
-              <td><strong>${route.name}</strong></td>
-              <td style="font-family: var(--font-mono); color: var(--text-muted);">${route.target}</td>
-              <td><span style="color: var(--accent-magenta); font-family: var(--font-mono);">${route.policy}</span></td>
-              <td style="font-family: var(--font-mono); color: var(--text-primary);">${route.volume}</td>
-              <td style="font-family: var(--font-mono);">${route.latency}</td>
-              <td><span class="badge-status active">● ${route.status}</span></td>
-            </tr>
-          `).join('');
-        }
+        view.classList.toggle('active', isActive);
+        view.setAttribute('aria-hidden', String(!isActive));
+        view.style.display = isActive ? 'flex' : 'none';
+      });
 
-        // 5. Shift SVG Graph Line Smoothly
-        trafficHistory.shift();
-        trafficHistory.push(trafficVal(metrics.total_requests || 0));
+      navItems.forEach(item => {
+        const isActive = item.dataset.nav === workspaceName;
+        item.classList.toggle('active', isActive);
+        const link = item.querySelector('a');
+        if (link) link.setAttribute('aria-current', isActive ? 'page' : 'false');
+      });
+
+      if (workspaceName === 'overview') {
         renderSVGChart(trafficHistory);
-
-      } catch (err) {
-        pulseDot.classList.add('offline');
-        statusText.innerText = 'Telemetry Feed Offline';
-        console.warn('KOMNI Polling Error:', err);
       }
     }
 
@@ -1060,9 +1225,10 @@
       document.getElementById('policyModal').classList.remove('active');
     }
 
-    // Initialize telemetry polling cycle (Every 3 seconds)
-    fetchTelemetry();
-    setInterval(fetchTelemetry, 3000);
+    // Initial render: no backend/interceptor calls.
+    setLocalWorkspaceStatus();
+    renderSVGChart(trafficHistory);
+    switchWorkspace('overview');
   </script>
 </body>
 </html>
