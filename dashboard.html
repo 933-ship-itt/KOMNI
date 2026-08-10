@@ -894,6 +894,28 @@
       box-sizing: border-box;
     }
 
+    /* Policy Engine post-tutorial workspace + key provisioning UI */
+    .policy-engine-real-workspace{width:100%;height:100%;display:none;flex-direction:column;gap:18px;padding:28px 30px 34px;overflow:auto;position:relative;z-index:2}
+    .policy-engine-real-workspace.active{display:flex}
+    .policy-real-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:4px 2px 10px}
+    .policy-real-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:1.6px;color:#a75ce5;text-transform:uppercase;margin-bottom:8px}
+    .policy-real-header h2{font-family:var(--font-display);font-size:clamp(25px,3vw,38px);letter-spacing:-1.5px;color:#f5f2f8;margin:0}
+    .policy-real-header p{margin:7px 0 0;color:#777780;font-size:11px;max-width:650px;line-height:1.55}
+    .policy-key-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+    .policy-key-empty{min-height:300px;border:1px dashed rgba(255,255,255,.11);border-radius:16px;display:flex;align-items:center;justify-content:center;text-align:center;background:rgba(255,255,255,.018)}
+    .policy-key-empty-inner{max-width:420px;padding:32px}.policy-key-empty-icon{width:52px;height:52px;margin:0 auto 15px;border-radius:15px;display:grid;place-items:center;background:rgba(151,73,231,.1);border:1px solid rgba(151,73,231,.22);color:#c35ae9;font-size:22px}.policy-key-empty h3{font-family:var(--font-display);font-size:19px;color:#f0edf4;margin:0 0 8px}.policy-key-empty p{color:#777780;font-size:11px;line-height:1.6;margin:0 0 18px}
+    .policy-key-card-real{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015));padding:18px;box-shadow:0 18px 50px rgba(0,0,0,.2);animation:keyCardIn .5s cubic-bezier(.22,1,.36,1) both}.policy-key-card-real::after{content:"";position:absolute;inset:-80px auto auto -50px;width:150px;height:150px;border-radius:50%;background:rgba(96,54,225,.12);filter:blur(35px);pointer-events:none}.policy-key-card-real:hover{border-color:rgba(196,95,233,.22);transform:translateY(-2px);transition:transform .25s,border-color .25s}
+    @keyframes keyCardIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+    .policy-key-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}.policy-key-provider{display:flex;align-items:center;gap:9px}.policy-key-provider-mark{width:30px;height:30px;border-radius:9px;background:#fff;color:#111;display:grid;place-items:center;font-weight:900}.policy-key-provider-name{font-size:11px;font-weight:700;color:#eee}.policy-key-active{font-family:var(--font-mono);font-size:8px;color:#55d995;border:1px solid rgba(80,214,138,.2);background:rgba(80,214,138,.06);padding:5px 7px;border-radius:999px}.policy-key-product{position:relative;z-index:1;margin:18px 0 14px;display:flex;gap:12px;align-items:center}.policy-key-product-image{width:58px;height:58px;border-radius:11px;object-fit:cover;background:#101014;border:1px solid rgba(255,255,255,.07)}.policy-key-product-image.no-image{display:grid;place-items:center;color:#555;font-family:var(--font-mono);font-size:9px}.policy-key-product strong{display:block;color:#f1eef5;font-size:14px;margin-bottom:4px}.policy-key-product span{display:block;color:#777780;font-family:var(--font-mono);font-size:8px;line-height:1.5;word-break:break-all}.policy-key-secret{position:relative;z-index:1;background:#08080c;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:11px;font-family:var(--font-mono);font-size:9px;color:#b7a9bd;margin-bottom:12px;word-break:break-all}.policy-key-meta-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:9px}.policy-meta{min-width:0}.policy-meta span{display:block;color:#5e5e67;font-family:var(--font-mono);font-size:7px;letter-spacing:1px;margin-bottom:4px}.policy-meta strong{display:block;color:#c9c5ce;font-size:9px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.policy-key-actions{position:relative;z-index:1;display:flex;justify-content:flex-end;margin-top:15px}.policy-delete-button{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);color:#8d8b94;border-radius:7px;padding:7px 10px;font-family:var(--font-mono);font-size:8px;cursor:pointer}.policy-delete-button:hover{color:#ff8d9c;border-color:rgba(255,100,120,.25);background:rgba(255,100,120,.04)}
+
+    /* Setup flow: same fullscreen shell, now with real interactive states */
+    .wizard-mode-setup .wizard-skip{display:none}.wizard-mode-setup .wizard-content{align-items:stretch}.wizard-setup-stage{width:min(920px,100%);margin:auto;display:flex;flex-direction:column;justify-content:center;min-height:100%;padding:18px 0 34px;animation:wizardSlideIn .55s cubic-bezier(.22,1,.36,1)}
+    .setup-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:1.8px;color:#c45fe9;text-transform:uppercase;margin-bottom:13px}.setup-title{font-family:var(--font-display);font-size:clamp(31px,4.5vw,58px);letter-spacing:-2.3px;line-height:1.02;color:#f7f5fb;margin:0 auto 12px;max-width:760px;text-align:center}.setup-subtitle{color:#92919a;font-size:13px;line-height:1.65;max-width:610px;text-align:center;margin:0 auto 26px}.setup-panel{width:min(700px,100%);margin:0 auto;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015));padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+    .setup-field{display:block;text-align:left;margin-bottom:14px}.setup-field>span{display:block;color:#85838d;font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;margin-bottom:7px}.setup-input{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.1);background:#07070a;color:#f3f0f5;border-radius:10px;padding:13px 14px;font-family:var(--font-mono);font-size:11px;outline:none;transition:border-color .2s,box-shadow .2s}.setup-input:focus{border-color:rgba(196,95,233,.55);box-shadow:0 0 0 3px rgba(196,95,233,.08)}.setup-input::placeholder{color:#4f4e57}.setup-help{margin:8px 0 0;color:#62616a;font-size:9px;line-height:1.5}.setup-action-row{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}.setup-primary{border:0;border-radius:999px;padding:11px 18px;background:linear-gradient(100deg,#6036e1,#d83dc2);color:#fff;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 10px 35px rgba(96,54,225,.2)}.setup-primary:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}.setup-secondary{border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:11px 17px;background:rgba(255,255,255,.03);color:#aaa7b0;font-size:11px;cursor:pointer}.setup-status{display:flex;align-items:center;gap:8px;min-height:20px;margin-top:12px;color:#777780;font-family:var(--font-mono);font-size:8px}.setup-status-dot{width:6px;height:6px;border-radius:50%;background:#777;box-shadow:none}.setup-status-dot.loading{background:#d05de7;box-shadow:0 0 12px rgba(208,93,231,.7);animation:liveBlink 1s infinite}.setup-status-dot.success{background:#50d68a;box-shadow:0 0 12px rgba(80,214,138,.65)}.setup-status-dot.error{background:#ff7184;box-shadow:0 0 12px rgba(255,113,132,.55)}
+    .catalogue-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 auto 14px;width:min(1040px,100%)}.catalogue-count{font-family:var(--font-mono);font-size:8px;color:#67666e;letter-spacing:1px}.catalogue-selected{font-family:var(--font-mono);font-size:8px;color:#bba8c1}.catalogue-grid{width:min(1040px,100%);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;max-height:52vh;overflow:auto;padding:3px 4px 8px}.catalogue-card{position:relative;text-align:left;border:1px solid rgba(255,255,255,.08);border-radius:15px;background:rgba(255,255,255,.028);overflow:hidden;cursor:pointer;transition:transform .25s,border-color .25s,background .25s,box-shadow .25s}.catalogue-card:hover{transform:translateY(-3px);border-color:rgba(196,95,233,.28);background:rgba(255,255,255,.045)}.catalogue-card.selected{border-color:rgba(196,95,233,.7);box-shadow:0 0 0 1px rgba(196,95,233,.18),0 18px 50px rgba(96,54,225,.12);background:linear-gradient(145deg,rgba(96,54,225,.12),rgba(216,61,194,.035))}.catalogue-image{width:100%;height:150px;object-fit:cover;background:#09090d;display:block}.catalogue-image-fallback{width:100%;height:150px;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,rgba(96,54,225,.24),transparent 45%),#09090d;color:#625f6a;font-family:var(--font-mono);font-size:8px;letter-spacing:1px}.catalogue-body{padding:13px}.catalogue-product-name{display:block;color:#eeeaf1;font-size:12px;font-weight:700;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.catalogue-product-id{display:block;color:#696770;font-family:var(--font-mono);font-size:7px;word-break:break-all;line-height:1.4;margin-bottom:9px}.catalogue-price{display:flex;align-items:baseline;gap:5px;color:#cfcbd4}.catalogue-price strong{font-size:14px}.catalogue-price span{font-family:var(--font-mono);font-size:7px;color:#68666e}.catalogue-select-mark{position:absolute;top:10px;right:10px;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);color:transparent;font-size:11px;transition:.2s}.catalogue-card.selected .catalogue-select-mark{background:linear-gradient(135deg,#6036e1,#d83dc2);border-color:transparent;color:#fff}.catalogue-meta{margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);color:#77747e;font-family:var(--font-mono);font-size:7px;line-height:1.55;max-height:74px;overflow:auto}
+    .confirm-layout{width:min(680px,100%);margin:0 auto}.confirm-card{border:1px solid rgba(196,95,233,.2);border-radius:18px;background:linear-gradient(145deg,rgba(96,54,225,.1),rgba(255,255,255,.025));padding:22px;text-align:left}.confirm-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)}.confirm-row:last-child{border-bottom:0}.confirm-row span{color:#66646d;font-family:var(--font-mono);font-size:8px;letter-spacing:1px}.confirm-row strong{color:#e7e3ea;font-size:10px;text-align:right;max-width:65%;word-break:break-all}.confirm-warning{margin-top:12px;color:#777780;font-size:9px;line-height:1.55}.created-key-card{width:min(700px,100%);margin:0 auto;text-align:center;padding:30px;border:1px solid rgba(80,214,138,.18);border-radius:20px;background:radial-gradient(circle at 50% 0,rgba(80,214,138,.08),transparent 42%),rgba(255,255,255,.025)}.created-check{width:82px;height:82px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:rgba(80,214,138,.08);border:1px solid rgba(80,214,138,.28);color:#50d68a;font-size:31px;animation:checkEnter .8s cubic-bezier(.16,1,.3,1)}.created-key-value{margin:18px auto 10px;background:#07070a;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;color:#ddd9e1;font-family:var(--font-mono);font-size:10px;word-break:break-all}.created-key-note{color:#68666e;font-size:9px;line-height:1.5}.setup-error{color:#ff929f;font-size:9px;line-height:1.55;margin-top:10px;display:none}.setup-error.active{display:block}
+    @media(max-width:760px){.policy-engine-real-workspace{padding:20px 16px 28px}.policy-real-header{align-items:flex-start;flex-direction:column}.policy-key-grid{grid-template-columns:1fr}.catalogue-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-height:55vh}.catalogue-image,.catalogue-image-fallback{height:120px}.setup-panel{padding:16px}.setup-action-row{flex-direction:column-reverse}.setup-primary,.setup-secondary{width:100%}}
+
     /* Modal Scaffolding */
     .modal-overlay {
       position: fixed;
@@ -1177,8 +1199,8 @@
 
       <!-- Workspace: Policy Engine -->
       <section class="workspace-view" id="policy-engine-workspace" data-workspace="policy-engine" aria-hidden="true">
-        <div class="policy-engine-viewport">
-          <div class="policy-engine-landing">
+        <div class="policy-engine-viewport" id="policy-engine-viewport">
+          <div class="policy-engine-landing" id="policy-engine-landing">
             <div class="policy-engine-orb" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none">
                 <path d="M24 43s16-8 16-20V9L24 3 8 9v14c0 12 16 20 16 20Z" stroke="url(#policyShieldGradient)" stroke-width="1.6"/>
@@ -1192,6 +1214,13 @@
             <div class="policy-engine-status"><span class="status-indicator"></span><span>Workspace ready</span></div>
             <button class="btn-premium policy-start-button" type="button" onclick="startPolicyWizard()">Get Started <span>→</span></button>
             <div class="policy-engine-footnote">Guided setup · A few short steps</div>
+          </div>
+          <div class="policy-engine-real-workspace" id="policy-engine-real-workspace">
+            <div class="policy-real-header">
+              <div><div class="policy-real-eyebrow">KOMNI / POLICY ENGINE</div><h2>Your connections</h2><p>Manage the payment infrastructure connections and KOMNI API keys created for this workspace.</p></div>
+              <button class="btn-premium" type="button" onclick="startKeyCreation()">+ Create KOMNI Key</button>
+            </div>
+            <div class="policy-key-grid" id="policy-key-grid"></div>
           </div>
         </div>
       </section>
@@ -1360,10 +1389,10 @@
             </div>
           </div>
           <div class="wizard-eyebrow">09 / BRIEFING COMPLETE</div>
-          <h2>You're ready for the next step.</h2>
-          <p>The connection flow that comes after this briefing is still under development.</p>
-          <p>For now, you know the important part: KOMNI sits beside your financial infrastructure — it does not become the processor.</p>
-          <div class="wizard-coming-soon">NEXT STEP · UNDER DEVELOPMENT</div>
+          <h2>You're ready to create your first KOMNI Key.</h2>
+          <p>The next step connects one Stripe product to a KOMNI API key.</p>
+          <p>We'll walk through it one screen at a time.</p>
+          <button class="setup-primary tutorial-start-key" type="button" onclick="startKeyCreation()">Start creating your KOMNI Key <span>→</span></button>
         </section>
       </div>
 
@@ -1376,141 +1405,390 @@
 
   <script>
     /*
-     * KOMNI dashboard — local workspace mode
+     * KOMNI dashboard — frontend Policy Engine iteration.
      *
-     * The dashboard is intentionally disconnected from the interceptor/backend
-     * while the UI and Policy Engine workspace are being built.
-     * No network requests are made from this page.
+     * The setup UI is intentionally built around the future Python endpoint:
+     *   POST https://komni-backend.vercel.app/api/create_key
+     *
+     * No interceptor calls are made here. The backend create_key contract is
+     * being established from the frontend first and can be implemented later.
      */
 
+    const KOMNI_CREATE_KEY_URL = 'https://komni-backend.vercel.app/api/create_key';
+    const KOMNI_LOCAL_KEYS_STORAGE = 'komni.policyEngine.keys.v1';
     let trafficHistory = [15, 20, 12, 28, 35, 22, 45, 30, 55, 25];
 
-    function trafficVal(volume) {
-      return Math.min(130, Math.max(10, (volume * 2.5) + 20));
-    }
+    function trafficVal(volume) { return Math.min(130, Math.max(10, (volume * 2.5) + 20)); }
 
     function renderSVGChart(history) {
-      const width = 500;
-      const height = 150;
-      const step = width / (history.length - 1);
-
-      const points = history.map((val, idx) => {
-        const x = idx * step;
-        const y = height - val;
-        return `${x},${y}`;
-      });
-
+      const width = 500, height = 150, step = width / (history.length - 1);
+      const points = history.map((val, idx) => `${idx * step},${height - val}`);
       const lineD = `M ${points.join(' L ')}`;
       const areaD = `M 0,${height} L ${points.join(' L ')} L ${width},${height} Z`;
-
       const linePath = document.getElementById('chart-line-path');
       const areaPath = document.getElementById('chart-area-path');
-
-      if (linePath && areaPath) {
-        linePath.setAttribute('d', lineD);
-        areaPath.setAttribute('d', areaD);
-      }
+      if (linePath && areaPath) { linePath.setAttribute('d', lineD); areaPath.setAttribute('d', areaD); }
     }
 
     function setLocalWorkspaceStatus() {
       const pulseDot = document.getElementById('system-pulse');
       const statusText = document.getElementById('system-status-text');
       const streamBadge = document.getElementById('stream-status-badge');
-
       if (pulseDot) pulseDot.classList.remove('offline');
       if (statusText) statusText.innerText = 'Local workspace mode';
-      if (streamBadge) {
-        streamBadge.innerText = '● Local';
-        streamBadge.style.color = 'var(--text-muted)';
-      }
+      if (streamBadge) { streamBadge.innerText = '● Local'; streamBadge.style.color = 'var(--text-muted)'; }
     }
 
     function switchWorkspace(workspaceName) {
-      const views = document.querySelectorAll('.workspace-view');
-      const navItems = document.querySelectorAll('.nav-item[data-nav]');
-
-      // Hard guarantee: only the requested workspace is rendered.
-      views.forEach(view => {
+      document.querySelectorAll('.workspace-view').forEach(view => {
         const isActive = view.dataset.workspace === workspaceName;
-
         view.classList.toggle('active', isActive);
         view.setAttribute('aria-hidden', String(!isActive));
         view.style.display = isActive ? 'flex' : 'none';
       });
-
-      navItems.forEach(item => {
+      document.querySelectorAll('.nav-item[data-nav]').forEach(item => {
         const isActive = item.dataset.nav === workspaceName;
         item.classList.toggle('active', isActive);
         const link = item.querySelector('a');
         if (link) link.setAttribute('aria-current', isActive ? 'page' : 'false');
       });
-
-      if (workspaceName === 'overview') {
-        renderSVGChart(trafficHistory);
-      }
+      if (workspaceName === 'overview') renderSVGChart(trafficHistory);
+      if (workspaceName === 'policy-engine') renderPolicyEngineWorkspace();
     }
 
+    /* ---------- Tutorial ---------- */
     let policyWizardStep = 0;
-    const POLICY_WIZARD_LAST_STEP = 8;
+    const POLICY_TUTORIAL_LAST_STEP = 8;
+    let policyWizardMode = 'tutorial';
+
+    function renderTutorialProgress() {
+      const progress = document.querySelector('.wizard-progress');
+      if (!progress) return;
+      progress.innerHTML = Array.from({length: 9}, (_, i) =>
+        `<span class="wizard-step-dot ${i === policyWizardStep ? 'active' : ''} ${i < policyWizardStep ? 'complete' : ''}" data-dot="${i}"></span>${i < 8 ? '<span class="wizard-progress-line"></span>' : ''}`
+      ).join('');
+    }
 
     function renderPolicyWizardStep() {
+      if (policyWizardMode !== 'tutorial') return;
       document.querySelectorAll('.wizard-slide').forEach(slide => {
         slide.classList.toggle('active', Number(slide.dataset.slide) === policyWizardStep);
       });
-      document.querySelectorAll('.wizard-step-dot').forEach(dot => {
-        const step = Number(dot.dataset.dot);
-        dot.classList.toggle('active', step === policyWizardStep);
-        dot.classList.toggle('complete', step < policyWizardStep);
-      });
-      document.getElementById('wizardCounter').innerText = `${String(policyWizardStep + 1).padStart(2, '0')} / 06`;
-      document.getElementById('wizardBack').style.visibility = policyWizardStep === 0 ? 'hidden' : 'visible';
-      document.getElementById('wizardNext').innerHTML = policyWizardStep === POLICY_WIZARD_LAST_STEP ? 'Finish <span>✓</span>' : 'Next <span>→</span>';
+      renderTutorialProgress();
+      const counter = document.getElementById('wizardCounter');
+      if (counter) counter.innerText = `${String(policyWizardStep + 1).padStart(2, '0')} / 09`;
+      const back = document.getElementById('wizardBack');
+      const next = document.getElementById('wizardNext');
+      if (back) back.style.visibility = policyWizardStep === 0 ? 'hidden' : 'visible';
+      if (next) next.innerHTML = policyWizardStep === POLICY_TUTORIAL_LAST_STEP ? 'Create Key <span>→</span>' : 'Next <span>→</span>';
     }
 
     function startPolicyWizard() {
+      if (getStoredKeys().length) { openPolicyWizard(); startKeyCreation(); return; }
+      policyWizardMode = 'tutorial';
       policyWizardStep = 0;
+      openPolicyWizard();
+      renderPolicyWizardStep();
+    }
+
+    function openPolicyWizard() {
       const wizard = document.getElementById('policyWizard');
       wizard.classList.add('active');
       wizard.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      renderPolicyWizardStep();
     }
 
     function nextPolicyWizardStep() {
-      if (policyWizardStep >= POLICY_WIZARD_LAST_STEP) return closePolicyWizard();
+      if (policyWizardMode === 'setup') return handleSetupNext();
+      if (policyWizardStep >= POLICY_TUTORIAL_LAST_STEP) return startKeyCreation();
       policyWizardStep++;
       renderPolicyWizardStep();
     }
 
     function previousPolicyWizardStep() {
-      if (policyWizardStep > 0) {
-        policyWizardStep--;
-        renderPolicyWizardStep();
-      }
+      if (policyWizardMode === 'setup') return handleSetupBack();
+      if (policyWizardStep > 0) { policyWizardStep--; renderPolicyWizardStep(); }
     }
 
-    function skipPolicyWizard() {
-      closePolicyWizard();
-    }
+    function skipPolicyWizard() { closePolicyWizard(); }
 
     function closePolicyWizard() {
       const wizard = document.getElementById('policyWizard');
       wizard.classList.remove('active');
+      wizard.classList.remove('wizard-mode-setup');
       wizard.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      policyWizardMode = 'tutorial';
+      renderTutorialProgress();
+      const content = document.getElementById('policyWizardContent');
+      if (content) content.innerHTML = window.__tutorialMarkup || content.innerHTML;
     }
 
+    /* Preserve the original tutorial DOM so the setup flow can temporarily replace it. */
+    window.__tutorialMarkup = document.getElementById('policyWizardContent').innerHTML;
+
+    /* ---------- Key creation ---------- */
+    let keySetupStep = 0;
+    let keySetupData = { stripeSecretKey: '', productId: '', catalogue: [], selectedProductId: null, response: null };
+
+    function setSetupProgress(step) {
+      const progress = document.querySelector('.wizard-progress');
+      if (!progress) return;
+      const total = 5;
+      progress.innerHTML = Array.from({length: total}, (_, i) =>
+        `<span class="wizard-step-dot ${i === step ? 'active' : ''} ${i < step ? 'complete' : ''}"></span>${i < total-1 ? '<span class="wizard-progress-line"></span>' : ''}`
+      ).join('');
+      const counter = document.getElementById('wizardCounter');
+      if (counter) counter.innerText = `${String(step + 1).padStart(2,'0')} / ${String(total).padStart(2,'0')}`;
+    }
+
+    function setupStageShell(eyebrow, title, subtitle, inner) {
+      return `<div class="wizard-setup-stage"><div class="setup-eyebrow">${eyebrow}</div><h2 class="setup-title">${title}</h2><p class="setup-subtitle">${subtitle}</p>${inner}</div>`;
+    }
+
+    function renderSetupStep() {
+      const content = document.getElementById('policyWizardContent');
+      const back = document.getElementById('wizardBack');
+      const next = document.getElementById('wizardNext');
+      if (!content) return;
+      document.getElementById('policyWizard').classList.add('wizard-mode-setup');
+      setSetupProgress(keySetupStep);
+      if (back) back.style.visibility = keySetupStep === 0 ? 'hidden' : 'visible';
+      if (next) { next.style.display = keySetupStep === 2 || keySetupStep === 4 ? 'none' : 'inline-flex'; next.disabled = false; }
+
+      if (keySetupStep === 0) {
+        content.innerHTML = setupStageShell('01 / CREATE YOUR KOMNI KEY','Create your first KOMNI Key.','Connect one Stripe product to a KOMNI API key. The key will become the identity used by your future KOMNI transaction flow.',`<div class="setup-panel"><label class="setup-field"><span>STRIPE SECRET API KEY</span><input id="stripeSecretKeyInput" class="setup-input" type="password" autocomplete="off" placeholder="sk_test_••••••••••••••••" value="${escapeHtml(keySetupData.stripeSecretKey)}"></label><label class="setup-field"><span>STRIPE PRODUCT ID</span><input id="stripeProductIdInput" class="setup-input" type="text" autocomplete="off" placeholder="prod_••••••••••••" value="${escapeHtml(keySetupData.productId)}"></label><p class="setup-help">For this development version, the browser will send these values to the future Python <b>/api/create_key</b> endpoint. Do not use a live secret key in this prototype.</p><div id="setupError" class="setup-error"></div><div class="setup-action-row"><button class="setup-primary" type="button" onclick="fetchStripeCatalogue()">Connect Stripe & Fetch Catalogue <span>→</span></button></div><div class="setup-status"><i class="setup-status-dot"></i><span>Development connection · Stripe only</span></div></div>`);
+        return;
+      }
+
+      if (keySetupStep === 1) {
+        content.innerHTML = setupStageShell('02 / CONNECTING','Let KOMNI read your Stripe catalogue.','We are asking the Python endpoint for the products and metadata associated with your Stripe connection.',`<div class="setup-panel" style="text-align:center"><div class="wizard-visual-core" style="margin:0 auto 20px"><span class="core-k">K</span></div><div id="catalogueLoadingStatus" class="setup-status" style="justify-content:center"><i class="setup-status-dot loading"></i><span>Waiting for catalogue response…</span></div><div id="setupError" class="setup-error"></div></div>`);
+        fetchCatalogueFromBackend();
+        return;
+      }
+
+      if (keySetupStep === 2) {
+        const products = keySetupData.catalogue;
+        content.innerHTML = setupStageShell('03 / CHOOSE ONE PRODUCT','Choose the product KOMNI will connect.','You can connect exactly one product to this KOMNI Key. Selecting another product automatically replaces the current selection.',`<div class="catalogue-toolbar"><span class="catalogue-count">${products.length} PRODUCT${products.length === 1 ? '' : 'S'} FOUND</span><span class="catalogue-selected" id="catalogueSelectedLabel">No product selected</span></div><div class="catalogue-grid">${products.map(renderCatalogueCard).join('')}</div><div id="setupError" class="setup-error"></div>`);
+        const nextBtn = document.getElementById('wizardNext');
+        if (nextBtn) { nextBtn.style.display='inline-flex'; nextBtn.disabled = !keySetupData.selectedProductId; nextBtn.innerHTML='Review <span>→</span>'; }
+        return;
+      }
+
+      if (keySetupStep === 3) {
+        const product = keySetupData.catalogue.find(p => normalizeProduct(p).id === keySetupData.selectedProductId);
+        const normalized = normalizeProduct(product || {});
+        content.innerHTML = setupStageShell('04 / CONFIRM CONNECTION','One product. One KOMNI Key.','Review the connection before KOMNI creates the key.',`<div class="confirm-layout"><div class="confirm-card"><div class="confirm-row"><span>PROCESSOR</span><strong>Stripe · Development</strong></div><div class="confirm-row"><span>PRODUCT</span><strong>${escapeHtml(normalized.name || normalized.id || 'Unknown product')}</strong></div><div class="confirm-row"><span>PRODUCT ID</span><strong>${escapeHtml(normalized.id || '—')}</strong></div><div class="confirm-row"><span>PRICE</span><strong>${escapeHtml(formatProductPrice(normalized))}</strong></div></div><p class="confirm-warning">The Stripe secret is used only for this setup request. The frontend does not save it to the local key registry.</p><div id="setupError" class="setup-error"></div><div class="setup-action-row"><button class="setup-primary" type="button" onclick="createKOMNIKey()">Confirm & Create KOMNI Key <span>→</span></button></div></div>`);
+        return;
+      }
+
+      if (keySetupStep === 4) {
+        const response = keySetupData.response || {};
+        const generatedKey = response.komni_key || response.api_key || response.key || response.data?.komni_key || response.data?.api_key || 'komni_test_pending_backend';
+        const masked = maskKey(generatedKey);
+        content.innerHTML = setupStageShell('05 / KEY CREATED','Your KOMNI Key is ready.','The frontend has received the key creation response. The Policy Engine workspace will now treat this setup as complete.',`<div class="created-key-card"><div class="created-check">✓</div><div class="setup-eyebrow" style="margin-bottom:7px">KOMNI API KEY</div><div class="created-key-value">${escapeHtml(masked)}</div><div class="created-key-note">Keep the full key private. The dashboard stores only the returned connection metadata and a masked key for this frontend prototype.</div><div class="setup-action-row" style="justify-content:center"><button class="setup-primary" type="button" onclick="finishKeySetup()">Enter Policy Engine <span>→</span></button></div></div>`);
+        return;
+      }
+    }
+
+    function startKeyCreation() {
+      keySetupStep = 0;
+      keySetupData = { stripeSecretKey: '', productId: '', catalogue: [], selectedProductId: null, response: null };
+      policyWizardMode = 'setup';
+      openPolicyWizard();
+      renderSetupStep();
+    }
+
+    function handleSetupNext() {
+      if (keySetupStep === 2 && !keySetupData.selectedProductId) return;
+      if (keySetupStep === 0) return fetchStripeCatalogue();
+      if (keySetupStep === 1) return;
+      if (keySetupStep === 2) { keySetupStep = 3; renderSetupStep(); return; }
+      if (keySetupStep === 3) return createKOMNIKey();
+      if (keySetupStep === 4) return finishKeySetup();
+    }
+
+    function handleSetupBack() {
+      if (keySetupStep > 0) { keySetupStep--; renderSetupStep(); }
+    }
+
+    function readSetupCredentials() {
+      const key = document.getElementById('stripeSecretKeyInput');
+      const prod = document.getElementById('stripeProductIdInput');
+      keySetupData.stripeSecretKey = key ? key.value.trim() : keySetupData.stripeSecretKey;
+      keySetupData.productId = prod ? prod.value.trim() : keySetupData.productId;
+    }
+
+    function showSetupError(message) {
+      const el = document.getElementById('setupError');
+      if (el) { el.textContent = message; el.classList.add('active'); }
+    }
+
+    function setLoadingStatus(text) {
+      const el = document.getElementById('catalogueLoadingStatus');
+      if (el) el.innerHTML = `<i class="setup-status-dot loading"></i><span>${escapeHtml(text)}</span>`;
+    }
+
+    async function fetchStripeCatalogue() {
+      readSetupCredentials();
+      if (!keySetupData.stripeSecretKey || !keySetupData.productId) { showSetupError('Enter both your Stripe secret key and Stripe product ID to continue.'); return; }
+      keySetupStep = 1;
+      renderSetupStep();
+    }
+
+    async function fetchCatalogueFromBackend() {
+      try {
+        setLoadingStatus('Contacting Python /api/create_key…');
+        const response = await fetch(KOMNI_CREATE_KEY_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Accept':'application/json'},
+          body:JSON.stringify({ action:'catalogue', provider:'stripe', stripe_secret_key:keySetupData.stripeSecretKey, product_id:keySetupData.productId })
+        });
+        const data = await safeJson(response);
+        if (!response.ok) throw new Error(data?.detail || data?.error || `Backend returned HTTP ${response.status}.`);
+        const products = data.products || data.catalogue || data.data?.products || data.data?.catalogue || [];
+        if (!Array.isArray(products) || !products.length) throw new Error('The endpoint responded successfully, but no Stripe products were returned.');
+        keySetupData.catalogue = products;
+        keySetupStep = 2;
+        renderSetupStep();
+      } catch (error) {
+        setLoadingStatus('Catalogue request could not be completed.');
+        showSetupError(`${error.message} The frontend is wired to ${KOMNI_CREATE_KEY_URL}.`);
+        const dot = document.querySelector('#catalogueLoadingStatus .setup-status-dot');
+        if (dot) dot.className='setup-status-dot error';
+      }
+    }
+
+    function normalizeProduct(product) {
+      const p = product || {};
+      const price = p.default_price && typeof p.default_price === 'object' ? p.default_price : (p.price || p.defaultPrice || {});
+      return { id:p.id || p.product_id || p.productId || '', name:p.name || p.product_name || 'Unnamed product', description:p.description || '', images:Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []), active:p.active !== false, metadata:p.metadata || {}, price, currency:price.currency || p.currency || 'usd', amount:price.unit_amount ?? price.amount ?? p.unit_amount ?? p.amount ?? null };
+    }
+
+    function renderCatalogueCard(product, index) {
+      const p = normalizeProduct(product);
+      const selected = p.id === keySetupData.selectedProductId;
+      const image = p.images[0];
+      const metadata = Object.entries(p.metadata || {}).map(([k,v])=>`${escapeHtml(k)}: ${escapeHtml(String(v))}`).join(' · ');
+      return `<article class="catalogue-card ${selected?'selected':''}" data-product-id="${escapeHtml(p.id)}" onclick="selectCatalogueProduct('${escapeJs(p.id)}')"><div class="catalogue-select-mark">✓</div>${image ? `<img class="catalogue-image" src="${escapeHtml(image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.outerHTML='<div class=\\"catalogue-image-fallback\\">IMAGE UNAVAILABLE</div>'">` : '<div class="catalogue-image-fallback">NO IMAGE</div>'}<div class="catalogue-body"><strong class="catalogue-product-name">${escapeHtml(p.name)}</strong><span class="catalogue-product-id">${escapeHtml(p.id)}</span><div class="catalogue-price"><strong>${escapeHtml(formatProductPrice(p))}</strong><span>${p.active ? 'ACTIVE' : 'INACTIVE'}</span></div>${metadata ? `<div class="catalogue-meta">${metadata}</div>` : ''}</div></article>`;
+    }
+
+    function selectCatalogueProduct(productId) {
+      keySetupData.selectedProductId = productId;
+      document.querySelectorAll('.catalogue-card').forEach(card => card.classList.toggle('selected', card.dataset.productId === productId));
+      const label = document.getElementById('catalogueSelectedLabel');
+      const next = document.getElementById('wizardNext');
+      const product = keySetupData.catalogue.find(p => normalizeProduct(p).id === productId);
+      if (label) label.textContent = product ? `Selected · ${normalizeProduct(product).name}` : 'No product selected';
+      if (next) next.disabled = !productId;
+    }
+
+    async function createKOMNIKey() {
+      if (!keySetupData.selectedProductId) { showSetupError('Select exactly one product before confirming.'); return; }
+      const selected = keySetupData.catalogue.find(p => normalizeProduct(p).id === keySetupData.selectedProductId);
+      if (!selected) { showSetupError('The selected product is no longer available in the catalogue.'); return; }
+      const button = document.querySelector('.setup-primary');
+      if (button) { button.disabled=true; button.textContent='Creating KOMNI Key…'; }
+      try {
+        const response = await fetch(KOMNI_CREATE_KEY_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Accept':'application/json'},
+          body:JSON.stringify({ action:'create_key', provider:'stripe', stripe_secret_key:keySetupData.stripeSecretKey, product_id:keySetupData.productId, selected_product_id:keySetupData.selectedProductId })
+        });
+        const data = await safeJson(response);
+        if (!response.ok) throw new Error(data?.detail || data?.error || `Backend returned HTTP ${response.status}.`);
+        keySetupData.response = data;
+        keySetupStep = 4;
+        renderSetupStep();
+      } catch(error) {
+        if (button) { button.disabled=false; button.textContent='Confirm & Create KOMNI Key →'; }
+        showSetupError(`${error.message} The frontend is wired to ${KOMNI_CREATE_KEY_URL}.`);
+      }
+    }
+
+    function finishKeySetup() {
+      const response = keySetupData.response || {};
+      const normalizedProduct = normalizeProduct(keySetupData.catalogue.find(p => normalizeProduct(p).id === keySetupData.selectedProductId) || {});
+      const generatedKey = response.komni_key || response.api_key || response.key || response.data?.komni_key || response.data?.api_key || '';
+      const connection = response.connection || response.data?.connection || {};
+      const record = {
+        id: connection.id || response.id || `local_${Date.now()}`,
+        provider:'stripe',
+        environment: response.environment || connection.environment || 'test',
+        productId: normalizedProduct.id,
+        productName: normalizedProduct.name,
+        productDescription: normalizedProduct.description,
+        productImage: normalizedProduct.images[0] || '',
+        productMetadata: normalizedProduct.metadata || {},
+        price: normalizedProduct.amount,
+        currency: normalizedProduct.currency,
+        active: normalizedProduct.active,
+        apiKeyMasked: maskKey(generatedKey),
+        apiKeyPrefix: generatedKey ? generatedKey.slice(0, Math.min(18, generatedKey.length)) : 'komni_test_pending',
+        createdAt: new Date().toISOString(),
+        status:'active'
+      };
+      const keys = getStoredKeys();
+      keys.unshift(record);
+      localStorage.setItem(KOMNI_LOCAL_KEYS_STORAGE, JSON.stringify(keys));
+      keySetupData.stripeSecretKey='';
+      keySetupData.productId='';
+      keySetupData.catalogue=[];
+      closePolicyWizard();
+      renderPolicyEngineWorkspace();
+    }
+
+    function getStoredKeys() {
+      try { const value=JSON.parse(localStorage.getItem(KOMNI_LOCAL_KEYS_STORAGE)||'[]'); return Array.isArray(value)?value:[]; } catch { return []; }
+    }
+
+    function renderPolicyEngineWorkspace() {
+      const landing=document.getElementById('policy-engine-landing');
+      const real=document.getElementById('policy-engine-real-workspace');
+      const grid=document.getElementById('policy-key-grid');
+      if (!landing || !real || !grid) return;
+      const keys=getStoredKeys();
+      landing.style.display=keys.length?'none':'flex';
+      real.classList.toggle('active',keys.length>0);
+      if (!keys.length) { grid.innerHTML=''; return; }
+      grid.innerHTML=keys.map((key,index)=>`<article class="policy-key-card-real" style="animation-delay:${Math.min(index,8)*.05}s"><div class="policy-key-card-top"><div class="policy-key-provider"><div class="policy-key-provider-mark">S</div><span class="policy-key-provider-name">Stripe · ${escapeHtml(key.environment||'test')}</span></div><span class="policy-key-active">ACTIVE</span></div><div class="policy-key-product">${key.productImage?`<img class="policy-key-product-image" src="${escapeHtml(key.productImage)}" alt="${escapeHtml(key.productName)}">`:'<div class="policy-key-product-image no-image">NO IMAGE</div>'}<div><strong>${escapeHtml(key.productName||'Unnamed product')}</strong><span>${escapeHtml(key.productId||'No product ID')}</span></div></div><div class="policy-key-secret">${escapeHtml(key.apiKeyMasked||key.apiKeyPrefix||'KOMNI key pending')}</div><div class="policy-key-meta-grid"><div class="policy-meta"><span>CREATED</span><strong>${escapeHtml(new Date(key.createdAt).toLocaleString())}</strong></div><div class="policy-meta"><span>PRICE</span><strong>${escapeHtml(formatProductPrice({amount:key.price,currency:key.currency}))}</strong></div><div class="policy-meta"><span>METADATA</span><strong>${Object.keys(key.productMetadata||{}).length} fields</strong></div><div class="policy-meta"><span>STATUS</span><strong>${escapeHtml(key.status||'active')}</strong></div></div><div class="policy-key-actions"><button class="policy-delete-button" type="button" onclick="deleteStoredKey('${escapeJs(key.id)}')">Delete key</button></div></article>`).join('');
+    }
+
+    function deleteStoredKey(id) {
+      const keys=getStoredKeys().filter(k=>k.id!==id);
+      localStorage.setItem(KOMNI_LOCAL_KEYS_STORAGE,JSON.stringify(keys));
+      renderPolicyEngineWorkspace();
+    }
+
+    function formatProductPrice(product) {
+      const amount=product?.amount;
+      if (amount===null || amount===undefined || amount==='') return 'Price not returned';
+      const numeric=Number(amount);
+      const value=Number.isFinite(numeric) ? numeric/100 : amount;
+      return `${String(value)} ${(product?.currency||'usd').toUpperCase()}`;
+    }
+
+    function maskKey(key) {
+      if (!key) return 'komni_test_pending_backend';
+      if (key.length<=14) return key;
+      return `${key.slice(0,10)}••••••••${key.slice(-4)}`;
+    }
+
+    function escapeHtml(value) { return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+    function escapeJs(value) { return String(value??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+    async function safeJson(response) { const text=await response.text(); try{return text?JSON.parse(text):{};}catch{return {detail:text||'Empty response'};} }
+
     document.addEventListener('keydown', event => {
-      const wizard = document.getElementById('policyWizard');
+      const wizard=document.getElementById('policyWizard');
       if (!wizard.classList.contains('active')) return;
-      if (event.key === 'Escape') closePolicyWizard();
-      if (event.key === 'ArrowRight') nextPolicyWizardStep();
-      if (event.key === 'ArrowLeft') previousPolicyWizardStep();
+      if (event.key==='Escape') closePolicyWizard();
+      if (event.key==='ArrowRight') nextPolicyWizardStep();
+      if (event.key==='ArrowLeft') previousPolicyWizardStep();
     });
 
-    // Initial render: no backend/interceptor calls.
     setLocalWorkspaceStatus();
     renderSVGChart(trafficHistory);
+    renderPolicyEngineWorkspace();
     switchWorkspace('overview');
   </script>
 </body>
