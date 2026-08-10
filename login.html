@@ -1009,473 +1009,125 @@
       initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
     });
 
-    // ============================================================
-    // KOMNI AUTHENTICATION
-    // ============================================================
-    //
-    // The browser sends the issuance key exactly as entered.
-    // verify_key.py is the single source of truth for normalization,
-    // hashing, Firestore lookup, status, and authorization.
-    //
-    const VERCEL_BACKEND_URL =
-      'https://komni-backend.vercel.app/api/verify_key';
-
-    const KOMNI_SESSION_KEY = 'komni_auth_session';
-
-    function getElement(id) {
-      return document.getElementById(id);
-    }
-
-    function appendTerminalLine(terminal, text, type = 'info') {
-      const line = document.createElement('span');
-      line.className = `terminal-line ${type}`;
-      line.textContent = `> ${text}`;
-      terminal.appendChild(line);
-      terminal.scrollTop = terminal.scrollHeight;
-    }
-
-    function showValidationError(message) {
-      const pill = getElement('validationStatusPill');
-      const retry = getElement('retryButtonContainer');
-
-      pill.className = 'auth-status-pill is-error';
-      pill.textContent = 'Authentication Failed';
-      retry.style.display = 'block';
-
-      return message;
-    }
-
-    function saveAuthSession(issuanceKey, verification) {
-      /*
-       * This is a frontend session handoff, not the security boundary.
-       * The dashboard/backend must still authorize sensitive operations
-       * server-side using the verified business/workspace identity.
-       */
-      const metadata =
-        verification && verification.metadata
-          ? verification.metadata
-          : {};
-
-      const session = {
-        authenticated: true,
-        issuance_key: issuanceKey,
-        verified_at: new Date().toISOString(),
-        metadata: {
-          owner: metadata.owner || '',
-          business_id: metadata.business_id || '',
-          workspace_id: metadata.workspace_id || '',
-          tier: metadata.tier || '',
-          key_type: metadata.key_type || '',
-          status: metadata.status || 'active'
-        }
-      };
-
-      sessionStorage.setItem(
-        KOMNI_SESSION_KEY,
-        JSON.stringify(session)
-      );
-    }
-
-    function clearAuthSession() {
-      sessionStorage.removeItem(KOMNI_SESSION_KEY);
-    }
-
+    // Integrated Authentication with Vercel Python Backend
     async function handleAuthSubmit(e) {
       e.preventDefault();
+      
+      let rawKey = document.getElementById('issuanceKeyInput').value.trim();
+      if (!rawKey) return;
 
-      const input = getElement('issuanceKeyInput');
-      const rawKey = input.value.trim();
-
-      if (!rawKey) {
-        input.focus();
-        return;
+      // Convenience mapping: convert 'test' to demo test key format
+      let formattedKey = rawKey;
+      if (rawKey.toLowerCase() === 'test') {
+        formattedKey = 'ik_test_demo';
+      } else if (rawKey.toUpperCase().startsWith('IK-')) {
+        // Standardize IK- keys to lower case prefix for backend matching
+        formattedKey = 'ik_' + rawKey.substring(3);
       }
 
-      const loginCard = getElement('loginCard');
-      const valCard = getElement('validationCard');
-      const term = getElement('validationTerminal');
-      const pill = getElement('validationStatusPill');
-      const retry = getElement('retryButtonContainer');
-      const authBtn = getElement('authBtn');
-
-      clearAuthSession();
-
-      loginCard.style.display = 'none';
+      document.getElementById('loginCard').style.display = 'none';
+      const valCard = document.getElementById('validationCard');
       valCard.style.display = 'block';
-      valCard.classList.remove('is-active');
-      void valCard.offsetWidth;
       valCard.classList.add('is-active');
 
-      retry.style.display = 'none';
-      term.innerHTML = '';
-
+      const term = document.getElementById('validationTerminal');
+      const pill = document.getElementById('validationStatusPill');
+      
       pill.className = 'auth-status-pill';
-      pill.textContent = 'Connecting to Gateway...';
+      pill.innerText = 'Connecting to Gateway...';
+      document.getElementById('retryButtonContainer').style.display = 'none';
 
-      authBtn.disabled = true;
-
-      appendTerminalLine(
-        term,
-        'Initializing Enterprise Issuance Key verification...',
-        'info'
-      );
-
-      /*
-       * IMPORTANT:
-       * Do NOT convert "ik-test-demo" into "ik_test_demo" here.
-       * Do NOT convert "test" into a hardcoded development key.
-       * Do NOT alter the user's key before sending it.
-       *
-       * The backend performs normalization and Firestore lookup.
-       */
-      appendTerminalLine(
-        term,
-        'Submitting key to KOMNI authorization gateway...',
-        'accent'
-      );
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
+      term.innerHTML = `<span class="terminal-line info">> Initializing HSM Handshake for key: ${rawKey}</span>`;
 
       try {
+        term.innerHTML += '<span class="terminal-line accent">> Querying Vercel Serverless Backend...</span>';
+        
         const response = await fetch(VERCEL_BACKEND_URL, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            key: rawKey
-          }),
-          signal: controller.signal,
-          cache: 'no-store'
+          body: JSON.stringify({ key: formattedKey })
         });
 
-        const contentType =
-          response.headers.get('content-type') || '';
+        const data = await response.json();
 
-        let data = null;
-
-        if (contentType.includes('application/json')) {
-          data = await response.json();
-        } else {
-          const text = await response.text();
-          data = {
-            valid: false,
-            reason: text || 'Authorization gateway returned a non-JSON response.'
-          };
-        }
-
-        if (response.ok && data && data.valid === true) {
-          const metadata = data.metadata || {};
-
-          saveAuthSession(rawKey, data);
-
-          appendTerminalLine(
-            term,
-            `Authorization gateway: VERIFIED [${response.status}]`,
-            'success'
-          );
-
-          if (metadata.owner) {
-            appendTerminalLine(
-              term,
-              `Registered owner: ${metadata.owner}`,
-              'info'
-            );
+        if (response.ok && data.valid) {
+          term.innerHTML += `<span class="terminal-line success">> Backend Signature: VERIFIED [200 OK]</span>`;
+          if (data.metadata && data.metadata.owner) {
+            term.innerHTML += `<span class="terminal-line info">> Registered Owner: ${data.metadata.owner}</span>`;
           }
-
-          if (metadata.business_id) {
-            appendTerminalLine(
-              term,
-              `Business identity: ${metadata.business_id}`,
-              'info'
-            );
-          }
-
-          if (metadata.workspace_id) {
-            appendTerminalLine(
-              term,
-              `Workspace identity: ${metadata.workspace_id}`,
-              'info'
-            );
-          }
-
-          pill.className = 'auth-status-pill is-success';
-          pill.textContent = 'Handshake Complete';
+          pill.classList.add('is-success');
+          pill.innerText = 'Handshake Complete';
 
           setTimeout(() => {
             valCard.style.display = 'none';
+            const surCard = document.getElementById('surveyCard');
+            surCard.style.display = 'block';
+            surCard.classList.add('is-active');
+          }, 1800);
 
-            const surveyCard = getElement('surveyCard');
-            surveyCard.style.display = 'block';
-            surveyCard.classList.remove('is-active');
-            void surveyCard.offsetWidth;
-            surveyCard.classList.add('is-active');
-          }, 900);
-
-          return;
-        }
-
-        const reason =
-          data && data.reason
-            ? data.reason
-            : `Authorization rejected [HTTP ${response.status}]`;
-
-        appendTerminalLine(
-          term,
-          `AUTHENTICATION REJECTED: ${reason}`,
-          'error'
-        );
-
-        if (response.status === 401) {
-          appendTerminalLine(
-            term,
-            'The issuance key is invalid, revoked, inactive, or not registered.',
-            'error'
-          );
-        } else if (response.status >= 500) {
-          appendTerminalLine(
-            term,
-            'The authorization service reported a server-side failure.',
-            'error'
-          );
-        }
-
-        showValidationError(reason);
-      } catch (err) {
-        if (err && err.name === 'AbortError') {
-          appendTerminalLine(
-            term,
-            'REQUEST TIMEOUT: Authorization gateway did not respond within 15 seconds.',
-            'error'
-          );
-          showValidationError('Authorization gateway timed out.');
         } else {
-          console.error('KOMNI authentication error:', err);
-
-          appendTerminalLine(
-            term,
-            'NETWORK ERROR: Unable to reach authorization gateway.',
-            'error'
-          );
-
-          appendTerminalLine(
-            term,
-            'Check the deployed backend URL and browser network/CORS status.',
-            'error'
-          );
-
-          showValidationError(
-            'Unable to reach the KOMNI authorization gateway.'
-          );
+          term.innerHTML += `<span class="terminal-line error">> AUTHENTICATION REJECTED: ${data.reason || 'Invalid Key'}</span>`;
+          pill.classList.add('is-error');
+          pill.innerText = 'Authentication Failed';
+          document.getElementById('retryButtonContainer').style.display = 'block';
         }
-      } finally {
-        clearTimeout(timeout);
-        authBtn.disabled = false;
+
+      } catch (err) {
+        term.innerHTML += `<span class="terminal-line error">> NETWORK ERROR: Unable to reach backend gateway.</span>`;
+        pill.classList.add('is-error');
+        pill.innerText = 'Gateway Error';
+        document.getElementById('retryButtonContainer').style.display = 'block';
       }
     }
 
     function resetLoginCard() {
-      clearAuthSession();
-
-      getElement('validationCard').style.display = 'none';
-
-      const loginCard = getElement('loginCard');
+      document.getElementById('validationCard').style.display = 'none';
+      const loginCard = document.getElementById('loginCard');
       loginCard.style.display = 'block';
-
-      const input = getElement('issuanceKeyInput');
-      input.value = '';
-      input.focus();
-
-      getElement('validationTerminal').innerHTML = '';
-
-      const pill = getElement('validationStatusPill');
-      pill.className = 'auth-status-pill';
-      pill.textContent = 'Awaiting registry handshake';
-
-      getElement('retryButtonContainer').style.display = 'none';
-    }
-
-    function getSelectedRadioValue(name) {
-      const selected = document.querySelector(
-        `input[name="${name}"]:checked`
-      );
-
-      return selected ? selected.value : null;
+      document.getElementById('issuanceKeyInput').value = '';
+      document.getElementById('issuanceKeyInput').focus();
     }
 
     function handleSurveySubmit(e) {
       e.preventDefault();
-
-      const sessionRaw = sessionStorage.getItem(KOMNI_SESSION_KEY);
-
-      if (!sessionRaw) {
-        resetLoginCard();
-        return;
-      }
-
-      let session;
-
-      try {
-        session = JSON.parse(sessionRaw);
-      } catch {
-        clearAuthSession();
-        resetLoginCard();
-        return;
-      }
-
-      if (
-        !session ||
-        session.authenticated !== true ||
-        !session.metadata ||
-        session.metadata.status !== 'active'
-      ) {
-        clearAuthSession();
-        resetLoginCard();
-        return;
-      }
-
-      /*
-       * Store only UI preferences in the session.
-       * The verified workspace identity comes from verify_key.py.
-       */
-      session.preferences = {
-        governance_profile:
-          getSelectedRadioValue('govProfile') || 'strict',
-        notification_endpoint:
-          getSelectedRadioValue('endpoint') || 'email'
-      };
-
-      sessionStorage.setItem(
-        KOMNI_SESSION_KEY,
-        JSON.stringify(session)
-      );
-
-      getElement('surveyCard').style.display = 'none';
-
-      const setupCard = getElement('setupCard');
+      document.getElementById('surveyCard').style.display = 'none';
+      const setupCard = document.getElementById('setupCard');
       setupCard.style.display = 'block';
-      setupCard.classList.remove('is-active');
-      void setupCard.offsetWidth;
       setupCard.classList.add('is-active');
 
       let progress = 0;
+      const bar = document.getElementById('setupProgressBar');
+      const pct = document.getElementById('setupProgressPercentage');
+      const status = document.getElementById('setupProgressStatus');
+      const term = document.getElementById('setupTerminal');
 
-      const bar = getElement('setupProgressBar');
-      const pct = getElement('setupProgressPercentage');
-      const status = getElement('setupProgressStatus');
-      const term = getElement('setupTerminal');
-      const launchButton = getElement('launchDashboardBtn');
-      const setupPill = getElement('setupStatusPill');
-
-      launchButton.style.display = 'none';
-      bar.style.width = '0%';
-      pct.textContent = '0%';
-      status.textContent = 'Initializing workspace...';
-      setupPill.className = 'auth-status-pill';
-      setupPill.textContent = 'Building dashboard shell';
-      term.innerHTML = '';
-
-      appendTerminalLine(
-        term,
-        'Provisioning authenticated workspace shell...',
-        'info'
-      );
+      term.innerHTML = '<span class="terminal-line info">> Provisioning workspace environment...</span>';
 
       const interval = setInterval(() => {
         progress += 10;
+        bar.style.width = progress + '%';
+        pct.innerText = progress + '%';
 
-        bar.style.width = `${progress}%`;
-        pct.textContent = `${progress}%`;
-
-        if (progress === 20) {
-          status.textContent = 'Loading workspace identity...';
-          appendTerminalLine(
-            term,
-            'Verified workspace identity loaded.',
-            'accent'
-          );
-        } else if (progress === 40) {
-          status.textContent = 'Binding telemetry sockets...';
-          appendTerminalLine(
-            term,
-            'Telemetry channel established.',
-            'accent'
-          );
-        } else if (progress === 60) {
-          status.textContent = 'Loading governance profile...';
-          appendTerminalLine(
-            term,
-            'Governance preferences attached.',
-            'info'
-          );
+        if (progress === 40) {
+          status.innerText = 'Binding telemetry sockets...';
+          term.innerHTML += '<span class="terminal-line accent">> Telemetry channel established.</span>';
         } else if (progress === 80) {
-          status.textContent = 'Applying client preferences...';
-          appendTerminalLine(
-            term,
-            'Client preference profile attached.',
-            'info'
-          );
+          status.innerText = 'Applying client preferences...';
+          term.innerHTML += '<span class="terminal-line info">> Governance posture attached.</span>';
         } else if (progress >= 100) {
           clearInterval(interval);
-
-          status.textContent = 'Workspace Ready';
-          setupPill.className = 'auth-status-pill is-success';
-          setupPill.textContent = 'Workspace Ready';
-
-          appendTerminalLine(
-            term,
-            'Authenticated dashboard shell compiled successfully.',
-            'success'
-          );
-
-          launchButton.style.display = 'block';
+          status.innerText = 'Workspace Ready';
+          term.innerHTML += '<span class="terminal-line success">> Shell compiled successfully.</span>';
+          document.getElementById('launchDashboardBtn').style.display = 'block';
         }
-      }, 250);
+      }, 300);
     }
 
     function launchDashboard() {
-      const sessionRaw =
-        sessionStorage.getItem(KOMNI_SESSION_KEY);
-
-      if (!sessionRaw) {
-        resetLoginCard();
-        return;
-      }
-
-      /*
-       * The dashboard can read this session to determine which
-       * business/workspace it should load. Sensitive authorization
-       * decisions must still be made by the backend.
-       */
       window.location.href = 'dashboard.html#issued';
     }
-
-    // Prevent a stale/invalid local session from being treated as logged in.
-    document.addEventListener('DOMContentLoaded', () => {
-      const existing = sessionStorage.getItem(KOMNI_SESSION_KEY);
-
-      if (!existing) {
-        return;
-      }
-
-      try {
-        const session = JSON.parse(existing);
-
-        if (
-          !session ||
-          session.authenticated !== true ||
-          !session.metadata ||
-          session.metadata.status !== 'active'
-        ) {
-          clearAuthSession();
-        }
-      } catch {
-        clearAuthSession();
-      }
-    });
-
   </script>
 </body>
 </html>
