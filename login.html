@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KOMNI — Premium Access Terminal</title>
-    <meta name="description" content="KOMNI Enterprise Access Node - Authenticate session via Issuance Key." />
+    <meta name="description" content="KOMNI Enterprise Access Node - Authenticate session via Google OAuth." />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,16 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
     <!-- GSAP Animation Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js">
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <!-- Firebase Compat SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js">
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         /* ======================================================================
@@ -315,7 +311,7 @@
         /* ---- Shared card container ---- */
         .card-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             margin: 0 auto;
             position: relative;
         }
@@ -472,7 +468,7 @@
             line-height: 1.6;
             color: var(--text-secondary);
             margin: 20px 0;
-            height: 150px;
+            height: 160px;
             overflow-y: auto;
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
         }
@@ -482,18 +478,10 @@
             white-space: nowrap;
             overflow: hidden;
         }
-        .terminal-line.info {
-            color: #8A8A8A;
-        }
-        .terminal-line.success {
-            color: #22c55e;
-        }
-        .terminal-line.error {
-            color: #ef4444;
-        }
-        .terminal-line.accent {
-            color: var(--accent-magenta);
-        }
+        .terminal-line.info { color: #8A8A8A; }
+        .terminal-line.success { color: #22c55e; }
+        .terminal-line.error { color: #ef4444; }
+        .terminal-line.accent { color: var(--accent-magenta); }
 
         /* ---- Validation Card ---- */
         .validation-card {
@@ -547,7 +535,7 @@
         .wizard-dot.active {
             background: var(--accent-magenta);
             box-shadow: 0 0 16px rgba(216, 61, 194, 0.55);
-            transform: scale(1.2);
+            transform: scale(1.25);
         }
         .wizard-dot.completed {
             background: var(--accent-violet);
@@ -612,7 +600,7 @@
             width: 100%;
             height: 42px;
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 6px;
             padding: 0 14px;
             font-family: var(--font-main);
@@ -626,8 +614,9 @@
         }
         .wizard-form-group input:focus,
         .wizard-form-group select:focus {
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(216, 61, 194, 0.5);
             background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 12px rgba(216, 61, 194, 0.15);
         }
         .wizard-form-group select {
             appearance: none;
@@ -641,7 +630,7 @@
             color: #fff;
         }
 
-        /* Wizard radio group (minimal) */
+        /* Wizard radio group */
         .wizard-radio-group {
             display: flex;
             flex-direction: column;
@@ -678,11 +667,11 @@
             flex-shrink: 0;
             transition: all 0.3s ease;
         }
-        .wizard-radio-option input[type="radio"]:checked~.radio-dot {
+        .wizard-radio-option input[type="radio"]:checked ~ .radio-dot {
             border-color: var(--accent-magenta);
             box-shadow: 0 0 10px rgba(216, 61, 194, 0.4);
         }
-        .wizard-radio-option input[type="radio"]:checked~.radio-dot::after {
+        .wizard-radio-option input[type="radio"]:checked ~ .radio-dot::after {
             content: "";
             width: 6px;
             height: 6px;
@@ -694,7 +683,7 @@
             color: var(--text-secondary);
             transition: color 0.3s ease;
         }
-        .wizard-radio-option input[type="radio"]:checked~.radio-label {
+        .wizard-radio-option input[type="radio"]:checked ~ .radio-label {
             color: #fff;
             font-weight: 500;
         }
@@ -723,7 +712,7 @@
             color: #000000;
         }
         .wizard-btn-primary:hover {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.88);
             transform: translateY(-1px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
@@ -743,7 +732,7 @@
             box-shadow: none !important;
         }
 
-        /* Wizard step 1 — welcome avatar */
+        /* Step 1 — Welcome Avatar */
         .welcome-avatar {
             width: 72px;
             height: 72px;
@@ -766,7 +755,7 @@
         }
 
         .welcome-greeting {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
             letter-spacing: -0.03em;
             margin-bottom: 4px;
@@ -790,21 +779,21 @@
             margin-top: 4px;
         }
 
-        /* ---- Step 4: Complete ---- */
+        /* Step 4: Complete */
         .complete-icon {
-            width: 80px;
-            height: 80px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
             background: var(--logo-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 36px;
             margin: 0 auto 16px auto;
-            box-shadow: 0 0 60px rgba(96, 54, 225, 0.3);
+            box-shadow: 0 0 50px rgba(96, 54, 225, 0.35);
         }
         .complete-title {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
             text-align: center;
             letter-spacing: -0.03em;
@@ -814,9 +803,10 @@
             color: var(--text-secondary);
             font-size: 13px;
             margin-top: 6px;
+            line-height: 1.5;
         }
 
-        /* ---- Responsive ---- */
+        /* Responsive UI */
         @media (max-width: 1024px) {
             .app-viewport {
                 grid-template-columns: 1fr;
@@ -957,17 +947,17 @@
                 ============================================================ -->
                 <div class="validation-card" id="validationCard">
                     <div class="brand-header">
-                        <h2 class="login-title" id="validationTitle">Verifying Issuance Registry</h2>
-                        <p class="login-subtitle">Establishing secure session &amp; indexing your profile…</p>
+                        <h2 class="login-title" id="validationTitle">Verifying Access Credentials</h2>
+                        <p class="login-subtitle">Establishing secure session &amp; indexing client metadata to Firestore…</p>
                         <div class="auth-status-pill" id="validationStatusPill">Awaiting handshake</div>
                     </div>
                     <div class="terminal-box" id="validationTerminal"></div>
                     <div id="retryButtonContainer" style="display:none; margin-top:15px;">
-                        <button class="wizard-btn wizard-btn-primary" onclick="resetLoginCard();" style="width:100%;">Try Another Key</button>
+                        <button class="wizard-btn wizard-btn-primary" onclick="resetLoginCard();" style="width:100%;">Try Again</button>
                     </div>
                     <div class="security-notice">
                         <div class="shield-dot"></div>
-                        <div class="security-notice-text">Out-of-band HSM verification in progress.</div>
+                        <div class="security-notice-text">Out-of-band HSM verification &amp; B2B client sync in progress.</div>
                     </div>
                 </div>
 
@@ -990,14 +980,14 @@
                             <span id="avatarInitial">K</span>
                         </div>
                         <div class="step-label">Step 1 of 4</div>
-                        <div class="step-title welcome-greeting" id="wizardGreeting">Welcome, <span id="wizardName">Guest</span></div>
+                        <div class="step-title welcome-greeting" id="wizardGreeting">Welcome, <span id="wizardName">Associate</span></div>
                         <div class="step-desc welcome-email" id="wizardEmail">user@example.com</div>
-                        <div class="welcome-badge">Verified Associate</div>
+                        <div class="welcome-badge">Active B2B Client</div>
 
                         <div style="margin-top: 20px; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 16px; border: 1px solid rgba(255,255,255,0.04);">
                             <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
-                                Welcome to the KOMNI enterprise network. Your identity has been securely verified.
-                                Let's complete your profile so we can tailor your workspace experience.
+                                Welcome to the KOMNI enterprise platform. Your Google identity has been successfully authenticated and indexed to Firestore.
+                                Let's configure your client workspace posture.
                             </p>
                         </div>
 
@@ -1006,37 +996,37 @@
                         </div>
                     </div>
 
-                    <!-- STEP 2: Organization -->
+                    <!-- STEP 2: Enterprise Organization -->
                     <div class="wizard-step" data-step="1">
                         <div class="step-label">Step 2 of 4</div>
-                        <div class="step-title">Your Organization</div>
-                        <div class="step-desc">Tell us about your company so we can align your governance posture.</div>
+                        <div class="step-title">Enterprise Profile</div>
+                        <div class="step-desc">Tell us about your organization to align system governance and settlement controls.</div>
 
                         <div class="wizard-form-group">
-                            <label for="wizCompany">Company Name</label>
-                            <input type="text" id="wizCompany" placeholder="e.g. Acme Corp" autocomplete="organization" />
+                            <label for="wizCompany">Organization / Company Name</label>
+                            <input type="text" id="wizCompany" placeholder="e.g. Acme Corp / Global Labs" autocomplete="organization" />
                         </div>
 
                         <div class="wizard-form-group">
-                            <label for="wizIndustry">Industry</label>
+                            <label for="wizIndustry">Industry Sector</label>
                             <select id="wizIndustry">
-                                <option value="">Select industry…</option>
-                                <option value="fintech">Fintech</option>
-                                <option value="banking">Banking &amp; Finance</option>
-                                <option value="healthcare">Healthcare</option>
-                                <option value="retail">Retail &amp; E‑commerce</option>
-                                <option value="technology">Technology / SaaS</option>
+                                <option value="">Select industry sector…</option>
+                                <option value="fintech">Fintech &amp; Blockchain</option>
+                                <option value="banking">Banking &amp; Financial Services</option>
+                                <option value="healthcare">Healthcare &amp; Life Sciences</option>
+                                <option value="retail">E-Commerce &amp; Retail</option>
+                                <option value="technology">Software / SaaS Technology</option>
                                 <option value="logistics">Logistics &amp; Supply Chain</option>
-                                <option value="energy">Energy &amp; Utilities</option>
-                                <option value="education">Education</option>
-                                <option value="government">Government / Public Sector</option>
-                                <option value="other">Other</option>
+                                <option value="energy">Energy &amp; Infrastructure</option>
+                                <option value="education">Education &amp; EdTech</option>
+                                <option value="government">Public Sector / Government</option>
+                                <option value="other">Other Enterprise Sector</option>
                             </select>
                         </div>
 
                         <div class="wizard-form-group">
-                            <label for="wizRole">Your Role</label>
-                            <input type="text" id="wizRole" placeholder="e.g. VP of Operations" autocomplete="job-title" />
+                            <label for="wizRole">Your Associate Role</label>
+                            <input type="text" id="wizRole" placeholder="e.g. Chief Risk Officer, Lead Engineer" autocomplete="job-title" />
                         </div>
 
                         <div class="wizard-btn-group">
@@ -1045,29 +1035,29 @@
                         </div>
                     </div>
 
-                    <!-- STEP 3: Preferences -->
+                    <!-- STEP 3: Workspace Preferences -->
                     <div class="wizard-step" data-step="2">
                         <div class="step-label">Step 3 of 4</div>
-                        <div class="step-title">Workspace Preferences</div>
-                        <div class="step-desc">Configure how you'd like to interact with the KOMNI console.</div>
+                        <div class="step-title">Workspace Governance</div>
+                        <div class="step-desc">Select operating preferences for transactional controls and reporting alerts.</div>
 
                         <div class="wizard-form-group">
-                            <label>Operating Posture</label>
+                            <label>Operating Governance Posture</label>
                             <div class="wizard-radio-group">
                                 <label class="wizard-radio-option">
                                     <input type="radio" name="wizPosture" value="strict" checked />
                                     <span class="radio-dot"></span>
-                                    <span class="radio-label">Strict — full governance oversight</span>
+                                    <span class="radio-label">Strict — Maximum compliance oversight &amp; dual signing</span>
                                 </label>
                                 <label class="wizard-radio-option">
                                     <input type="radio" name="wizPosture" value="balanced" />
                                     <span class="radio-dot"></span>
-                                    <span class="radio-label">Balanced — operational flexibility</span>
+                                    <span class="radio-label">Balanced — Standard operational speed with logging</span>
                                 </label>
                                 <label class="wizard-radio-option">
                                     <input type="radio" name="wizPosture" value="agile" />
                                     <span class="radio-dot"></span>
-                                    <span class="radio-label">Agile — rapid iteration mode</span>
+                                    <span class="radio-label">Agile — Unrestricted real-time integration mode</span>
                                 </label>
                             </div>
                         </div>
@@ -1078,17 +1068,17 @@
                                 <label class="wizard-radio-option">
                                     <input type="radio" name="wizNotify" value="email" checked />
                                     <span class="radio-dot"></span>
-                                    <span class="radio-label">Email summaries (daily)</span>
+                                    <span class="radio-label">Email updates &amp; transaction digests</span>
                                 </label>
                                 <label class="wizard-radio-option">
                                     <input type="radio" name="wizNotify" value="console" />
                                     <span class="radio-dot"></span>
-                                    <span class="radio-label">Console‑only updates</span>
+                                    <span class="radio-label">In-console notifications only</span>
                                 </label>
                                 <label class="wizard-radio-option">
                                     <input type="radio" name="wizNotify" value="both" />
                                     <span class="radio-dot"></span>
-                                    <span class="radio-label">Both email &amp; console</span>
+                                    <span class="radio-label">Real-time dual channel dispatch</span>
                                 </label>
                             </div>
                         </div>
@@ -1099,21 +1089,21 @@
                         </div>
                     </div>
 
-                    <!-- STEP 4: Complete -->
+                    <!-- STEP 4: Launch Dashboard -->
                     <div class="wizard-step" data-step="3">
                         <div class="complete-icon">✓</div>
                         <div class="step-label" style="text-align:center;">Step 4 of 4</div>
-                        <div class="complete-title">All Set, <span id="completeName">Guest</span>!</div>
-                        <div class="complete-desc">Your profile has been indexed and your workspace is being provisioned.<br />Ready to enter the KOMNI dashboard.</div>
+                        <div class="complete-title">Setup Complete, <span id="completeName">Associate</span>!</div>
+                        <div class="complete-desc">Your profile has been indexed to Firestore. Your workspace is provisioned and ready for access.</div>
 
-                        <div style="margin-top:24px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.15); border-radius:8px; padding:14px; text-align:center;">
-                            <span style="font-size:12px; color:#22c55e; font-weight:500;">✓ Firestore registration complete</span>
-                            <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Your enterprise profile is now active.</span>
+                        <div style="margin-top:20px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.18); border-radius:8px; padding:14px; text-align:center;">
+                            <span style="font-size:12px; color:#22c55e; font-weight:600;">✓ Active Client Document Synced to Firestore</span>
+                            <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Redirecting you directly to /dashboard.</span>
                         </div>
 
                         <div class="wizard-btn-group">
                             <button class="wizard-btn wizard-btn-primary" id="wizardLaunchBtn" onclick="launchDashboard();" style="width:100%;">
-                                Enter Dashboard →
+                                Launch Dashboard →
                             </button>
                         </div>
                     </div>
@@ -1139,24 +1129,22 @@
            FIREBASE CONFIG
            ==================================================================== */
         const firebaseConfig = {
-  apiKey: "AIzaSyCAGeF1z2VW5lf0qUcOio2MVNZ8vWTHHWg",
-  authDomain: "komni-eb72e.firebaseapp.com",
-  projectId: "komni-eb72e",
-  storageBucket: "komni-eb72e.firebasestorage.app",
-  messagingSenderId: "754396573424",
-  appId: "1:754396573424:web:87b1638b20903dae94dc35",
-  measurementId: "G-6GZYWR2G78"
-};
+            apiKey: "AIzaSyCAGeF1z2VW5lf0qUcOio2MVNZ8vWTHHWg",
+            authDomain: "komni-eb72e.firebaseapp.com",
+            projectId: "komni-eb72e",
+            storageBucket: "komni-eb72e.firebasestorage.app",
+            messagingSenderId: "754396573424",
+            appId: "1:754396573424:web:87b1638b20903dae94dc35",
+            measurementId: "G-6GZYWR2G78"
+        };
 
         let firebaseApp, firebaseAuth, firestore;
-        let authHandled = false; // prevent duplicate processing
+        let authHandled = false;
 
         try {
             firebaseApp = firebase.initializeApp(firebaseConfig);
             firebaseAuth = firebase.auth();
             firestore = firebase.firestore();
-            // Optional: use new cache setting to avoid deprecation warning
-            // firestore.settings({ cache: 'persistent' });
             console.log('Firebase initialized successfully.');
         } catch (e) {
             console.error('Firebase init error:', e);
@@ -1269,8 +1257,7 @@
                                     gsap.to({ speed: 45 }, {
                                         speed: 12,
                                         duration: 1.5,
-                                        onUpdate: function() { currentSpeed = this.targets()[0]
-                                                .speed; }
+                                        onUpdate: function() { currentSpeed = this.targets()[0].speed; }
                                     });
                                     scenes.forEach(s => s.classList.remove('active', 'exit'));
                                     currentScene = 0;
@@ -1311,65 +1298,52 @@
 
             initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
 
-            // Set up auth state listener
+            // Setup auth listener
             setupAuthListener();
 
-            // Also handle any pending redirect result (fallback)
+            // Catch any pending redirect auth response
             if (firebaseAuth) {
                 firebaseAuth.getRedirectResult().then((result) => {
-                    if (result.user) {
-                        console.log('Redirect result detected user:', result.user.uid);
-                        // The auth listener will handle it, but just in case
+                    if (result.user && !authHandled) {
+                        console.log('Redirect result user detected:', result.user.uid);
                     }
-                }).catch(err => console.warn('Redirect result error:', err));
+                }).catch(err => console.warn('Redirect result warning:', err));
             }
         });
 
         /* ====================================================================
-           AUTH STATE LISTENER (primary)
+           AUTH STATE LISTENER
            ==================================================================== */
         function setupAuthListener() {
-            if (!firebaseAuth) {
-                console.error('Firebase Auth not initialized');
-                return;
-            }
+            if (!firebaseAuth) return;
 
             firebaseAuth.onAuthStateChanged(async (user) => {
                 console.log('Auth state changed. User:', user ? user.uid : 'null');
-                if (authHandled) {
-                    console.log('Auth already handled, skipping.');
-                    return;
-                }
+                if (authHandled) return;
 
                 if (user) {
                     authHandled = true;
                     try {
-                        console.log('Processing authenticated user:', user.uid);
+                        showValidationCard(user);
                         await indexUserInFirestore(user);
 
-                        // Store session
+                        // Cache auth details
                         sessionStorage.setItem('komniAuthUser', JSON.stringify({
                             uid: user.uid,
                             displayName: user.displayName || '',
                             email: user.email || '',
-                            photoURL: user.photoURL || ''
+                            photoURL: user.photoURL || '',
+                            providerId: user.providerData?.[0]?.providerId || 'google.com'
                         }));
-
-                        showValidationCard(user);
                     } catch (err) {
-                        console.error('Error during auth processing:', err);
-                        // Still show validation with error message
-                        showValidationCard(user, err);
+                        console.error('Auth processing error:', err);
                     }
                 } else {
-                    // No user signed in
-                    authHandled = false; // allow future sign-in
-                    console.log('No user signed in.');
-                    // Show login card, hide others
+                    authHandled = false;
                     loginCard.style.display = 'block';
                     validationCard.style.display = 'none';
                     wizardCard.style.display = 'none';
-                    // Reset button
+                    
                     const btn = document.getElementById('googleSignInBtn');
                     const txt = document.getElementById('googleSignInText');
                     btn.disabled = false;
@@ -1379,7 +1353,7 @@
         }
 
         /* ====================================================================
-           GOOGLE SIGN-IN (redirect)
+           GOOGLE SIGN-IN (Popup with Fallback to Redirect)
            ==================================================================== */
         async function handleGoogleSignIn() {
             const button = document.getElementById('googleSignInBtn');
@@ -1388,116 +1362,122 @@
                 showAuthError('Firebase auth unavailable.');
                 return;
             }
+
             button.disabled = true;
-            text.textContent = 'Opening Google…';
+            text.textContent = 'Authenticating with Google…';
+
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('email');
+            provider.addScope('profile');
+            provider.setCustomParameters({ prompt: 'select_account' });
 
             try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                provider.setCustomParameters({ prompt: 'select_account' });
-                await firebaseAuth.signInWithRedirect(provider);
+                const result = await firebaseAuth.signInWithPopup(provider);
+                if (result.user) {
+                    console.log('Popup authentication successful.');
+                }
             } catch (err) {
-                console.error('Google sign-in error:', err);
-                button.disabled = false;
-                text.textContent = 'Sign in with Google';
-                showAuthError(err?.message || 'Unable to open Google sign-in.');
+                console.warn('Popup sign-in error/blocked, falling back to redirect:', err);
+                if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
+                    try {
+                        await firebaseAuth.signInWithRedirect(provider);
+                    } catch (redirectErr) {
+                        button.disabled = false;
+                        text.textContent = 'Sign in with Google';
+                        showAuthError(redirectErr?.message || 'Unable to open Google Sign-In.');
+                    }
+                } else {
+                    button.disabled = false;
+                    text.textContent = 'Sign in with Google';
+                    showAuthError(err?.message || 'Authentication error occurred.');
+                }
             }
         }
 
         /* ====================================================================
-           FIRESTORE INDEXING (users + clients)
+           FIRESTORE INDEXING (Active Registered Client + Enterprise Metadata)
            ==================================================================== */
         async function indexUserInFirestore(user) {
-            if (!firestore || !user) {
-                console.warn('Firestore or user not available');
-                return;
-            }
+            if (!firestore || !user) return;
 
             try {
-                const userRef = firestore.collection('users').doc(user.uid);
                 const now = firebase.firestore.FieldValue.serverTimestamp();
-                const doc = await userRef.get();
-                const exists = doc.exists;
+                const userRef = firestore.collection('users').doc(user.uid);
+                const clientRef = firestore.collection('clients').doc(user.uid);
 
-                const baseData = {
+                const userDoc = await userRef.get();
+                const exists = userDoc.exists;
+
+                // Google Metadata Extraction
+                const googleMeta = {
+                    authProvider: user.providerData?.[0]?.providerId || 'google.com',
+                    emailVerified: user.emailVerified || true,
+                    creationTime: user.metadata.creationTime || new Date().toISOString(),
+                    lastSignInTime: user.metadata.lastSignInTime || new Date().toISOString(),
+                    userAgent: navigator.userAgent || '',
+                    locale: navigator.language || 'en-US'
+                };
+
+                const baseUserData = {
                     uid: user.uid,
                     email: user.email || '',
                     displayName: user.displayName || '',
                     photoURL: user.photoURL || '',
+                    role: 'associate',
+                    clientStatus: 'active',
                     lastSignInAt: now,
                     signInCount: firebase.firestore.FieldValue.increment(1),
-                    status: 'active',
-                    metadata: {
-                        authProvider: 'google',
-                        lastSignInAt: new Date().toISOString(),
-                        userAgent: navigator.userAgent || ''
+                    googleMetadata: googleMeta,
+                    enterpriseData: {
+                        isB2BClient: true,
+                        tier: 'enterprise_associate',
+                        registeredAt: exists ? (userDoc.data()?.enterpriseData?.registeredAt || new Date().toISOString()) : new Date().toISOString()
                     }
                 };
 
                 if (exists) {
-                    await userRef.update({
-                        ...baseData,
-                        // preserve existing enterprise fields
-                        company: doc.data().company || '',
-                        industry: doc.data().industry || '',
-                        jobRole: doc.data().jobRole || '',
-                        operatingPosture: doc.data().operatingPosture || 'balanced',
-                        notificationCadence: doc.data().notificationCadence || 'email',
-                    });
-                    wizardUserData = {
-                        ...doc.data(),
-                        ...baseData,
-                        isNew: false
-                    };
-                    console.log('Updated existing user in Firestore');
+                    await userRef.update(baseUserData);
+                    wizardUserData = { ...userDoc.data(), ...baseUserData };
+                    console.log('Updated active associate user in Firestore.');
                 } else {
-                    const newData = {
-                        ...baseData,
+                    const newUserData = {
+                        ...baseUserData,
                         createdAt: now,
                         company: '',
                         industry: '',
                         jobRole: '',
                         operatingPosture: 'balanced',
                         notificationCadence: 'email',
-                        isOnboarded: false,
-                        signInCount: 1
+                        isOnboarded: false
                     };
-                    await userRef.set(newData);
-                    wizardUserData = { ...newData, isNew: true };
-                    console.log('Created new user in Firestore');
+                    await userRef.set(newUserData);
+                    wizardUserData = newUserData;
+                    console.log('Indexed new active client user in Firestore.');
                 }
 
-                // Also index in 'clients' collection
-                const clientRef = firestore.collection('clients').doc(user.uid);
-                const clientDoc = await clientRef.get();
-                if (!clientDoc.exists) {
-                    await clientRef.set({
-                        uid: user.uid,
-                        email: user.email || '',
-                        displayName: user.displayName || '',
-                        status: 'active',
-                        registeredAt: now,
-                        type: 'associate',
-                        metadata: {
-                            source: 'google_oauth',
-                            registeredVia: 'login.komni.com'
-                        }
-                    });
-                    console.log('Created client record');
-                } else {
-                    await clientRef.update({
-                        lastSeenAt: now,
-                        status: 'active'
-                    });
-                    console.log('Updated client record');
-                }
+                // Index in 'clients' collection as an active B2B registered associate/client
+                await clientRef.set({
+                    uid: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || '',
+                    photoURL: user.photoURL || '',
+                    status: 'active',
+                    type: 'registered_associate_client',
+                    googleMetadata: googleMeta,
+                    updatedAt: now,
+                    createdAt: exists ? (userDoc.data()?.createdAt || now) : now
+                }, { merge: true });
+
+                console.log('Client collection successfully synced.');
+
             } catch (err) {
                 console.error('Firestore indexing error:', err);
-                throw err; // rethrow so caller can handle
+                throw err;
             }
         }
 
         /* ====================================================================
-           SHOW VALIDATION CARD → WIZARD
+           SHOW VALIDATION CARD -> WIZARD
            ==================================================================== */
         function showValidationCard(user, error = null) {
             loginCard.style.display = 'none';
@@ -1509,35 +1489,34 @@
 
             if (error) {
                 pill.className = 'auth-status-pill is-error';
-                pill.innerText = 'Indexing Error';
+                pill.innerText = 'Sync Warning';
                 term.innerHTML =
-                    '<span class="terminal-line info">> Authentication successful but Firestore indexing failed.</span>' +
+                    '<span class="terminal-line info">> Authentication completed with sync warning.</span>' +
                     `<span class="terminal-line error">> Error: ${escapeHtml(error.message || 'Unknown error')}</span>` +
-                    '<span class="terminal-line info">> You can still proceed, but profile data may be incomplete.</span>';
-                // Show retry button? We'll just continue to wizard after a delay.
+                    '<span class="terminal-line info">> Proceeding to workspace onboarding…</span>';
+                
                 setTimeout(() => {
                     validationCard.style.display = 'none';
                     launchWizard(user);
-                }, 2500);
+                }, 2000);
                 return;
             }
 
             pill.className = 'auth-status-pill is-success';
-            pill.innerText = 'Google Authentication Complete';
+            pill.innerText = 'Google Authenticated';
 
-            const email = user.email || 'Google account';
+            const email = user.email || 'Google Account';
             const name = user.displayName || 'Associate';
 
             term.innerHTML =
-                '<span class="terminal-line info">> Initializing secure Google identity handshake…</span>' +
-                '<span class="terminal-line accent">> Verifying Firebase Authentication session…</span>' +
-                `<span class="terminal-line success">> Identity verified: ${escapeHtml(email)}</span>` +
-                '<span class="terminal-line success">> Firebase session established [200 OK]</span>' +
-                '<span class="terminal-line info">> Indexing profile in Firestore…</span>';
+                '<span class="terminal-line info">> Initiating Google OAuth Handshake…</span>' +
+                '<span class="terminal-line accent">> Verifying session tokens with Firebase Auth…</span>' +
+                `<span class="terminal-line success">> Authenticated: ${escapeHtml(email)}</span>` +
+                '<span class="terminal-line info">> Indexing user as active client in Firestore [/users & /clients]…</span>';
 
             setTimeout(() => {
-                term.innerHTML += '<span class="terminal-line success">> Firestore registration complete ✓</span>';
-                term.innerHTML += `<span class="terminal-line accent">> Welcome, ${escapeHtml(name)}</span>`;
+                term.innerHTML += '<span class="terminal-line success">> Firestore registration &amp; Google metadata indexed ✓</span>';
+                term.innerHTML += `<span class="terminal-line accent">> Welcome Associate: ${escapeHtml(name)}</span>`;
             }, 600);
 
             setTimeout(() => {
@@ -1553,7 +1532,7 @@
             wizardCard.style.display = 'block';
             wizardCard.classList.add('is-active');
 
-            const name = user.displayName || 'Guest';
+            const name = user.displayName || 'Associate';
             const email = user.email || 'user@example.com';
             const photo = user.photoURL || '';
 
@@ -1568,7 +1547,7 @@
                 avatarEl.innerHTML = `<span id="avatarInitial">${name.charAt(0).toUpperCase()}</span>`;
             }
 
-            // Pre-fill wizardUserData if available
+            // Populate existing values if returning user
             if (wizardUserData) {
                 if (wizardUserData.company) document.getElementById('wizCompany').value = wizardUserData.company;
                 if (wizardUserData.industry) document.getElementById('wizIndustry').value = wizardUserData.industry;
@@ -1583,16 +1562,8 @@
                     const radio = document.querySelector(`input[name="wizNotify"][value="${cadence}"]`);
                     if (radio) radio.checked = true;
                 }
-                // If already onboarded, skip to step 4
-                if (wizardUserData.isOnboarded && wizardUserData.company) {
-                    currentWizardStep = 3;
-                    updateWizardUI();
-                    document.getElementById('wizardLaunchBtn').textContent = 'Enter Dashboard →';
-                    return;
-                }
             }
 
-            // Start from step 0
             currentWizardStep = 0;
             updateWizardUI();
         }
@@ -1604,11 +1575,10 @@
             if (currentWizardStep === 1) {
                 const company = document.getElementById('wizCompany').value.trim();
                 if (!company) {
-                    document.getElementById('wizCompany').focus();
-                    document.getElementById('wizCompany').style.borderColor = '#ef4444';
-                    setTimeout(() => {
-                        document.getElementById('wizCompany').style.borderColor = '';
-                    }, 1500);
+                    const companyInput = document.getElementById('wizCompany');
+                    companyInput.focus();
+                    companyInput.style.borderColor = '#ef4444';
+                    setTimeout(() => { companyInput.style.borderColor = ''; }, 1500);
                     return;
                 }
             }
@@ -1642,17 +1612,13 @@
                 if (i === currentWizardStep) d.classList.add('active');
                 else if (i < currentWizardStep) d.classList.add('completed');
             });
-
-            if (currentWizardStep === 3) {
-                document.getElementById('wizardLaunchBtn').textContent = 'Enter Dashboard →';
-            }
         }
 
         /* ====================================================================
            SAVE WIZARD DATA TO FIRESTORE
            ==================================================================== */
         async function saveWizardData() {
-            const user = firebaseAuth.currentUser;
+            const user = firebaseAuth?.currentUser;
             if (!user || !firestore) return;
 
             const company = document.getElementById('wizCompany').value.trim() || '';
@@ -1677,12 +1643,11 @@
                     company,
                     industry,
                     jobRole,
-                    status: 'active',
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                console.log('Wizard data saved to Firestore.');
+                console.log('Enterprise wizard preferences saved to Firestore.');
             } catch (err) {
-                console.error('Firestore save error:', err);
+                console.error('Error saving wizard preferences:', err);
             }
         }
 
@@ -1690,10 +1655,9 @@
            LAUNCH DASHBOARD
            ==================================================================== */
         function launchDashboard() {
-            saveWizardData().then(() => {
-                window.location.href = 'dashboard.html#issued';
-            }).catch(() => {
-                window.location.href = 'dashboard.html#issued';
+            saveWizardData().finally(() => {
+                // Navigate to /dashboard as requested
+                window.location.href = '/dashboard';
             });
         }
 
@@ -1737,16 +1701,8 @@
             const err = document.getElementById('googleAuthError');
             if (err) err.remove();
 
-            // Reset wizard state
             currentWizardStep = 0;
-            document.querySelectorAll('.wizard-step').forEach((s, i) => {
-                s.classList.toggle('active', i === 0);
-            });
-            document.querySelectorAll('.wizard-dot').forEach((d, i) => {
-                d.classList.toggle('active', i === 0);
-                d.classList.toggle('completed', false);
-            });
-            authHandled = false; // allow re-auth
+            authHandled = false;
         }
     </script>
 </body>
