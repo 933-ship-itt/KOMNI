@@ -1,1236 +1,1724 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KOMNI — Premium Access Terminal</title>
-  <meta name="description" content="KOMNI Enterprise Access Node - Authenticate session via Issuance Key.">
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-  <!-- GSAP Animation Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-  <!-- Firebase Compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-  <style>
-    /* ==========================================================================
-       1. SYSTEM VARIABLES & BASE STYLES
-       ========================================================================== */
-    :root {
-      --bg-color: #000000;
-      --text-primary: #FFFFFF;
-      --text-secondary: #8A8A8A;
-      --text-muted: #525252;
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.18);
-      
-      --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
-      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-brand: 'Plus Jakarta Sans', 'Inter', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
-
-      /* Advert & Login Variables */
-      --bg-black: #030308;
-      --accent-violet: #6036E1;
-      --accent-magenta: #D83DC2;
-      --text-sub: #a1a1aa;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      scrollbar-width: thin;
-      scrollbar-color: #6036E1 #000000;
-    }
-
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: #000000;
-      border-left: 1px solid rgba(255, 255, 255, 0.03);
-      border-right: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #6036E1 0%, #D83DC2 100%);
-      border-radius: 4px;
-    }
-
-    html, body {
-      background-color: var(--bg-color);
-      color: var(--text-primary);
-      font-family: var(--font-main);
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    /* ==========================================================================
-       2. LOGIN VIEWPORT & KINETIC ADVERT STAGE
-       ========================================================================== */
-    .viewport-glow {
-      position: absolute;
-      width: 50vw;
-      height: 50vw;
-      border-radius: 50%;
-      filter: blur(160px);
-      opacity: 0.12;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .glow-left { top: -20%; left: -10%; background: var(--accent-violet); }
-
-    .app-viewport {
-      position: relative;
-      z-index: 10;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-    }
-
-    .advert-side {
-      position: relative;
-      background: radial-gradient(circle at 50% 50%, #0a0618 0%, #020205 100%);
-      border-right: 1px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 48px;
-      overflow: hidden;
-    }
-
-    .advert-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 20;
-    }
-
-    .brand-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-subtle);
-      border-radius: 100px;
-      backdrop-filter: blur(10px);
-    }
-
-    .brand-pill img {
-      height: 18px;
-      width: auto;
-    }
-
-    .brand-pill span {
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing: 3px;
-    }
-
-    .sys-badge {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .stage-wrapper {
-      position: relative;
-      flex: 1;
-      margin: 40px 0;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    }
-
-    .advert-frame-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 50%, #0d0722 0%, #030308 100%);
-      overflow: hidden;
-      color: #fff;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .advert-frame-container canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
-      width: 100%;
-      height: 100%;
-    }
-
-    .advert-frame-container .director-ui {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    .advert-frame-container .scene-container {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-      perspective: 1200px;
-    }
-
-    .advert-frame-container .scene-content {
-      position: absolute;
-      width: 90%;
-      max-width: 900px;
-      text-align: center;
-      top: 50%;
-      left: 50%;
-      opacity: 0;
-      transform: translate3d(-50%, calc(-50% + 40px), -100px) rotateX(-15deg);
-      filter: blur(12px);
-      transition: all 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-      visibility: hidden;
-    }
-
-    .advert-frame-container .scene-content.active {
-      opacity: 1;
-      transform: translate3d(-50%, -50%, 0) rotateX(0deg);
-      filter: blur(0px);
-      visibility: visible;
-    }
-
-    .advert-frame-container .scene-content.exit {
-      opacity: 0;
-      transform: translate3d(-50%, calc(-50% - 40px), 100px) rotateX(15deg);
-      filter: blur(16px);
-      visibility: visible;
-    }
-
-    .advert-frame-container h1 {
-      font-size: clamp(1.8rem, 3vw, 3.2rem);
-      margin: 0;
-      background: var(--logo-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-    }
-
-    .advert-frame-container p {
-      font-size: clamp(0.85rem, 1vw, 1.05rem);
-      color: var(--text-sub);
-      margin-top: 16px;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .advert-frame-container .finale-stage {
-      position: absolute;
-      inset: 0;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.8s ease;
-    }
-
-    .advert-frame-container .finale-stage.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .advert-frame-container .intro-svg {
-      width: 80%;
-      height: auto;
-      overflow: visible;
-    }
-
-    .advert-frame-container .fill-text {
-      font-size: 80px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      fill: url(#svgGradLogin);
-    }
-
-    .advert-frame-container .sub-url-path {
-      font-size: 14px;
-      font-weight: 800;
-      fill: #ffffff;
-      letter-spacing: 0.5em;
-      opacity: 0.8;
-    }
-
-    .advert-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 20;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .nav-back-link {
-      color: var(--text-secondary);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: color 0.3s ease;
-      cursor: pointer;
-    }
-
-    .nav-back-link:hover {
-      color: var(--text-primary);
-    }
-
-    /* ==========================================================================
-       3. ISSUANCE KEY LOGIN TERMINAL & CARDS
-       ========================================================================== */
-    .login-side {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 60px;
-      background: #020205;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 380px;
-      background: transparent;
-      border: none;
-      position: relative;
-    }
-
-    .brand-header {
-      margin-bottom: 36px;
-      text-align: left;
-    }
-
-    .main-logo-icon {
-      height: 32px;
-      width: auto;
-      margin-bottom: 24px;
-      filter: drop-shadow(0 0 8px rgba(96, 54, 225, 0.25));
-    }
-
-    .login-title {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .login-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-      font-weight: 400;
-      line-height: 1.5;
-    }
-
-    .brand-word {
-      font-family: var(--font-brand);
-      font-weight: 800;
-      letter-spacing: -0.045em;
-      background: var(--logo-gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
-    }
-
-    .google-signin-btn {
-      width: 100%;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      background: #ffffff;
-      color: #111111;
-      font-family: var(--font-main);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.1px;
-      cursor: pointer;
-      transition: transform 0.3s var(--ease-expensive),
-                  box-shadow 0.3s var(--ease-expensive),
-                  background 0.3s ease;
-    }
-
-    .google-signin-btn:hover {
-      background: #f5f5f5;
-      transform: translateY(-1px);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-    }
-
-    .google-signin-btn:active {
-      transform: translateY(0);
-    }
-
-    .google-signin-btn:disabled {
-      opacity: 0.65;
-      cursor: wait;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .google-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .form-group {
-      margin-bottom: 24px;
-    }
-
-    .field-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .field-label .label-title {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-
-    .field-label .key-type {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 400;
-      color: var(--text-muted);
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-wrapper input {
-      width: 100%;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 6px;
-      padding: 0 44px 0 16px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: #fff;
-      outline: none;
-      transition: all 0.3s var(--ease-expensive);
-    }
-
-    .input-wrapper input::placeholder {
-      color: var(--text-muted);
-      font-family: var(--font-main);
-    }
-
-    .input-wrapper input:focus {
-      border-color: rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .key-icon {
-      position: absolute;
-      right: 14px;
-      width: 16px;
-      height: 16px;
-      fill: rgba(255, 255, 255, 0.2);
-      pointer-events: none;
-      transition: fill 0.3s ease;
-    }
-
-    .input-wrapper input:focus ~ .key-icon {
-      fill: rgba(255, 255, 255, 0.5);
-    }
-
-    .submit-btn {
-      width: 100%;
-      height: 48px;
-      background: #FFFFFF;
-      border: none;
-      border-radius: 6px;
-      color: #000000;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s var(--ease-expensive);
-    }
-
-    .submit-btn:hover { background: rgba(255, 255, 255, 0.9); }
-    .submit-btn:active { background: rgba(255, 255, 255, 0.8); }
-
-    .security-notice {
-      margin-top: 32px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 11px;
-    }
-
-    .security-notice-text {
-      font-family: var(--font-mono);
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-
-    .shield-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--text-muted);
-      flex-shrink: 0;
-    }
-
-    /* Dynamic Multi-Step Login Cards */
-    .validation-card, .survey-card, .setup-card {
-      display: none;
-      width: 100%;
-      max-width: 420px;
-      background: transparent;
-      border: none;
-      position: relative;
-    }
-
-    .validation-card.is-active,
-    .survey-card.is-active,
-    .setup-card.is-active {
-      animation: cardLiftIn 0.5s var(--ease-expensive) both;
-    }
-
-    @keyframes cardLiftIn {
-      from {
-        opacity: 0;
-        transform: translateY(18px) scale(0.97);
-        filter: blur(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-    }
-
-    .auth-status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text-secondary);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      width: fit-content;
-    }
-
-    .auth-status-pill::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent-magenta);
-      box-shadow: 0 0 12px rgba(216, 61, 194, 0.85);
-    }
-
-    .auth-status-pill.is-success {
-      color: #fff;
-      border-color: rgba(34, 197, 94, 0.35);
-      background: rgba(34, 197, 94, 0.08);
-    }
-
-    .auth-status-pill.is-success::before {
-      background: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.95);
-    }
-
-    .auth-status-pill.is-error {
-      color: #ef4444;
-      border-color: rgba(239, 68, 68, 0.35);
-      background: rgba(239, 68, 68, 0.08);
-    }
-
-    .auth-status-pill.is-error::before {
-      background: #ef4444;
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.95);
-    }
-
-    .terminal-box {
-      background: #030308;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      line-height: 1.6;
-      color: var(--text-secondary);
-      margin: 20px 0;
-      height: 180px;
-      overflow-y: auto;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-    }
-    
-    .terminal-line {
-      display: block;
-      margin-bottom: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .terminal-line.info { color: #8A8A8A; }
-    .terminal-line.success { color: #22c55e; }
-    .terminal-line.error { color: #ef4444; }
-    .terminal-line.accent { color: var(--accent-magenta); }
-
-    /* Custom Radio Buttons */
-    .custom-survey-group { margin-bottom: 20px; }
-    .survey-question {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      margin-bottom: 10px;
-      display: block;
-    }
-    .survey-options { display: flex; flex-direction: column; gap: 8px; }
-    .survey-option {
-      display: flex;
-      align-items: center;
-      position: relative;
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 6px;
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: all 0.3s var(--ease-expensive);
-    }
-    .survey-option:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.02);
-    }
-    .survey-option input[type="radio"] { position: absolute; opacity: 0; cursor: pointer; }
-    .option-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      margin-right: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-    .survey-option input[type="radio"]:checked ~ .option-dot {
-      border-color: var(--accent-magenta);
-      box-shadow: 0 0 8px var(--accent-magenta);
-    }
-    .survey-option input[type="radio"]:checked ~ .option-dot::after {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent-magenta);
-    }
-    .option-text { font-size: 12px; color: var(--text-secondary); transition: color 0.3s ease; }
-    .survey-option input[type="radio"]:checked ~ .option-text { color: #fff; font-weight: 500; }
-
-    /* Progress Setup Box */
-    .setup-progress-container { margin: 24px 0; }
-    .progress-bar-wrapper {
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--logo-gradient);
-      border-radius: 10px;
-      box-shadow: 0 0 10px var(--accent-magenta);
-    }
-    .progress-label-group {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 10px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-    }
-    .progress-status-text { color: var(--text-secondary); }
-    .progress-percentage { color: var(--accent-magenta); font-weight: 600; }
-
-    /* Responsiveness */
-    @media (max-width: 1024px) {
-      .app-viewport { grid-template-columns: 1fr; overflow-y: auto; }
-      .advert-side { display: none; }
-      .login-side { height: 100vh; padding: 30px; }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KOMNI — Premium Access Terminal</title>
+    <meta name="description" content="KOMNI Enterprise Access Node - Authenticate session via Issuance Key." />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,500;0,800;1,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js">
+    </script>
+
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js">
+    </script>
+
+    <style>
+        /* ======================================================================
+             1. SYSTEM VARIABLES & BASE STYLES
+             ====================================================================== */
+        :root {
+            --bg-color: #000000;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8A8A8A;
+            --text-muted: #525252;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-strong: rgba(255, 255, 255, 0.18);
+
+            --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-brand: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
+
+            --bg-black: #030308;
+            --accent-violet: #6036E1;
+            --accent-magenta: #D83DC2;
+            --text-sub: #a1a1aa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scrollbar-width: thin;
+            scrollbar-color: #6036E1 #000000;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 1px solid rgba(255, 255, 255, 0.03);
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6036E1 0%, #D83DC2 100%);
+            border-radius: 4px;
+        }
+
+        html,
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* ======================================================================
+             2. LOGIN VIEWPORT & KINETIC ADVERT STAGE
+             ====================================================================== */
+        .viewport-glow {
+            position: absolute;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            filter: blur(160px);
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-left {
+            top: -20%;
+            left: -10%;
+            background: var(--accent-violet);
+        }
+
+        .app-viewport {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* ---- LEFT: ADVERT ---- */
+        .advert-side {
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, #0a0618 0%, #020205 100%);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px;
+            overflow: hidden;
+        }
+
+        .advert-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 20;
+        }
+
+        .brand-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            backdrop-filter: blur(10px);
+        }
+        .brand-pill img {
+            height: 18px;
+            width: auto;
+        }
+        .brand-pill span {
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 3px;
+        }
+
+        .sys-badge {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stage-wrapper {
+            position: relative;
+            flex: 1;
+            margin: 40px 0;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .advert-frame-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #0d0722 0%, #030308 100%);
+            overflow: hidden;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .advert-frame-container canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+        }
+        .advert-frame-container .director-ui {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .advert-frame-container .scene-container {
+            position: absolute;
+            inset: 0;
+            transform-style: preserve-3d;
+            perspective: 1200px;
+        }
+        .advert-frame-container .scene-content {
+            position: absolute;
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+            top: 50%;
+            left: 50%;
+            opacity: 0;
+            transform: translate3d(-50%, calc(-50% + 40px), -100px) rotateX(-15deg);
+            filter: blur(12px);
+            transition: all 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+            visibility: hidden;
+        }
+        .advert-frame-container .scene-content.active {
+            opacity: 1;
+            transform: translate3d(-50%, -50%, 0) rotateX(0deg);
+            filter: blur(0px);
+            visibility: visible;
+        }
+        .advert-frame-container .scene-content.exit {
+            opacity: 0;
+            transform: translate3d(-50%, calc(-50% - 40px), 100px) rotateX(15deg);
+            filter: blur(16px);
+            visibility: visible;
+        }
+        .advert-frame-container h1 {
+            font-size: clamp(1.8rem, 3vw, 3.2rem);
+            margin: 0;
+            background: var(--logo-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.05;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+        .advert-frame-container p {
+            font-size: clamp(0.85rem, 1vw, 1.05rem);
+            color: var(--text-sub);
+            margin-top: 16px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .advert-frame-container .finale-stage {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        .advert-frame-container .finale-stage.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .advert-frame-container .intro-svg {
+            width: 80%;
+            height: auto;
+            overflow: visible;
+        }
+        .advert-frame-container .fill-text {
+            font-size: 80px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            fill: url(#svgGradLogin);
+        }
+        .advert-frame-container .sub-url-path {
+            font-size: 14px;
+            font-weight: 800;
+            fill: #ffffff;
+            letter-spacing: 0.5em;
+            opacity: 0.8;
+        }
+
+        .advert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .nav-back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+        .nav-back-link:hover {
+            color: var(--text-primary);
+        }
+
+        /* ======================================================================
+             3. RIGHT SIDE — LOGIN + WELCOME WIZARD
+             ====================================================================== */
+        .login-side {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            background: #020205;
+            overflow-y: auto;
+        }
+
+        /* ---- Shared card container ---- */
+        .card-container {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* ---- Login Card ---- */
+        .login-card {
+            display: block;
+            background: transparent;
+            border: none;
+        }
+        .login-card .brand-header {
+            margin-bottom: 36px;
+            text-align: left;
+        }
+        .main-logo-icon {
+            height: 32px;
+            width: auto;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 0 8px rgba(96, 54, 225, 0.25));
+        }
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .login-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            line-height: 1.5;
+        }
+        .brand-word {
+            font-family: var(--font-brand);
+            font-weight: 800;
+            letter-spacing: -0.045em;
+            background: var(--logo-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .google-signin-btn {
+            width: 100%;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #111111;
+            font-family: var(--font-main);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.1px;
+            cursor: pointer;
+            transition: transform 0.3s var(--ease-expensive),
+                box-shadow 0.3s var(--ease-expensive),
+                background 0.3s ease;
+        }
+        .google-signin-btn:hover {
+            background: #f5f5f5;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+        }
+        .google-signin-btn:active {
+            transform: translateY(0);
+        }
+        .google-signin-btn:disabled {
+            opacity: 0.65;
+            cursor: wait;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .security-notice {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+        }
+        .security-notice-text {
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        .shield-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* ---- Auth Status Pill ---- */
+        .auth-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+        .auth-status-pill::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-magenta);
+            box-shadow: 0 0 12px rgba(216, 61, 194, 0.85);
+        }
+        .auth-status-pill.is-success {
+            color: #fff;
+            border-color: rgba(34, 197, 94, 0.35);
+            background: rgba(34, 197, 94, 0.08);
+        }
+        .auth-status-pill.is-success::before {
+            background: #22c55e;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.95);
+        }
+        .auth-status-pill.is-error {
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.08);
+        }
+        .auth-status-pill.is-error::before {
+            background: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.95);
+        }
+
+        /* ---- Terminal Box ---- */
+        .terminal-box {
+            background: #030308;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin: 20px 0;
+            height: 150px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+        .terminal-line {
+            display: block;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .terminal-line.info {
+            color: #8A8A8A;
+        }
+        .terminal-line.success {
+            color: #22c55e;
+        }
+        .terminal-line.error {
+            color: #ef4444;
+        }
+        .terminal-line.accent {
+            color: var(--accent-magenta);
+        }
+
+        /* ---- Validation Card ---- */
+        .validation-card {
+            display: none;
+            background: transparent;
+            border: none;
+        }
+        .validation-card.is-active {
+            animation: cardLiftIn 0.5s var(--ease-expensive) both;
+        }
+
+        /* ---- WELCOME WIZARD ---- */
+        .wizard-card {
+            display: none;
+            background: transparent;
+            border: none;
+            width: 100%;
+        }
+        .wizard-card.is-active {
+            animation: cardLiftIn 0.5s var(--ease-expensive) both;
+        }
+
+        @keyframes cardLiftIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.97);
+                filter: blur(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        /* Wizard progress dots */
+        .wizard-progress {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 24px 0 20px 0;
+        }
+        .wizard-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            transition: all 0.4s var(--ease-expensive);
+            cursor: pointer;
+        }
+        .wizard-dot.active {
+            background: var(--accent-magenta);
+            box-shadow: 0 0 16px rgba(216, 61, 194, 0.55);
+            transform: scale(1.2);
+        }
+        .wizard-dot.completed {
+            background: var(--accent-violet);
+        }
+
+        /* Wizard step container */
+        .wizard-step {
+            display: none;
+            animation: fadeStep 0.5s var(--ease-expensive) both;
+        }
+        .wizard-step.active {
+            display: block;
+        }
+        @keyframes fadeStep {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .wizard-step .step-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .wizard-step .step-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .wizard-step .step-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* Wizard form elements */
+        .wizard-form-group {
+            margin-bottom: 18px;
+        }
+        .wizard-form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .wizard-form-group input,
+        .wizard-form-group select {
+            width: 100%;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 6px;
+            padding: 0 14px;
+            font-family: var(--font-main);
+            font-size: 13px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s var(--ease-expensive);
+        }
+        .wizard-form-group input::placeholder {
+            color: var(--text-muted);
+        }
+        .wizard-form-group input:focus,
+        .wizard-form-group select:focus {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .wizard-form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8A8A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            color: #fff;
+        }
+        .wizard-form-group select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        /* Wizard radio group (minimal) */
+        .wizard-radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .wizard-radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-expensive);
+        }
+        .wizard-radio-option:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .wizard-radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .wizard-radio-option .radio-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        .wizard-radio-option input[type="radio"]:checked~.radio-dot {
+            border-color: var(--accent-magenta);
+            box-shadow: 0 0 10px rgba(216, 61, 194, 0.4);
+        }
+        .wizard-radio-option input[type="radio"]:checked~.radio-dot::after {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-magenta);
+        }
+        .wizard-radio-option .radio-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+        .wizard-radio-option input[type="radio"]:checked~.radio-label {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* Wizard buttons */
+        .wizard-btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .wizard-btn {
+            flex: 1;
+            height: 44px;
+            border: none;
+            border-radius: 6px;
+            font-family: var(--font-main);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-expensive);
+        }
+        .wizard-btn-primary {
+            background: #FFFFFF;
+            color: #000000;
+        }
+        .wizard-btn-primary:hover {
+            background: rgba(255, 255, 255, 0.85);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        .wizard-btn-secondary {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .wizard-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+        .wizard-btn:disabled {
+            opacity: 0.5;
+            cursor: wait;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Wizard step 1 — welcome avatar */
+        .welcome-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--logo-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+            box-shadow: 0 0 40px rgba(96, 54, 225, 0.25);
+            overflow: hidden;
+        }
+        .welcome-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .welcome-greeting {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 4px;
+        }
+        .welcome-email {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .welcome-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--accent-magenta);
+            background: rgba(216, 61, 194, 0.12);
+            border: 1px solid rgba(216, 61, 194, 0.2);
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin-top: 4px;
+        }
+
+        /* ---- Step 4: Complete ---- */
+        .complete-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--logo-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 16px auto;
+            box-shadow: 0 0 60px rgba(96, 54, 225, 0.3);
+        }
+        .complete-title {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.03em;
+        }
+        .complete-desc {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 1024px) {
+            .app-viewport {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+            }
+            .advert-side {
+                display: none;
+            }
+            .login-side {
+                height: 100vh;
+                padding: 30px 20px;
+            }
+            .card-container {
+                max-width: 400px;
+            }
+        }
+        @media (max-width: 480px) {
+            .login-side {
+                padding: 20px 16px;
+            }
+            .wizard-step .step-title {
+                font-size: 18px;
+            }
+            .wizard-btn-group {
+                flex-direction: column;
+            }
+            .wizard-btn {
+                height: 48px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="app-viewport">
-    <div class="viewport-glow glow-left"></div>
-    
-    <!-- LEFT SIDE: LIVE KINETIC ADVERT STAGE -->
-    <div class="advert-side">
-      <div class="advert-header">
-        <div class="brand-pill">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Emblem">
-          <span>KOMNI</span>
-        </div>
-        <div class="sys-badge">NODE // LIVE-TERMINAL</div>
-      </div>
+    <div class="app-viewport">
+        <div class="viewport-glow glow-left"></div>
 
-      <div class="stage-wrapper">
-        <div class="advert-frame-container">
-          <div class="director-ui">
-            <div class="scene-container">
-              <div class="scene-content active">
-                <h1>KOMNI</h1>
-                <p>Centralized operational governance & payment workflows.</p>
-              </div>
-              <div class="scene-content">
-                <h1>Unified Infrastructure</h1>
-                <p>Connect payment providers with absolute transaction oversight.</p>
-              </div>
-              <div class="scene-content">
-                <h1>Observable Controls</h1>
-                <p>Traceable, structured execution designed for mission-critical operations.</p>
-              </div>
-              <div class="scene-content">
-                <h1>Institutional Resilience</h1>
-                <p>Architected for evolving enterprise requirements & security compliance.</p>
-              </div>
-              <div class="scene-content">
-                <h1>Financial Operations</h1>
-                <p>Bring consistency, speed, and accountability to every workflow.</p>
-              </div>
+        <!-- LEFT: ADVERT -->
+        <div class="advert-side">
+            <div class="advert-header">
+                <div class="brand-pill">
+                    <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Emblem" />
+                    <span>KOMNI</span>
+                </div>
+                <div class="sys-badge">NODE // LIVE-TERMINAL</div>
             </div>
-          </div>
 
-          <div class="finale-stage">
-            <svg class="intro-svg" viewBox="0 0 900 200">
-              <defs>
-                <linearGradient id="svgGradLogin" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color:#6036E1;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#D83DC2;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="fill-text">KOMNI</text>
-              <text x="50%" y="80%" text-anchor="middle" class="sub-url-path">KOMNI.COM</text>
-            </svg>
-          </div>
+            <div class="stage-wrapper">
+                <div class="advert-frame-container">
+                    <div class="director-ui">
+                        <div class="scene-container">
+                            <div class="scene-content active">
+                                <h1>KOMNI</h1>
+                                <p>Centralized operational governance &amp; payment workflows.</p>
+                            </div>
+                            <div class="scene-content">
+                                <h1>Unified Infrastructure</h1>
+                                <p>Connect payment providers with absolute transaction oversight.</p>
+                            </div>
+                            <div class="scene-content">
+                                <h1>Observable Controls</h1>
+                                <p>Traceable, structured execution designed for mission-critical operations.</p>
+                            </div>
+                            <div class="scene-content">
+                                <h1>Institutional Resilience</h1>
+                                <p>Architected for evolving enterprise requirements &amp; security compliance.</p>
+                            </div>
+                            <div class="scene-content">
+                                <h1>Financial Operations</h1>
+                                <p>Bring consistency, speed, and accountability to every workflow.</p>
+                            </div>
+                        </div>
+                    </div>
 
-          <canvas id="loginAdvertCanvas"></canvas>
+                    <div class="finale-stage">
+                        <svg class="intro-svg" viewBox="0 0 900 200">
+                            <defs>
+                                <linearGradient id="svgGradLogin" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#6036E1;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#D83DC2;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="fill-text">KOMNI</text>
+                            <text x="50%" y="80%" text-anchor="middle" class="sub-url-path">KOMNI.COM</text>
+                        </svg>
+                    </div>
+
+                    <canvas id="loginAdvertCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="advert-footer">
+                <a href="index.html" class="nav-back-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Main Platform
+                </a>
+                <span>SOC-2 TYPE II ENCRYPTED</span>
+            </div>
         </div>
-      </div>
 
-      <div class="advert-footer">
-        <a href="index.html" class="nav-back-link">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Back to Main Platform
-        </a>
-        <span>SOC-2 TYPE II ENCRYPTED</span>
-      </div>
+        <!-- RIGHT: LOGIN / WIZARD -->
+        <div class="login-side">
+
+            <div class="card-container">
+
+                <!-- ============================================================
+                1. LOGIN CARD
+                ============================================================ -->
+                <div class="login-card" id="loginCard">
+                    <div class="brand-header">
+                        <h2 class="login-title">Sign into <span class="brand-word">KOMNI</span></h2>
+                        <p class="login-subtitle">Use your Google account to securely authenticate and enter the KOMNI workspace.</p>
+                    </div>
+
+                    <button type="button" class="google-signin-btn" id="googleSignInBtn" onclick="handleGoogleSignIn();">
+                        <span class="google-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="19" height="19">
+                                <path fill="#4285F4" d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.96h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.26Z"/>
+                                <path fill="#34A853" d="M12 21.5c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.93-3.31.93-2.54 0-4.69-1.72-5.46-4.03H3.3v2.53A9.74 9.74 0 0 0 12 21.5Z"/>
+                                <path fill="#FBBC05" d="M6.54 13.59A5.85 5.85 0 0 1 6.23 12c0-.55.11-1.08.31-1.59V7.88H3.3A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.12l3.24-2.53Z"/>
+                                <path fill="#EA4335" d="M12 6.38c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.39 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.38l3.24 2.53C7.31 8.1 9.46 6.38 12 6.38Z"/>
+                            </svg>
+                        </span>
+                        <span id="googleSignInText">Sign in with Google</span>
+                    </button>
+
+                    <div class="security-notice">
+                        <div class="shield-dot"></div>
+                        <div class="security-notice-text">Authentication is handled securely by Firebase. Your Google credentials never pass through KOMNI.</div>
+                    </div>
+                </div>
+
+                <!-- ============================================================
+                2. VALIDATION CARD
+                ============================================================ -->
+                <div class="validation-card" id="validationCard">
+                    <div class="brand-header">
+                        <h2 class="login-title" id="validationTitle">Verifying Issuance Registry</h2>
+                        <p class="login-subtitle">Establishing secure session &amp; indexing your profile…</p>
+                        <div class="auth-status-pill" id="validationStatusPill">Awaiting handshake</div>
+                    </div>
+                    <div class="terminal-box" id="validationTerminal"></div>
+                    <div id="retryButtonContainer" style="display:none; margin-top:15px;">
+                        <button class="wizard-btn wizard-btn-primary" onclick="resetLoginCard();" style="width:100%;">Try Another Key</button>
+                    </div>
+                    <div class="security-notice">
+                        <div class="shield-dot"></div>
+                        <div class="security-notice-text">Out-of-band HSM verification in progress.</div>
+                    </div>
+                </div>
+
+                <!-- ============================================================
+                3. WELCOME WIZARD CARD
+                ============================================================ -->
+                <div class="wizard-card" id="wizardCard">
+
+                    <!-- Progress Dots -->
+                    <div class="wizard-progress" id="wizardProgress">
+                        <span class="wizard-dot active" data-step="0"></span>
+                        <span class="wizard-dot" data-step="1"></span>
+                        <span class="wizard-dot" data-step="2"></span>
+                        <span class="wizard-dot" data-step="3"></span>
+                    </div>
+
+                    <!-- STEP 1: Welcome -->
+                    <div class="wizard-step active" data-step="0">
+                        <div class="welcome-avatar" id="wizardAvatar">
+                            <span id="avatarInitial">K</span>
+                        </div>
+                        <div class="step-label">Step 1 of 4</div>
+                        <div class="step-title welcome-greeting" id="wizardGreeting">Welcome, <span id="wizardName">Guest</span></div>
+                        <div class="step-desc welcome-email" id="wizardEmail">user@example.com</div>
+                        <div class="welcome-badge">Verified Associate</div>
+
+                        <div style="margin-top: 20px; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 16px; border: 1px solid rgba(255,255,255,0.04);">
+                            <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+                                Welcome to the KOMNI enterprise network. Your identity has been securely verified.
+                                Let's complete your profile so we can tailor your workspace experience.
+                            </p>
+                        </div>
+
+                        <div class="wizard-btn-group">
+                            <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Organization -->
+                    <div class="wizard-step" data-step="1">
+                        <div class="step-label">Step 2 of 4</div>
+                        <div class="step-title">Your Organization</div>
+                        <div class="step-desc">Tell us about your company so we can align your governance posture.</div>
+
+                        <div class="wizard-form-group">
+                            <label for="wizCompany">Company Name</label>
+                            <input type="text" id="wizCompany" placeholder="e.g. Acme Corp" autocomplete="organization" />
+                        </div>
+
+                        <div class="wizard-form-group">
+                            <label for="wizIndustry">Industry</label>
+                            <select id="wizIndustry">
+                                <option value="">Select industry…</option>
+                                <option value="fintech">Fintech</option>
+                                <option value="banking">Banking &amp; Finance</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="retail">Retail &amp; E‑commerce</option>
+                                <option value="technology">Technology / SaaS</option>
+                                <option value="logistics">Logistics &amp; Supply Chain</option>
+                                <option value="energy">Energy &amp; Utilities</option>
+                                <option value="education">Education</option>
+                                <option value="government">Government / Public Sector</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="wizard-form-group">
+                            <label for="wizRole">Your Role</label>
+                            <input type="text" id="wizRole" placeholder="e.g. VP of Operations" autocomplete="job-title" />
+                        </div>
+
+                        <div class="wizard-btn-group">
+                            <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev()">← Back</button>
+                            <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Preferences -->
+                    <div class="wizard-step" data-step="2">
+                        <div class="step-label">Step 3 of 4</div>
+                        <div class="step-title">Workspace Preferences</div>
+                        <div class="step-desc">Configure how you'd like to interact with the KOMNI console.</div>
+
+                        <div class="wizard-form-group">
+                            <label>Operating Posture</label>
+                            <div class="wizard-radio-group">
+                                <label class="wizard-radio-option">
+                                    <input type="radio" name="wizPosture" value="strict" checked />
+                                    <span class="radio-dot"></span>
+                                    <span class="radio-label">Strict — full governance oversight</span>
+                                </label>
+                                <label class="wizard-radio-option">
+                                    <input type="radio" name="wizPosture" value="balanced" />
+                                    <span class="radio-dot"></span>
+                                    <span class="radio-label">Balanced — operational flexibility</span>
+                                </label>
+                                <label class="wizard-radio-option">
+                                    <input type="radio" name="wizPosture" value="agile" />
+                                    <span class="radio-dot"></span>
+                                    <span class="radio-label">Agile — rapid iteration mode</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="wizard-form-group">
+                            <label>Notification Cadence</label>
+                            <div class="wizard-radio-group">
+                                <label class="wizard-radio-option">
+                                    <input type="radio" name="wizNotify" value="email" checked />
+                                    <span class="radio-dot"></span>
+                                    <span class="radio-label">Email summaries (daily)</span>
+                                </label>
+                                <label class="wizard-radio-option">
+                                    <input type="radio" name="wizNotify" value="console" />
+                                    <span class="radio-dot"></span>
+                                    <span class="radio-label">Console‑only updates</span>
+                                </label>
+                                <label class="wizard-radio-option">
+                                    <input type="radio" name="wizNotify" value="both" />
+                                    <span class="radio-dot"></span>
+                                    <span class="radio-label">Both email &amp; console</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="wizard-btn-group">
+                            <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev()">← Back</button>
+                            <button class="wizard-btn wizard-btn-primary" onclick="wizardNext()">Continue →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: Complete -->
+                    <div class="wizard-step" data-step="3">
+                        <div class="complete-icon">✓</div>
+                        <div class="step-label" style="text-align:center;">Step 4 of 4</div>
+                        <div class="complete-title">All Set, <span id="completeName">Guest</span>!</div>
+                        <div class="complete-desc">Your profile has been indexed and your workspace is being provisioned.<br />Ready to enter the KOMNI dashboard.</div>
+
+                        <div style="margin-top:24px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.15); border-radius:8px; padding:14px; text-align:center;">
+                            <span style="font-size:12px; color:#22c55e; font-weight:500;">✓ Firestore registration complete</span>
+                            <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Your enterprise profile is now active.</span>
+                        </div>
+
+                        <div class="wizard-btn-group">
+                            <button class="wizard-btn wizard-btn-primary" id="wizardLaunchBtn" onclick="launchDashboard();" style="width:100%;">
+                                Enter Dashboard →
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end wizard-card -->
+
+            </div>
+            <!-- end card-container -->
+
+        </div>
+        <!-- end login-side -->
+
     </div>
+    <!-- end app-viewport -->
 
-    <!-- RIGHT SIDE: CLEAN ISSUANCE KEY LOGIN TERMINAL -->
-    <div class="login-side">
-      
-      <!-- 1. INITIAL LOGIN CARD -->
-      <div class="login-card" id="loginCard">
-        <div class="brand-header">
-          <h2 class="login-title">Sign into <span class="brand-word">KOMNI</span></h2>
-          <p class="login-subtitle">Use your Google account to securely authenticate and enter the KOMNI workspace.</p>
-        </div>
 
-        <button type="button" class="google-signin-btn" id="googleSignInBtn" onclick="handleGoogleSignIn();">
-          <span class="google-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="19" height="19">
-              <path fill="#4285F4" d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.96h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.26Z"/>
-              <path fill="#34A853" d="M12 21.5c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.93-3.31.93-2.54 0-4.69-1.72-5.46-4.03H3.3v2.53A9.74 9.74 0 0 0 12 21.5Z"/>
-              <path fill="#FBBC05" d="M6.54 13.59A5.85 5.85 0 0 1 6.23 12c0-.55.11-1.08.31-1.59V7.88H3.3A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.12l3.24-2.53Z"/>
-              <path fill="#EA4335" d="M12 6.38c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.39 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.38l3.24 2.53C7.31 8.1 9.46 6.38 12 6.38Z"/>
-            </svg>
-          </span>
-          <span id="googleSignInText">Sign in with Google</span>
-        </button>
+    <!-- ======================================================================
+    SCRIPT ENGINE
+    ====================================================================== -->
+    <script>
+        /* ====================================================================
+           FIREBASE CONFIG
+           ==================================================================== */
+        const firebaseConfig = {
+            apiKey: "AIzaSyCAGeF1z2VW5lf0qUcOio2MVNZ8vWTHHWg",
+            authDomain: "komni-eb72e.firebaseapp.com",
+            projectId: "komni-eb72e",
+            storageBucket: "komni-eb72e.firebasestorage.app",
+            messagingSenderId: "754396573424",
+            appId: "1:754396573424:web:87b1638b20903dae94dc35",
+            measurementId: "G-6GZYWR2G78"
+        };
 
-        <div class="security-notice">
-          <div class="shield-dot"></div>
-          <div class="security-notice-text">Authentication is handled securely by Firebase. Your Google credentials never pass through KOMNI.</div>
-        </div>
-      </div>
+        let firebaseApp, firebaseAuth, firestore;
 
-      <!-- 2. VALIDATION CARD -->
-      <div class="validation-card" id="validationCard">
-        <div class="brand-header">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title" id="validationTitle">Verifying Issuance Registry</h2>
-          <p class="login-subtitle">Establishing connection to the secure Firebase gatekeeper...</p>
-          <div class="auth-status-pill" id="validationStatusPill">Awaiting registry handshake</div>
-        </div>
-        
-        <div class="terminal-box" id="validationTerminal"></div>
-
-        <div id="retryButtonContainer" style="display: none; margin-top: 15px;">
-          <button class="submit-btn" onclick="resetLoginCard();">
-            <span>Try Another Key</span>
-          </button>
-        </div>
-
-        <div class="security-notice">
-          <div class="shield-dot"></div>
-          <div class="security-notice-text">Out-of-band HSM verification in progress.</div>
-        </div>
-      </div>
-
-      <!-- 3. SURVEY CARD -->
-      <div class="survey-card" id="surveyCard">
-        <div class="brand-header">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title">Configure Client Preferences</h2>
-          <p class="login-subtitle">Google identity verified. Confirm your workspace preferences before the dashboard loads.</p>
-          <div class="auth-status-pill" id="surveyStatusPill">Preference profile required</div>
-        </div>
-
-        <form id="surveyForm" onsubmit="handleSurveySubmit(event);">
-          <div class="custom-survey-group">
-            <span class="survey-question">Preferred Operating Posture</span>
-            <div class="survey-options">
-              <label class="survey-option">
-                <input type="radio" name="govProfile" value="strict" checked>
-                <div class="option-dot"></div>
-                <div class="option-text">Strict issuance controls</div>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="govProfile" value="balanced">
-                <div class="option-dot"></div>
-                <div class="option-text">Balanced operations</div>
-              </label>
-            </div>
-          </div>
-
-          <div class="custom-survey-group">
-            <span class="survey-question">Notification Cadence</span>
-            <div class="survey-options">
-              <label class="survey-option">
-                <input type="radio" name="endpoint" value="email" checked>
-                <div class="option-dot"></div>
-                <div class="option-text">Email summaries</div>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="endpoint" value="console">
-                <div class="option-dot"></div>
-                <div class="option-text">Console-only updates</div>
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" class="submit-btn">
-            <span>Finalize Preference Profile</span>
-          </button>
-        </form>
-      </div>
-
-      <!-- 4. SETUP CARD -->
-      <div class="setup-card" id="setupCard">
-        <div class="brand-header">
-          <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title">Provisioning Issued Workspace</h2>
-          <p class="login-subtitle">Identity verified. Preparing the dashboard shell and neutral telemetry.</p>
-          <div class="auth-status-pill" id="setupStatusPill">Building dashboard shell</div>
-        </div>
-
-        <div class="terminal-box" id="setupTerminal"></div>
-
-        <div class="setup-progress-container">
-          <div class="progress-bar-wrapper">
-            <div class="progress-bar-fill" id="setupProgressBar"></div>
-          </div>
-          <div class="progress-label-group">
-            <span class="progress-status-text" id="setupProgressStatus">Extracting packages...</span>
-            <span class="progress-percentage" id="setupProgressPercentage">0%</span>
-          </div>
-        </div>
-
-        <button class="submit-btn" id="launchDashboardBtn" style="display: none;" onclick="launchDashboard();">
-          <span>Enter Issued Dashboard</span>
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- SCRIPT ENGINE -->
-  <script>
-    // Live Backend Vercel Endpoint
-    const VERCEL_BACKEND_URL = 'https://komni-backend.vercel.app/api/verify_key';
-
-    document.addEventListener('DOMContentLoaded', () => {
-      // Background Dynamic Particle Engine
-      class DynamicParticle {
-        constructor(canvasRef) { 
-          this.canvas = canvasRef;
-          this.reset(true); 
-        }
-        reset(init = false) {
-          const w = this.canvas.width || 800;
-          const h = this.canvas.height || 450;
-          this.x = (Math.random() - 0.5) * w * 3;
-          this.y = (Math.random() - 0.5) * h * 3;
-          this.z = init ? Math.random() * 1800 : 1800;
-          this.pz = this.z;
-          this.size = Math.random() * 2 + 1;
-          this.color = Math.random() > 0.4 ? '#6036E1' : '#D83DC2';
-        }
-        update(speed) {
-          this.pz = this.z;
-          this.z -= speed;
-          if (this.z < 1) this.reset();
-        }
-        draw(ctx, speedFactor) {
-          const w = this.canvas.width || 800;
-          const h = this.canvas.height || 450;
-          const s = 600 / this.z;
-          const ps = 600 / this.pz;
-          const x = this.x * s + w / 2;
-          const y = this.y * s + h / 2;
-          const px = this.x * ps + w / 2;
-          const py = this.y * ps + h / 2;
-
-          const alpha = Math.min(0.8, (1800 - this.z) / 1000);
-          if (alpha <= 0.01) return;
-          ctx.strokeStyle = this.color === '#6036E1' ? `rgba(96, 54, 225, ${alpha})` : `rgba(216, 61, 194, ${alpha})`;
-          ctx.lineWidth = this.size * s * (speedFactor * 0.2);
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(px, py);
-          ctx.stroke();
-        }
-      }
-
-      function initAdvertEngine(canvasId, containerSelector) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return null;
-        
-        const ctx = canvas.getContext('2d');
-        const container = canvas.closest(containerSelector);
-        const scenes = container.querySelectorAll('.scene-content');
-        const finaleStage = container.querySelector('.finale-stage');
-        
-        let width = 0, height = 0, currentScene = 0, frame = 0;
-        const SCENE_DURATION = 160; 
-        let isActive = true;
-        let currentSpeed = 12;
-
-        function resize() {
-          width = canvas.width = container.clientWidth;
-          height = canvas.height = container.clientHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        const particles = Array.from({ length: 350 }, () => new DynamicParticle(canvas));
-
-        function cycleScenes() {
-          if (!isActive) return;
-          const current = scenes[currentScene];
-          currentScene = (currentScene + 1) % (scenes.length + 1);
-
-          if (currentScene === scenes.length) {
-            current.classList.remove('active');
-            current.classList.add('exit');
-            finaleStage.classList.add('active');
-            
-            gsap.to({ speed: 12 }, { 
-              speed: 45, 
-              duration: 1.5, 
-              onUpdate: function() { currentSpeed = this.targets()[0].speed; },
-              onComplete: () => {
-                setTimeout(() => {
-                  if (!isActive) return;
-                  finaleStage.classList.remove('active');
-                  gsap.to({ speed: 45 }, { 
-                    speed: 12, 
-                    duration: 1.5, 
-                    onUpdate: function() { currentSpeed = this.targets()[0].speed; } 
-                  });
-                  
-                  scenes.forEach(s => s.classList.remove('active', 'exit'));
-                  currentScene = 0;
-                  scenes[0].classList.add('active');
-                }, 2500);
-              }
-            });
-          } else {
-            const prev = container.querySelector('.scene-content.active');
-            if (prev) {
-              prev.classList.remove('active');
-              prev.classList.add('exit');
-              setTimeout(() => prev.classList.remove('exit'), 1000);
-            }
-            scenes[currentScene].classList.add('active');
-          }
+        try {
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            firebaseAuth = firebase.auth();
+            firestore = firebase.firestore();
+            // Enable offline persistence
+            firestore.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+        } catch (e) {
+            console.error("Firebase init error:", e);
         }
 
-        function render() {
-          if (!isActive) return;
-          frame++;
-          if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
-            frame = 0;
-            cycleScenes();
-          }
+        /* ====================================================================
+           STATE
+           ==================================================================== */
+        let currentWizardStep = 0;
+        const TOTAL_STEPS = 4;
+        let wizardUserData = null; // populated after auth
 
-          ctx.fillStyle = 'rgba(3, 3, 8, 0.25)'; 
-          ctx.fillRect(0, 0, width, height);
-
-          ctx.lineCap = 'round';
-          const speedFactor = currentSpeed / 12;
-          particles.forEach(p => {
-            p.update(currentSpeed);
-            p.draw(ctx, speedFactor);
-          });
-
-          requestAnimationFrame(render);
-        }
-
-        render();
-      }
-
-      initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
-    });
-
-    // Firebase Authentication
-    const firebaseConfig = {
-  apiKey: "AIzaSyCAGeF1z2VW5lf0qUcOio2MVNZ8vWTHHWg",
-  authDomain: "komni-eb72e.firebaseapp.com",
-  projectId: "komni-eb72e",
-  storageBucket: "komni-eb72e.firebasestorage.app",
-  messagingSenderId: "754396573424",
-  appId: "1:754396573424:web:87b1638b20903dae94dc35",
-  measurementId: "G-6GZYWR2G78"
-};
-
-    let firebaseApp;
-    let firebaseAuth;
-
-    try {
-      firebaseApp = firebase.initializeApp(firebaseConfig);
-      firebaseAuth = firebase.auth();
-      handleGoogleRedirectResult();
-    } catch (error) {
-      console.error("Firebase initialization failed:", error);
-    }
-
-    async function handleGoogleSignIn() {
-      const button = document.getElementById('googleSignInBtn');
-      const buttonText = document.getElementById('googleSignInText');
-
-      if (!firebaseAuth) {
-        showAuthError('Firebase authentication could not be initialized.');
-        return;
-      }
-
-      button.disabled = true;
-      buttonText.textContent = 'Opening Google...';
-
-      try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-
-        // Full-page Google authentication. No popup is used.
-        await firebaseAuth.signInWithRedirect(provider);
-      } catch (error) {
-        console.error('Google redirect sign-in failed:', error);
-        button.disabled = false;
-        buttonText.textContent = 'Sign in with Google';
-        showAuthError(error?.message || 'Unable to open Google sign-in.');
-      }
-    }
-
-    async function handleGoogleRedirectResult() {
-      if (!firebaseAuth) return;
-
-      try {
-        const result = await firebaseAuth.getRedirectResult();
-        const user = result && result.user;
-        if (!user) return;
-
-        sessionStorage.setItem('komniAuthUser', JSON.stringify({
-          uid: user.uid,
-          displayName: user.displayName || '',
-          email: user.email || '',
-          photoURL: user.photoURL || ''
-        }));
-
+        /* ====================================================================
+           DOM REFS
+           ==================================================================== */
         const loginCard = document.getElementById('loginCard');
-        const valCard = document.getElementById('validationCard');
-        const term = document.getElementById('validationTerminal');
-        const pill = document.getElementById('validationStatusPill');
+        const validationCard = document.getElementById('validationCard');
+        const wizardCard = document.getElementById('wizardCard');
+        const validationTerminal = document.getElementById('validationTerminal');
+        const validationStatusPill = document.getElementById('validationStatusPill');
+        const retryContainer = document.getElementById('retryButtonContainer');
 
-        loginCard.style.display = 'none';
-        valCard.style.display = 'block';
-        valCard.classList.add('is-active');
+        /* ====================================================================
+           ADVERT ENGINE (background particles)
+           ==================================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            class DynamicParticle {
+                constructor(canvasRef) {
+                    this.canvas = canvasRef;
+                    this.reset(true);
+                }
+                reset(init = false) {
+                    const w = this.canvas.width || 800;
+                    const h = this.canvas.height || 450;
+                    this.x = (Math.random() - 0.5) * w * 3;
+                    this.y = (Math.random() - 0.5) * h * 3;
+                    this.z = init ? Math.random() * 1800 : 1800;
+                    this.pz = this.z;
+                    this.size = Math.random() * 2 + 1;
+                    this.color = Math.random() > 0.4 ? '#6036E1' : '#D83DC2';
+                }
+                update(speed) {
+                    this.pz = this.z;
+                    this.z -= speed;
+                    if (this.z < 1) this.reset();
+                }
+                draw(ctx, speedFactor) {
+                    const w = this.canvas.width || 800;
+                    const h = this.canvas.height || 450;
+                    const s = 600 / this.z;
+                    const ps = 600 / this.pz;
+                    const x = this.x * s + w / 2;
+                    const y = this.y * s + h / 2;
+                    const px = this.x * ps + w / 2;
+                    const py = this.y * ps + h / 2;
+                    const alpha = Math.min(0.8, (1800 - this.z) / 1000);
+                    if (alpha <= 0.01) return;
+                    ctx.strokeStyle = this.color === '#6036E1' ?
+                        `rgba(96, 54, 225, ${alpha})` :
+                        `rgba(216, 61, 194, ${alpha})`;
+                    ctx.lineWidth = this.size * s * (speedFactor * 0.2);
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(px, py);
+                    ctx.stroke();
+                }
+            }
 
-        pill.className = 'auth-status-pill is-success';
-        pill.innerText = 'Google Authentication Complete';
+            function initAdvertEngine(canvasId, containerSelector) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const container = canvas.closest(containerSelector);
+                const scenes = container.querySelectorAll('.scene-content');
+                const finaleStage = container.querySelector('.finale-stage');
+                let width = 0,
+                    height = 0,
+                    currentScene = 0,
+                    frame = 0;
+                const SCENE_DURATION = 160;
+                let isActive = true;
+                let currentSpeed = 12;
 
-        term.innerHTML =
-          '<span class="terminal-line info">> Initializing secure Google identity handshake...</span>' +
-          '<span class="terminal-line accent">> Verifying Firebase Authentication session...</span>' +
-          `<span class="terminal-line success">> Identity verified: ${escapeHtml(user.email || 'Google account')}</span>` +
-          '<span class="terminal-line success">> Firebase session established [200 OK]</span>';
+                function resize() {
+                    width = canvas.width = container.clientWidth;
+                    height = canvas.height = container.clientHeight;
+                }
+                window.addEventListener('resize', resize);
+                resize();
 
-        setTimeout(() => {
-          valCard.style.display = 'none';
-          const surveyCard = document.getElementById('surveyCard');
-          surveyCard.style.display = 'block';
-          surveyCard.classList.add('is-active');
-        }, 1100);
+                const particles = Array.from({ length: 350 }, () => new DynamicParticle(canvas));
 
-      } catch (error) {
-        console.error('Google redirect result failed:', error);
-        showAuthError(error?.message || 'Unable to complete Google sign-in.');
-      }
-    }
+                function cycleScenes() {
+                    if (!isActive) return;
+                    const current = scenes[currentScene];
+                    currentScene = (currentScene + 1) % (scenes.length + 1);
 
-    function showAuthError(message) {
-      const existing = document.getElementById('googleAuthError');
-      if (existing) existing.remove();
+                    if (currentScene === scenes.length) {
+                        current.classList.remove('active');
+                        current.classList.add('exit');
+                        finaleStage.classList.add('active');
+                        gsap.to({ speed: 12 }, {
+                            speed: 45,
+                            duration: 1.5,
+                            onUpdate: function() { currentSpeed = this.targets()[0].speed; },
+                            onComplete: () => {
+                                setTimeout(() => {
+                                    if (!isActive) return;
+                                    finaleStage.classList.remove('active');
+                                    gsap.to({ speed: 45 }, {
+                                        speed: 12,
+                                        duration: 1.5,
+                                        onUpdate: function() { currentSpeed = this.targets()[0]
+                                                .speed; }
+                                    });
+                                    scenes.forEach(s => s.classList.remove('active', 'exit'));
+                                    currentScene = 0;
+                                    scenes[0].classList.add('active');
+                                }, 2500);
+                            }
+                        });
+                    } else {
+                        const prev = container.querySelector('.scene-content.active');
+                        if (prev) {
+                            prev.classList.remove('active');
+                            prev.classList.add('exit');
+                            setTimeout(() => prev.classList.remove('exit'), 1000);
+                        }
+                        scenes[currentScene].classList.add('active');
+                    }
+                }
 
-      const error = document.createElement('div');
-      error.id = 'googleAuthError';
-      error.className = 'auth-status-pill is-error';
-      error.style.marginTop = '14px';
-      error.style.width = '100%';
-      error.style.justifyContent = 'center';
-      error.style.textTransform = 'none';
-      error.style.letterSpacing = '0';
-      error.textContent = message;
+                function render() {
+                    if (!isActive) return;
+                    frame++;
+                    if (frame >= SCENE_DURATION && currentScene !== scenes.length) {
+                        frame = 0;
+                        cycleScenes();
+                    }
+                    ctx.fillStyle = 'rgba(3, 3, 8, 0.25)';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.lineCap = 'round';
+                    const speedFactor = currentSpeed / 12;
+                    particles.forEach(p => {
+                        p.update(currentSpeed);
+                        p.draw(ctx, speedFactor);
+                    });
+                    requestAnimationFrame(render);
+                }
+                render();
+            }
 
-      document.getElementById('googleSignInBtn').insertAdjacentElement('afterend', error);
-    }
+            initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
 
-    function escapeHtml(value) {
-      return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+            // Check for redirect result on load
+            handleGoogleRedirectResult();
+        });
 
-    function resetLoginCard() {
-      document.getElementById('validationCard').style.display = 'none';
-      const loginCard = document.getElementById('loginCard');
-      loginCard.style.display = 'block';
 
-      const button = document.getElementById('googleSignInBtn');
-      const buttonText = document.getElementById('googleSignInText');
-      button.disabled = false;
-      buttonText.textContent = 'Sign in with Google';
+        /* ====================================================================
+           GOOGLE SIGN-IN
+           ==================================================================== */
+        async function handleGoogleSignIn() {
+            const button = document.getElementById('googleSignInBtn');
+            const text = document.getElementById('googleSignInText');
+            if (!firebaseAuth) {
+                showAuthError('Firebase auth unavailable.');
+                return;
+            }
+            button.disabled = true;
+            text.textContent = 'Opening Google…';
 
-      const error = document.getElementById('googleAuthError');
-      if (error) error.remove();
-    }
-
-    function handleSurveySubmit(e) {
-      e.preventDefault();
-      document.getElementById('surveyCard').style.display = 'none';
-      const setupCard = document.getElementById('setupCard');
-      setupCard.style.display = 'block';
-      setupCard.classList.add('is-active');
-
-      let progress = 0;
-      const bar = document.getElementById('setupProgressBar');
-      const pct = document.getElementById('setupProgressPercentage');
-      const status = document.getElementById('setupProgressStatus');
-      const term = document.getElementById('setupTerminal');
-
-      term.innerHTML = '<span class="terminal-line info">> Provisioning workspace environment...</span>';
-
-      const interval = setInterval(() => {
-        progress += 10;
-        bar.style.width = progress + '%';
-        pct.innerText = progress + '%';
-
-        if (progress === 40) {
-          status.innerText = 'Binding telemetry sockets...';
-          term.innerHTML += '<span class="terminal-line accent">> Telemetry channel established.</span>';
-        } else if (progress === 80) {
-          status.innerText = 'Applying client preferences...';
-          term.innerHTML += '<span class="terminal-line info">> Governance posture attached.</span>';
-        } else if (progress >= 100) {
-          clearInterval(interval);
-          status.innerText = 'Workspace Ready';
-          term.innerHTML += '<span class="terminal-line success">> Shell compiled successfully.</span>';
-          document.getElementById('launchDashboardBtn').style.display = 'block';
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
+                await firebaseAuth.signInWithRedirect(provider);
+            } catch (err) {
+                console.error(err);
+                button.disabled = false;
+                text.textContent = 'Sign in with Google';
+                showAuthError(err?.message || 'Unable to open Google sign-in.');
+            }
         }
-      }, 300);
-    }
 
-    function launchDashboard() {
-      window.location.href = 'dashboard.html#issued';
-    }
-  </script>
+
+        /* ====================================================================
+           HANDLE REDIRECT RESULT + FIRESTORE INDEXING
+           ==================================================================== */
+        async function handleGoogleRedirectResult() {
+            if (!firebaseAuth) return;
+            try {
+                const result = await firebaseAuth.getRedirectResult();
+                const user = result && result.user;
+                if (!user) return;
+
+                // --- 1. Index / update user in Firestore ---
+                await indexUserInFirestore(user);
+
+                // --- 2. Store session ---
+                sessionStorage.setItem('komniAuthUser', JSON.stringify({
+                    uid: user.uid,
+                    displayName: user.displayName || '',
+                    email: user.email || '',
+                    photoURL: user.photoURL || ''
+                }));
+
+                // --- 3. Show validation -> then wizard ---
+                showValidationCard(user);
+
+            } catch (err) {
+                console.error('Redirect result error:', err);
+                showAuthError(err?.message || 'Unable to complete sign-in.');
+            }
+        }
+
+
+        /* ====================================================================
+           FIRESTORE INDEXING
+           ==================================================================== */
+        async function indexUserInFirestore(user) {
+            if (!firestore || !user) return;
+
+            const userRef = firestore.collection('users').doc(user.uid);
+            const now = firebase.firestore.FieldValue.serverTimestamp();
+            const doc = await userRef.get();
+            const exists = doc.exists;
+
+            const baseData = {
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || '',
+                photoURL: user.photoURL || '',
+                lastSignInAt: now,
+                signInCount: firebase.firestore.FieldValue.increment(1),
+                status: 'active',
+                metadata: {
+                    authProvider: 'google',
+                    lastSignInAt: new Date().toISOString(),
+                    userAgent: navigator.userAgent || ''
+                }
+            };
+
+            if (exists) {
+                // Update existing
+                await userRef.update({
+                    ...baseData,
+                    // preserve enterprise fields if they exist
+                    company: doc.data().company || '',
+                    industry: doc.data().industry || '',
+                    department: doc.data().department || '',
+                    jobRole: doc.data().jobRole || '',
+                    operatingPosture: doc.data().operatingPosture || 'balanced',
+                    notificationCadence: doc.data().notificationCadence || 'email',
+                });
+                // Store for wizard prefill
+                wizardUserData = {
+                    ...doc.data(),
+                    ...baseData,
+                    isNew: false
+                };
+            } else {
+                // New user – create with defaults
+                const newData = {
+                    ...baseData,
+                    createdAt: now,
+                    company: '',
+                    industry: '',
+                    department: '',
+                    jobRole: '',
+                    operatingPosture: 'balanced',
+                    notificationCadence: 'email',
+                    isOnboarded: false,
+                    signInCount: 1
+                };
+                await userRef.set(newData);
+                wizardUserData = { ...newData, isNew: true };
+            }
+
+            // Also store a "clients" collection for B2B indexing
+            const clientRef = firestore.collection('clients').doc(user.uid);
+            const clientDoc = await clientRef.get();
+            if (!clientDoc.exists) {
+                await clientRef.set({
+                    uid: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || '',
+                    status: 'active',
+                    registeredAt: now,
+                    type: 'associate',
+                    metadata: {
+                        source: 'google_oauth',
+                        registeredVia: 'login.komni.com'
+                    }
+                });
+            } else {
+                await clientRef.update({
+                    lastSeenAt: now,
+                    status: 'active'
+                });
+            }
+
+            return { exists, data: wizardUserData };
+        }
+
+
+        /* ====================================================================
+           SHOW VALIDATION CARD → WIZARD
+           ==================================================================== */
+        function showValidationCard(user) {
+            loginCard.style.display = 'none';
+            validationCard.style.display = 'block';
+            validationCard.classList.add('is-active');
+
+            const pill = validationStatusPill;
+            const term = validationTerminal;
+
+            pill.className = 'auth-status-pill is-success';
+            pill.innerText = 'Google Authentication Complete';
+
+            const email = user.email || 'Google account';
+            const name = user.displayName || 'Associate';
+
+            term.innerHTML =
+                '<span class="terminal-line info">> Initializing secure Google identity handshake…</span>' +
+                '<span class="terminal-line accent">> Verifying Firebase Authentication session…</span>' +
+                `<span class="terminal-line success">> Identity verified: ${escapeHtml(email)}</span>` +
+                '<span class="terminal-line success">> Firebase session established [200 OK]</span>' +
+                '<span class="terminal-line info">> Indexing profile in Firestore…</span>';
+
+            // Firestore indexing already done in handleGoogleRedirectResult
+            // Add a small delay then show wizard
+            setTimeout(() => {
+                term.innerHTML += '<span class="terminal-line success">> Firestore registration complete ✓</span>';
+                term.innerHTML += `<span class="terminal-line accent">> Welcome, ${escapeHtml(name)}</span>`;
+            }, 600);
+
+            setTimeout(() => {
+                validationCard.style.display = 'none';
+                launchWizard(user);
+            }, 1400);
+        }
+
+
+        /* ====================================================================
+           LAUNCH WIZARD
+           ==================================================================== */
+        function launchWizard(user) {
+            wizardCard.style.display = 'block';
+            wizardCard.classList.add('is-active');
+
+            // Pre-fill user info
+            const name = user.displayName || 'Guest';
+            const email = user.email || 'user@example.com';
+            const photo = user.photoURL || '';
+
+            document.getElementById('wizardName').textContent = name;
+            document.getElementById('wizardEmail').textContent = email;
+            document.getElementById('completeName').textContent = name;
+
+            const avatarEl = document.getElementById('wizardAvatar');
+            if (photo) {
+                avatarEl.innerHTML = `<img src="${photo}" alt="${name}" />`;
+            } else {
+                avatarEl.innerHTML = `<span id="avatarInitial">${name.charAt(0).toUpperCase()}</span>`;
+            }
+
+            // Pre-fill wizardUserData if we have it from Firestore
+            if (wizardUserData) {
+                if (wizardUserData.company) document.getElementById('wizCompany').value = wizardUserData.company;
+                if (wizardUserData.industry) document.getElementById('wizIndustry').value = wizardUserData.industry;
+                if (wizardUserData.jobRole) document.getElementById('wizRole').value = wizardUserData.jobRole;
+                if (wizardUserData.operatingPosture) {
+                    const posture = wizardUserData.operatingPosture;
+                    const radio = document.querySelector(`input[name="wizPosture"][value="${posture}"]`);
+                    if (radio) radio.checked = true;
+                }
+                if (wizardUserData.notificationCadence) {
+                    const cadence = wizardUserData.notificationCadence;
+                    const radio = document.querySelector(`input[name="wizNotify"][value="${cadence}"]`);
+                    if (radio) radio.checked = true;
+                }
+                // If user already onboarded, skip to step 4?
+                if (wizardUserData.isOnboarded) {
+                    // Skip to step 4 directly
+                    currentWizardStep = 3;
+                    updateWizardUI();
+                }
+            }
+
+            currentWizardStep = 0;
+            updateWizardUI();
+
+            // Show "Enter Dashboard" if returning user with full profile
+            if (wizardUserData && wizardUserData.isOnboarded && wizardUserData.company) {
+                // They're already onboarded, let them skip
+                document.querySelector('.wizard-btn-group .wizard-btn-primary').textContent = 'Enter Dashboard →';
+                document.querySelector('.wizard-btn-group .wizard-btn-primary').onclick = launchDashboard;
+            }
+        }
+
+
+        /* ====================================================================
+           WIZARD NAVIGATION
+           ==================================================================== */
+        function wizardNext() {
+            // Validate step
+            if (currentWizardStep === 1) {
+                const company = document.getElementById('wizCompany').value.trim();
+                if (!company) {
+                    document.getElementById('wizCompany').focus();
+                    document.getElementById('wizCompany').style.borderColor = '#ef4444';
+                    setTimeout(() => {
+                        document.getElementById('wizCompany').style.borderColor = '';
+                    }, 1500);
+                    return;
+                }
+            }
+
+            if (currentWizardStep < TOTAL_STEPS - 1) {
+                currentWizardStep++;
+                updateWizardUI();
+                // If we reached step 4, save data to Firestore
+                if (currentWizardStep === 3) {
+                    saveWizardData();
+                }
+            }
+        }
+
+        function wizardPrev() {
+            if (currentWizardStep > 0) {
+                currentWizardStep--;
+                updateWizardUI();
+            }
+        }
+
+        function updateWizardUI() {
+            const steps = document.querySelectorAll('.wizard-step');
+            const dots = document.querySelectorAll('.wizard-dot');
+
+            steps.forEach((s, i) => {
+                s.classList.toggle('active', i === currentWizardStep);
+            });
+
+            dots.forEach((d, i) => {
+                d.classList.remove('active', 'completed');
+                if (i === currentWizardStep) d.classList.add('active');
+                else if (i < currentWizardStep) d.classList.add('completed');
+            });
+
+            // Special: if step 4, update launch button text
+            if (currentWizardStep === 3) {
+                const launchBtn = document.getElementById('wizardLaunchBtn');
+                if (launchBtn) {
+                    launchBtn.textContent = 'Enter Dashboard →';
+                }
+            }
+        }
+
+
+        /* ====================================================================
+           SAVE WIZARD DATA TO FIRESTORE
+           ==================================================================== */
+        async function saveWizardData() {
+            const user = firebaseAuth.currentUser;
+            if (!user || !firestore) return;
+
+            const company = document.getElementById('wizCompany').value.trim() || '';
+            const industry = document.getElementById('wizIndustry').value || '';
+            const jobRole = document.getElementById('wizRole').value.trim() || '';
+            const posture = document.querySelector('input[name="wizPosture"]:checked')?.value || 'balanced';
+            const notify = document.querySelector('input[name="wizNotify"]:checked')?.value || 'email';
+
+            const payload = {
+                company,
+                industry,
+                jobRole,
+                operatingPosture: posture,
+                notificationCadence: notify,
+                isOnboarded: true,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await firestore.collection('users').doc(user.uid).update(payload);
+                // Also update client record
+                await firestore.collection('clients').doc(user.uid).update({
+                    company,
+                    industry,
+                    jobRole,
+                    status: 'active',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log('Wizard data saved to Firestore.');
+            } catch (err) {
+                console.error('Firestore save error:', err);
+            }
+        }
+
+
+        /* ====================================================================
+           LAUNCH DASHBOARD
+           ==================================================================== */
+        function launchDashboard() {
+            // Save data one more time before redirect
+            saveWizardData().then(() => {
+                window.location.href = 'dashboard.html#issued';
+            }).catch(() => {
+                window.location.href = 'dashboard.html#issued';
+            });
+        }
+
+
+        /* ====================================================================
+           HELPERS
+           ==================================================================== */
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function showAuthError(message) {
+            const existing = document.getElementById('googleAuthError');
+            if (existing) existing.remove();
+            const error = document.createElement('div');
+            error.id = 'googleAuthError';
+            error.className = 'auth-status-pill is-error';
+            error.style.marginTop = '14px';
+            error.style.width = '100%';
+            error.style.justifyContent = 'center';
+            error.style.textTransform = 'none';
+            error.style.letterSpacing = '0';
+            error.textContent = message;
+            document.getElementById('googleSignInBtn').insertAdjacentElement('afterend', error);
+        }
+
+        function resetLoginCard() {
+            validationCard.style.display = 'none';
+            wizardCard.style.display = 'none';
+            loginCard.style.display = 'block';
+
+            const button = document.getElementById('googleSignInBtn');
+            const text = document.getElementById('googleSignInText');
+            button.disabled = false;
+            text.textContent = 'Sign in with Google';
+
+            const err = document.getElementById('googleAuthError');
+            if (err) err.remove();
+
+            // Reset wizard state
+            currentWizardStep = 0;
+            document.querySelectorAll('.wizard-step').forEach((s, i) => {
+                s.classList.toggle('active', i === 0);
+            });
+            document.querySelectorAll('.wizard-dot').forEach((d, i) => {
+                d.classList.toggle('active', i === 0);
+                d.classList.toggle('completed', false);
+            });
+        }
+    </script>
 </body>
 </html>
