@@ -16,6 +16,7 @@
 
   <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -33,6 +34,7 @@
       
       --logo-gradient: linear-gradient(to right, #6036E1, #D83DC2);
       --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-brand: 'Plus Jakarta Sans', 'Inter', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
       --ease-expensive: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -353,6 +355,62 @@
       color: var(--text-secondary);
       font-weight: 400;
       line-height: 1.5;
+    }
+
+    .brand-word {
+      font-family: var(--font-brand);
+      font-weight: 800;
+      letter-spacing: -0.045em;
+      background: var(--logo-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .google-signin-btn {
+      width: 100%;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #111111;
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1px;
+      cursor: pointer;
+      transition: transform 0.3s var(--ease-expensive),
+                  box-shadow 0.3s var(--ease-expensive),
+                  background 0.3s ease;
+    }
+
+    .google-signin-btn:hover {
+      background: #f5f5f5;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .google-signin-btn:active {
+      transform: translateY(0);
+    }
+
+    .google-signin-btn:disabled {
+      opacity: 0.65;
+      cursor: wait;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .google-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .form-group {
@@ -741,32 +799,25 @@
       <div class="login-card" id="loginCard">
         <div class="brand-header">
           <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
-          <h2 class="login-title">Institutional Sign In</h2>
-          <p class="login-subtitle">Enter your organization's verified Issuance Key to authenticate your access node.</p>
+          <h2 class="login-title">Sign into <span class="brand-word">KOMNI</span></h2>
+          <p class="login-subtitle">Use your Google account to securely authenticate and enter the KOMNI workspace.</p>
         </div>
 
-        <form id="loginForm" onsubmit="handleAuthSubmit(event);">
-          <div class="form-group">
-            <div class="field-label">
-              <span class="label-title">Enterprise Issuance Key</span>
-              <span class="key-type">HSM / RSA-4096</span>
-            </div>
-            <div class="input-wrapper">
-              <input type="password" id="issuanceKeyInput" placeholder="test OR ik_live_99f38a..." autocomplete="off" spellcheck="false" required>
-              <svg class="key-icon" viewBox="0 0 24 24">
-                <path d="M7 14A5 5 0 0 1 12 9E1 1 0 0 1 13 10V11H17V13H19V15H21V18H18L14.7 14.7A5 5 0 0 1 7 14ZM7 11A3 3 0 1 0 10 14A3 3 0 0 0 7 11Z"/>
-              </svg>
-            </div>
-          </div>
-
-          <button type="submit" class="submit-btn" id="authBtn">
-            <span>Authenticate Session</span>
-          </button>
-        </form>
+        <button type="button" class="google-signin-btn" id="googleSignInBtn" onclick="handleGoogleSignIn();">
+          <span class="google-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="19" height="19">
+              <path fill="#4285F4" d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.96h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.26Z"/>
+              <path fill="#34A853" d="M12 21.5c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.93-3.31.93-2.54 0-4.69-1.72-5.46-4.03H3.3v2.53A9.74 9.74 0 0 0 12 21.5Z"/>
+              <path fill="#FBBC05" d="M6.54 13.59A5.85 5.85 0 0 1 6.23 12c0-.55.11-1.08.31-1.59V7.88H3.3A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.12l3.24-2.53Z"/>
+              <path fill="#EA4335" d="M12 6.38c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.39 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.38l3.24 2.53C7.31 8.1 9.46 6.38 12 6.38Z"/>
+            </svg>
+          </span>
+          <span id="googleSignInText">Sign in with Google</span>
+        </button>
 
         <div class="security-notice">
           <div class="shield-dot"></div>
-          <div class="security-notice-text">System authorization required. Node session activity is permanently hash-chained.</div>
+          <div class="security-notice-text">Authentication is handled securely by Firebase. Your Google credentials never pass through KOMNI.</div>
         </div>
       </div>
 
@@ -798,7 +849,7 @@
         <div class="brand-header">
           <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
           <h2 class="login-title">Configure Client Preferences</h2>
-          <p class="login-subtitle">Key validated. Confirm the issued workspace preferences before the dashboard loads.</p>
+          <p class="login-subtitle">Google identity verified. Confirm your workspace preferences before the dashboard loads.</p>
           <div class="auth-status-pill" id="surveyStatusPill">Preference profile required</div>
         </div>
 
@@ -846,7 +897,7 @@
         <div class="brand-header">
           <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" class="main-logo-icon" alt="KOMNI Brand Logo">
           <h2 class="login-title">Provisioning Issued Workspace</h2>
-          <p class="login-subtitle">Firebase registry verified. Preparing the dashboard shell and neutral telemetry.</p>
+          <p class="login-subtitle">Identity verified. Preparing the dashboard shell and neutral telemetry.</p>
           <div class="auth-status-pill" id="setupStatusPill">Building dashboard shell</div>
         </div>
 
@@ -1009,85 +1060,134 @@
       initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
     });
 
-    // Integrated Authentication with Vercel Python Backend
-    async function handleAuthSubmit(e) {
-      e.preventDefault();
-      
-      let rawKey = document.getElementById('issuanceKeyInput').value.trim();
-      if (!rawKey) return;
+    // Firebase Authentication
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwHDXO512D3YnAyUkw44OGLsZR7g8kg4",
+      authDomain: "ropay-11bf2.firebaseapp.com",
+      projectId: "ropay-11bf2",
+      storageBucket: "ropay-11bf2.firebasestorage.app",
+      messagingSenderId: "128573345457",
+      appId: "1:128573345457:web:d2f1fdfb6dc08d932edc90",
+      measurementId: "G-VB6G0KWYP1"
+    };
 
-      // Convenience mapping: convert 'test' to demo test key format
-      let formattedKey = rawKey;
-      if (rawKey.toLowerCase() === 'test') {
-        formattedKey = 'ik_test_demo';
-      } else if (rawKey.toUpperCase().startsWith('IK-')) {
-        // Standardize IK- keys to lower case prefix for backend matching
-        formattedKey = 'ik_' + rawKey.substring(3);
+    let firebaseApp;
+    let firebaseAuth;
+
+    try {
+      firebaseApp = firebase.initializeApp(firebaseConfig);
+      firebaseAuth = firebase.auth();
+    } catch (error) {
+      console.error("Firebase initialization failed:", error);
+    }
+
+    async function handleGoogleSignIn() {
+      const button = document.getElementById('googleSignInBtn');
+      const buttonText = document.getElementById('googleSignInText');
+
+      if (!firebaseAuth) {
+        showAuthError('Firebase authentication could not be initialized.');
+        return;
       }
 
-      document.getElementById('loginCard').style.display = 'none';
-      const valCard = document.getElementById('validationCard');
-      valCard.style.display = 'block';
-      valCard.classList.add('is-active');
-
-      const term = document.getElementById('validationTerminal');
-      const pill = document.getElementById('validationStatusPill');
-      
-      pill.className = 'auth-status-pill';
-      pill.innerText = 'Connecting to Gateway...';
-      document.getElementById('retryButtonContainer').style.display = 'none';
-
-      term.innerHTML = `<span class="terminal-line info">> Initializing HSM Handshake for key: ${rawKey}</span>`;
+      button.disabled = true;
+      buttonText.textContent = 'Connecting to Google...';
 
       try {
-        term.innerHTML += '<span class="terminal-line accent">> Querying Vercel Serverless Backend...</span>';
-        
-        const response = await fetch(VERCEL_BACKEND_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ key: formattedKey })
-        });
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
 
-        const data = await response.json();
+        const result = await firebaseAuth.signInWithPopup(provider);
+        const user = result.user;
 
-        if (response.ok && data.valid) {
-          term.innerHTML += `<span class="terminal-line success">> Backend Signature: VERIFIED [200 OK]</span>`;
-          if (data.metadata && data.metadata.owner) {
-            term.innerHTML += `<span class="terminal-line info">> Registered Owner: ${data.metadata.owner}</span>`;
-          }
-          pill.classList.add('is-success');
-          pill.innerText = 'Handshake Complete';
-
-          setTimeout(() => {
-            valCard.style.display = 'none';
-            const surCard = document.getElementById('surveyCard');
-            surCard.style.display = 'block';
-            surCard.classList.add('is-active');
-          }, 1800);
-
-        } else {
-          term.innerHTML += `<span class="terminal-line error">> AUTHENTICATION REJECTED: ${data.reason || 'Invalid Key'}</span>`;
-          pill.classList.add('is-error');
-          pill.innerText = 'Authentication Failed';
-          document.getElementById('retryButtonContainer').style.display = 'block';
+        if (!user) {
+          throw new Error('Google authentication returned no user.');
         }
 
-      } catch (err) {
-        term.innerHTML += `<span class="terminal-line error">> NETWORK ERROR: Unable to reach backend gateway.</span>`;
-        pill.classList.add('is-error');
-        pill.innerText = 'Gateway Error';
-        document.getElementById('retryButtonContainer').style.display = 'block';
+        sessionStorage.setItem('komniAuthUser', JSON.stringify({
+          uid: user.uid,
+          displayName: user.displayName || '',
+          email: user.email || '',
+          photoURL: user.photoURL || ''
+        }));
+
+        const loginCard = document.getElementById('loginCard');
+        const valCard = document.getElementById('validationCard');
+        const term = document.getElementById('validationTerminal');
+        const pill = document.getElementById('validationStatusPill');
+
+        loginCard.style.display = 'none';
+        valCard.style.display = 'block';
+        valCard.classList.add('is-active');
+
+        pill.className = 'auth-status-pill is-success';
+        pill.innerText = 'Google Authentication Complete';
+
+        term.innerHTML =
+          '<span class="terminal-line info">> Initializing secure Google identity handshake...</span>' +
+          '<span class="terminal-line accent">> Verifying Firebase Authentication session...</span>' +
+          `<span class="terminal-line success">> Identity verified: ${escapeHtml(user.email || 'Google account')}</span>` +
+          '<span class="terminal-line success">> Firebase session established [200 OK]</span>';
+
+        setTimeout(() => {
+          valCard.style.display = 'none';
+          const surveyCard = document.getElementById('surveyCard');
+          surveyCard.style.display = 'block';
+          surveyCard.classList.add('is-active');
+        }, 1100);
+
+      } catch (error) {
+        console.error('Google sign-in failed:', error);
+
+        button.disabled = false;
+        buttonText.textContent = 'Sign in with Google';
+
+        if (error && error.code === 'auth/popup-closed-by-user') {
+          return;
+        }
+
+        showAuthError(error?.message || 'Unable to complete Google sign-in.');
       }
+    }
+
+    function showAuthError(message) {
+      const existing = document.getElementById('googleAuthError');
+      if (existing) existing.remove();
+
+      const error = document.createElement('div');
+      error.id = 'googleAuthError';
+      error.className = 'auth-status-pill is-error';
+      error.style.marginTop = '14px';
+      error.style.width = '100%';
+      error.style.justifyContent = 'center';
+      error.style.textTransform = 'none';
+      error.style.letterSpacing = '0';
+      error.textContent = message;
+
+      document.getElementById('googleSignInBtn').insertAdjacentElement('afterend', error);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     function resetLoginCard() {
       document.getElementById('validationCard').style.display = 'none';
       const loginCard = document.getElementById('loginCard');
       loginCard.style.display = 'block';
-      document.getElementById('issuanceKeyInput').value = '';
-      document.getElementById('issuanceKeyInput').focus();
+
+      const button = document.getElementById('googleSignInBtn');
+      const buttonText = document.getElementById('googleSignInText');
+      button.disabled = false;
+      buttonText.textContent = 'Sign in with Google';
+
+      const error = document.getElementById('googleAuthError');
+      if (error) error.remove();
     }
 
     function handleSurveySubmit(e) {
