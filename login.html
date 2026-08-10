@@ -981,7 +981,7 @@
 
 
     <!-- ======================================================================
-         5. FULLSCREEN WELCOME WIZARD OVERLAY (Completely leaves login screen)
+         5. FULLSCREEN WELCOME WIZARD OVERLAY
          ====================================================================== -->
     <div class="wizard-card" id="wizardCard">
         <div class="wizard-brand-bar">
@@ -1013,7 +1013,7 @@
 
                 <div style="margin-top: 20px; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 18px; border: 1px solid rgba(255,255,255,0.05);">
                     <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
-                        Your Google identity has been verified and registered into Firestore. Complete this brief workspace posture configuration to enter your dashboard.
+                        Your Google identity has been verified. Complete this brief workspace posture configuration to enter your dashboard.
                     </p>
                 </div>
 
@@ -1120,11 +1120,11 @@
                 <div class="complete-icon">✓</div>
                 <div class="step-label" style="text-align:center;">Step 4 of 4</div>
                 <div class="complete-title">Setup Complete, <span id="completeName">Associate</span>!</div>
-                <div class="complete-desc">Your workspace preferences have been saved to Firestore. You are ready to launch.</div>
+                <div class="complete-desc">Your workspace preferences have been processed. You are ready to launch.</div>
 
                 <div style="margin-top:24px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.18); border-radius:8px; padding:16px; text-align:center;">
-                    <span style="font-size:12px; color:#22c55e; font-weight:600;">✓ Client Document Synced to Firestore</span>
-                    <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Redirecting directly to /dashboard.</span>
+                    <span style="font-size:12px; color:#22c55e; font-weight:600;">✓ Ready to Initialize Node</span>
+                    <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Redirecting directly to /dashboard.html</span>
                 </div>
 
                 <div class="wizard-btn-group">
@@ -1144,7 +1144,7 @@
          ====================================================================== -->
     <script>
         /* ====================================================================
-           FIREBASE CONFIG
+           FIREBASE CONFIG (Sanitized for compat layer)
            ==================================================================== */
         const firebaseConfig = {
             apiKey: "AIzaSyCAGeF1z2VW5lf0qUcOio2MVNZ8vWTHHWg",
@@ -1152,8 +1152,7 @@
             projectId: "komni-eb72e",
             storageBucket: "komni-eb72e.firebasestorage.app",
             messagingSenderId: "754396573424",
-            appId: "1:754396573424:web:87b1638b20903dae94dc35",
-            measurementId: "G-6GZYWR2G78"
+            appId: "1:754396573424:web:87b1638b20903dae94dc35"
         };
 
         let firebaseApp, firebaseAuth, firestore;
@@ -1312,10 +1311,10 @@
 
             initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
 
-            // Listen for redirect authentication results upon landing
+            // Catch redirect results safely
             if (firebaseAuth) {
                 firebaseAuth.getRedirectResult().then((result) => {
-                    if (result.user && !authHandled) {
+                    if (result && result.user && !authHandled) {
                         console.log('Redirect result user authenticated:', result.user.uid);
                     }
                 }).catch(err => console.warn('Redirect auth warning:', err));
@@ -1336,19 +1335,23 @@
 
                 if (user) {
                     authHandled = true;
-                    try {
-                        showValidationCard(user);
-                        await indexUserInFirestore(user);
 
-                        sessionStorage.setItem('komniAuthUser', JSON.stringify({
-                            uid: user.uid,
-                            displayName: user.displayName || '',
-                            email: user.email || '',
-                            photoURL: user.photoURL || '',
-                            providerId: user.providerData?.[0]?.providerId || 'google.com'
-                        }));
+                    // Cache basic session locally regardless of database connection
+                    sessionStorage.setItem('komniAuthUser', JSON.stringify({
+                        uid: user.uid,
+                        displayName: user.displayName || '',
+                        email: user.email || '',
+                        photoURL: user.photoURL || '',
+                        providerId: user.providerData?.[0]?.providerId || 'google.com'
+                    }));
+
+                    showValidationCard(user);
+
+                    // Attempt indexing non-fatally
+                    try {
+                        await indexUserInFirestore(user);
                     } catch (err) {
-                        console.error('Auth processing error:', err);
+                        console.warn('Firestore sync bypassed due to offline/missing DB status:', err.message);
                     }
                 } else {
                     authHandled = false;
@@ -1358,8 +1361,8 @@
                     
                     const btn = document.getElementById('googleSignInBtn');
                     const txt = document.getElementById('googleSignInText');
-                    btn.disabled = false;
-                    txt.textContent = 'Sign in with Google';
+                    if (btn) btn.disabled = false;
+                    if (txt) txt.textContent = 'Sign in with Google';
                 }
             });
         }
@@ -1385,7 +1388,6 @@
             provider.setCustomParameters({ prompt: 'select_account' });
 
             try {
-                // Directly trigger full screen Google sign-in redirect
                 await firebaseAuth.signInWithRedirect(provider);
             } catch (err) {
                 button.disabled = false;
@@ -1400,76 +1402,77 @@
         async function indexUserInFirestore(user) {
             if (!firestore || !user) return;
 
+            const now = firebase.firestore.FieldValue.serverTimestamp();
+            const userRef = firestore.collection('users').doc(user.uid);
+            const clientRef = firestore.collection('clients').doc(user.uid);
+
+            let userDoc = null;
+            let exists = false;
+
             try {
-                const now = firebase.firestore.FieldValue.serverTimestamp();
-                const userRef = firestore.collection('users').doc(user.uid);
-                const clientRef = firestore.collection('clients').doc(user.uid);
-
-                const userDoc = await userRef.get();
-                const exists = userDoc.exists;
-
-                const googleMeta = {
-                    authProvider: user.providerData?.[0]?.providerId || 'google.com',
-                    emailVerified: user.emailVerified || true,
-                    creationTime: user.metadata.creationTime || new Date().toISOString(),
-                    lastSignInTime: user.metadata.lastSignInTime || new Date().toISOString(),
-                    userAgent: navigator.userAgent || '',
-                    locale: navigator.language || 'en-US'
-                };
-
-                const baseUserData = {
-                    uid: user.uid,
-                    email: user.email || '',
-                    displayName: user.displayName || '',
-                    photoURL: user.photoURL || '',
-                    role: 'associate',
-                    clientStatus: 'active',
-                    lastSignInAt: now,
-                    signInCount: firebase.firestore.FieldValue.increment(1),
-                    googleMetadata: googleMeta,
-                    enterpriseData: {
-                        isB2BClient: true,
-                        tier: 'enterprise_associate',
-                        registeredAt: exists ? (userDoc.data()?.enterpriseData?.registeredAt || new Date().toISOString()) : new Date().toISOString()
-                    }
-                };
-
-                if (exists) {
-                    await userRef.update(baseUserData);
-                    wizardUserData = { ...userDoc.data(), ...baseUserData };
-                } else {
-                    const newUserData = {
-                        ...baseUserData,
-                        createdAt: now,
-                        company: '',
-                        industry: '',
-                        jobRole: '',
-                        operatingPosture: 'balanced',
-                        notificationCadence: 'email',
-                        isOnboarded: false
-                    };
-                    await userRef.set(newUserData);
-                    wizardUserData = newUserData;
-                }
-
-                await clientRef.set({
-                    uid: user.uid,
-                    email: user.email || '',
-                    displayName: user.displayName || '',
-                    photoURL: user.photoURL || '',
-                    status: 'active',
-                    type: 'registered_associate_client',
-                    googleMetadata: googleMeta,
-                    updatedAt: now,
-                    createdAt: exists ? (userDoc.data()?.createdAt || now) : now
-                }, { merge: true });
-
-                console.log('User & Client collection successfully synced in Firestore.');
-
-            } catch (err) {
-                console.error('Firestore indexing error:', err);
-                throw err;
+                userDoc = await userRef.get();
+                exists = userDoc.exists;
+            } catch (e) {
+                console.warn('Firestore read error (DB probably not created yet):', e.message);
             }
+
+            const googleMeta = {
+                authProvider: user.providerData?.[0]?.providerId || 'google.com',
+                emailVerified: user.emailVerified || true,
+                creationTime: user.metadata.creationTime || new Date().toISOString(),
+                lastSignInTime: user.metadata.lastSignInTime || new Date().toISOString(),
+                userAgent: navigator.userAgent || '',
+                locale: navigator.language || 'en-US'
+            };
+
+            const baseUserData = {
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || '',
+                photoURL: user.photoURL || '',
+                role: 'associate',
+                clientStatus: 'active',
+                lastSignInAt: now,
+                signInCount: firebase.firestore.FieldValue.increment(1),
+                googleMetadata: googleMeta,
+                enterpriseData: {
+                    isB2BClient: true,
+                    tier: 'enterprise_associate',
+                    registeredAt: exists ? (userDoc?.data()?.enterpriseData?.registeredAt || new Date().toISOString()) : new Date().toISOString()
+                }
+            };
+
+            if (exists) {
+                await userRef.update(baseUserData);
+                wizardUserData = { ...(userDoc?.data() || {}), ...baseUserData };
+            } else {
+                const newUserData = {
+                    ...baseUserData,
+                    createdAt: now,
+                    company: '',
+                    industry: '',
+                    jobRole: '',
+                    operatingPosture: 'balanced',
+                    notificationCadence: 'email',
+                    isOnboarded: false
+                };
+                await userRef.set(newUserData, { merge: true });
+                wizardUserData = newUserData;
+            }
+
+            await clientRef.set({
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || '',
+                photoURL: user.photoURL || '',
+                status: 'active',
+                type: 'registered_associate_client',
+                googleMetadata: googleMeta,
+                updatedAt: now,
+                createdAt: exists ? (userDoc?.data()?.createdAt || now) : now
+            }, { merge: true });
+
+            console.log('User & Client collection successfully synced in Firestore.');
         }
 
         /* ====================================================================
@@ -1493,11 +1496,11 @@
                 '<span class="terminal-line info">> Executing Google OAuth Redirect Verification…</span>' +
                 '<span class="terminal-line accent">> Verifying session tokens with Firebase Auth…</span>' +
                 `<span class="terminal-line success">> Authenticated: ${escapeHtml(email)}</span>` +
-                '<span class="terminal-line info">> Syncing active registered client record to Firestore…</span>';
+                '<span class="terminal-line info">> Preparing onboarding posture environment…</span>';
 
             setTimeout(() => {
-                term.innerHTML += '<span class="terminal-line success">> Firestore user metadata indexed ✓</span>';
-                term.innerHTML += `<span class="terminal-line accent">> Launching fullscreen onboarding wizard for ${escapeHtml(name)}…</span>`;
+                term.innerHTML += '<span class="terminal-line success">> Authentication Handshake Verified ✓</span>';
+                term.innerHTML += `<span class="terminal-line accent">> Launching setup wizard for ${escapeHtml(name)}…</span>`;
             }, 600);
 
             setTimeout(() => {
@@ -1510,7 +1513,6 @@
            LAUNCH FULLSCREEN WIZARD
            ==================================================================== */
         function launchWizard(user) {
-            // Activate full-screen wizard overlay
             wizardCard.classList.add('is-active');
 
             const name = user.displayName || 'Associate';
@@ -1618,25 +1620,26 @@
             };
 
             try {
-                await firestore.collection('users').doc(user.uid).update(payload);
-                await firestore.collection('clients').doc(user.uid).update({
+                await firestore.collection('users').doc(user.uid).set(payload, { merge: true });
+                await firestore.collection('clients').doc(user.uid).set({
                     company,
                     industry,
                     jobRole,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                }, { merge: true });
                 console.log('Enterprise wizard preferences saved to Firestore.');
             } catch (err) {
-                console.error('Error saving wizard preferences:', err);
+                console.warn('Could not persist preferences to Firestore:', err.message);
             }
         }
 
         /* ====================================================================
-           LAUNCH DASHBOARD
+           LAUNCH DASHBOARD (FIXED ROUTE)
            ==================================================================== */
         function launchDashboard() {
             saveWizardData().finally(() => {
-                window.location.href = '/dashboard';
+                // Updated relative routing for GitHub static pages
+                window.location.href = 'dashboard.html';
             });
         }
 
@@ -1674,8 +1677,8 @@
 
             const button = document.getElementById('googleSignInBtn');
             const text = document.getElementById('googleSignInText');
-            button.disabled = false;
-            text.textContent = 'Sign in with Google';
+            if (button) button.disabled = false;
+            if (text) text.textContent = 'Sign in with Google';
 
             const err = document.getElementById('googleAuthError');
             if (err) err.remove();
