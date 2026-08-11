@@ -1,3 +1,8 @@
+20260811-183341).html
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1380,61 +1385,11 @@
 
             initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
 
-            // Catch redirect results safely
-            if (firebaseAuth) {
-                firebaseAuth.getRedirectResult().then((result) => {
-                    if (result && result.user && !authHandled) {
-                        console.log('Redirect result user authenticated:', result.user.uid);
-                    }
-                }).catch(err => console.warn('Redirect auth warning:', err));
-            }
-
-            setupAuthListener();
+            // Auth bootstrap is defined in the PIN Guard script below.
+            // Calling it here ensures redirect results and persisted sessions
+            // are handled exactly once.
+            bootstrapAuth();
         });
-
-        /* ====================================================================
-           AUTH STATE LISTENER
-           ==================================================================== */
-        function setupAuthListener() {
-            if (!firebaseAuth) return;
-
-            firebaseAuth.onAuthStateChanged(async (user) => {
-                console.log('Auth state changed. User:', user ? user.uid : 'null');
-                if (authHandled) return;
-
-                if (user) {
-                    authHandled = true;
-
-                    // Cache basic session locally regardless of database connection
-                    sessionStorage.setItem('komniAuthUser', JSON.stringify({
-                        uid: user.uid,
-                        displayName: user.displayName || '',
-                        email: user.email || '',
-                        photoURL: user.photoURL || '',
-                        providerId: user.providerData?.[0]?.providerId || 'google.com'
-                    }));
-
-                    showValidationCard(user);
-
-                    // Attempt indexing non-fatally
-                    try {
-                        await indexUserInFirestore(user);
-                    } catch (err) {
-                        console.warn('Firestore sync bypassed due to offline/missing DB status:', err.message);
-                    }
-                } else {
-                    authHandled = false;
-                    loginCard.style.display = 'block';
-                    validationCard.style.display = 'none';
-                    wizardCard.classList.remove('is-active');
-                    
-                    const btn = document.getElementById('googleSignInBtn');
-                    const txt = document.getElementById('googleSignInText');
-                    if (btn) btn.disabled = false;
-                    if (txt) txt.textContent = 'Sign in with Google';
-                }
-            });
-        }
 
         /* ====================================================================
            FULLSCREEN GOOGLE AUTH (signInWithRedirect)
@@ -2119,11 +2074,79 @@ pinBackButton.addEventListener('click', async () => {
  * New Google accounts are also routed through the same path; the backend
  * decides whether a PIN already exists or must be provisioned.
  */
+async function bootstrapAuth() {
+    if (!firebaseAuth) {
+        showAuthError('Firebase authentication could not be initialized.');
+        return;
+    }
+
+    try {
+        // Persist the Firebase session across the Google redirect.
+        await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    } catch (error) {
+        console.warn('Firebase persistence setup failed:', error);
+    }
+
+    // Register the listener before resolving the redirect result. This covers
+    // both returning OAuth redirects and already-authenticated page loads.
+    setupAuthListener();
+
+    try {
+        const result = await firebaseAuth.getRedirectResult();
+        if (result?.user && !authHandled) {
+            console.log('Google redirect completed:', result.user.uid);
+            await routeAuthenticatedUser(result.user);
+        }
+    } catch (error) {
+        console.error('Google redirect result error:', error);
+        authHandled = false;
+        pinGuardClose();
+        loginCard.style.display = 'block';
+        validationCard.style.display = 'none';
+        const message = error?.code === 'auth/unauthorized-domain'
+            ? 'This site is not authorized in Firebase Authentication. Add this domain to Firebase Authorized Domains.'
+            : (error?.message || 'Google sign-in could not be completed.');
+        showAuthError(message);
+    }
+}
+
+async function routeAuthenticatedUser(user) {
+    if (!user || authHandled) return;
+    authHandled = true;
+
+    loginCard.style.display = 'none';
+    validationCard.style.display = 'none';
+    wizardCard.classList.remove('is-active');
+
+    sessionStorage.setItem('komniAuthUser', JSON.stringify({
+        uid: user.uid,
+        email: user.email || '',
+        displayName: user.displayName || '',
+        photoURL: user.photoURL || '',
+        providerId: user.providerData?.[0]?.providerId || 'google.com'
+    }));
+
+    try {
+        await handleAuthenticatedUser(user);
+    } catch (error) {
+        console.error('PIN Guard routing error:', error);
+        authHandled = false;
+        pinGuardOpen();
+        pinGuardTitle.textContent = 'Security service unavailable';
+        pinGuardDescription.textContent =
+            'Google authentication succeeded, but KOMNI could not complete PIN Guard verification.';
+        pinProvisionBox.hidden = true;
+        pinEntryBox.style.display = 'none';
+        setPinGuardStatus('PIN GUARD ERROR', false);
+        pinGuardSetMessage(error.message || 'Try again later.');
+    }
+}
+
 function setupAuthListener() {
     if (!firebaseAuth) return;
 
     firebaseAuth.onAuthStateChanged(async user => {
-        if (authHandled) return;
+        console.log('Firebase auth state:', user ? user.uid : 'signed out');
 
         if (!user) {
             authHandled = false;
@@ -2131,36 +2154,15 @@ function setupAuthListener() {
             loginCard.style.display = 'block';
             validationCard.style.display = 'none';
             wizardCard.classList.remove('is-active');
+            const btn = document.getElementById('googleSignInBtn');
+            const txt = document.getElementById('googleSignInText');
+            if (btn) btn.disabled = false;
+            if (txt) txt.textContent = 'Sign in with Google';
             return;
         }
 
-        authHandled = true;
-        loginCard.style.display = 'none';
-        validationCard.style.display = 'none';
-        wizardCard.classList.remove('is-active');
-
-        try {
-            sessionStorage.setItem('komniAuthUser', JSON.stringify({
-                uid: user.uid,
-                email: user.email || '',
-                displayName: user.displayName || '',
-                photoURL: user.photoURL || '',
-                providerId: user.providerData?.[0]?.providerId || 'google.com'
-            }));
-
-            await handleAuthenticatedUser(user);
-        } catch (error) {
-            authHandled = false;
-            pinGuardOpen();
-
-            pinGuardTitle.textContent = 'Security service unavailable';
-            pinGuardDescription.textContent =
-                'Google authentication succeeded, but KOMNI could not complete PIN Guard verification.';
-
-            pinProvisionBox.hidden = true;
-            pinEntryBox.style.display = 'none';
-            setPinGuardStatus('PIN GUARD ERROR', false);
-            pinGuardSetMessage(error.message || 'Try again later.');
+        if (!authHandled) {
+            await routeAuthenticatedUser(user);
         }
     });
 }
