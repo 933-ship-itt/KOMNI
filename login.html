@@ -860,9 +860,9 @@
         }
     
 /* PIN GUARD */
-.pin-guard-overlay{position:fixed;inset:0;z-index:2500;display:none;align-items:center;justify-content:center;padding:28px;background:rgba(0,0,0,.78);backdrop-filter:blur(18px)}
+.pin-guard-overlay{position:fixed;inset:0;z-index:2500;display:none;align-items:center;justify-content:center;padding:0;background:radial-gradient(circle at 50% 30%,rgba(13,7,34,.98) 0%,#020205 62%,#000 100%);backdrop-filter:blur(18px)}
 .pin-guard-overlay.is-active{display:flex;animation:pinFade .35s ease both}
-.pin-guard-frame{width:min(560px,94vw);min-height:min(720px,90vh);display:flex;flex-direction:column;background:linear-gradient(145deg,rgba(12,8,28,.98),rgba(3,3,8,.99));border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 40px 120px rgba(0,0,0,.8),0 0 80px rgba(96,54,225,.12);overflow:hidden}
+.pin-guard-frame{width:100vw;height:100vh;min-height:100vh;display:flex;flex-direction:column;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:hidden}
 .pin-guard-brand{padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.07);font:600 10px var(--font-mono);letter-spacing:.18em;color:#aaa}
 .pin-guard-lock{color:var(--accent-magenta);margin-right:8px}
 .pin-guard-status{padding:10px 22px;font:500 9px var(--font-mono);letter-spacing:.15em;color:#22c55e;border-bottom:1px solid rgba(255,255,255,.05)}
@@ -892,7 +892,7 @@
 .pin-guard-message.success{color:#22c55e}
 .pin-guard-footer{padding:16px 22px;border-top:1px solid rgba(255,255,255,.06);text-align:center;font:9px var(--font-mono);letter-spacing:.12em;color:#444}
 @keyframes pinFade{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
-@media(max-width:600px){.pin-guard-overlay{padding:12px}.pin-guard-frame{width:100%;min-height:calc(100vh - 24px)}.pin-guard-content{padding:30px 20px}.pin-guard-content h1{font-size:23px}}
+@media(max-width:600px){.pin-guard-content{padding:30px 20px}.pin-guard-content h1{font-size:23px}}
 
     </style>
 </head>
@@ -1776,9 +1776,12 @@
    Backend: https://komni-backend.vercel.app/api/security/auth/pin_guard
    ===================================================================== */
 const PIN_GUARD_API = 'https://komni-backend.vercel.app/api/security/auth/pin_guard';
+const DASHBOARD_URL = '/dashboard';
+
 let pinGuardUser = null;
 let pinGuardToken = null;
 let provisionedPin = '';
+let pinGuardBusy = false;
 
 const pinGuardOverlay = document.getElementById('pinGuardOverlay');
 const pinGuardTitle = document.getElementById('pinGuardTitle');
@@ -1792,171 +1795,328 @@ const pinSavedCheck = document.getElementById('pinSavedCheck');
 const confirmPinButton = document.getElementById('confirmPinButton');
 const copyPinButton = document.getElementById('copyPinButton');
 const verifyPinButton = document.getElementById('verifyPinButton');
+const pinGuardStatus = document.getElementById('pinGuardStatus');
 
-function pinGuardOpen(){
-  pinGuardOverlay.classList.add('is-active');
-  pinGuardOverlay.setAttribute('aria-hidden','false');
-  document.body.style.overflow='hidden';
-}
-function pinGuardClose(){
-  pinGuardOverlay.classList.remove('is-active');
-  pinGuardOverlay.setAttribute('aria-hidden','true');
-  document.body.style.overflow='hidden';
-}
-function pinGuardSetMessage(msg, success=false){
-  pinGuardMessage.textContent=msg||'';
-  pinGuardMessage.classList.toggle('success',!!success);
-}
-function renderPinDots(){
-  const value=pinInput.value.replace(/\D/g,'').slice(0,6);
-  pinInput.value=value;
-  pinDots.forEach((d,i)=>d.classList.toggle('filled',i<value.length));
-}
-function resetPinEntry(){pinInput.value='';renderPinDots();}
-
-async function pinGuardRequest(path, options={}){
-  const headers={...(options.headers||{})};
-  if(pinGuardToken) headers.Authorization='Bearer '+pinGuardToken;
-  const res=await fetch(PIN_GUARD_API+path,{...options,headers});
-  let data={};
-  try{data=await res.json();}catch(_){ }
-  if(!res.ok) throw new Error(data.detail||data.message||`Security service returned HTTP ${res.status}`);
-  return data;
+function pinGuardOpen() {
+    pinGuardOverlay.classList.add('is-active');
+    pinGuardOverlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
 }
 
-async function getFirebaseToken(user){
-  return await user.getIdToken(true);
+function pinGuardClose() {
+    pinGuardOverlay.classList.remove('is-active');
+    pinGuardOverlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = 'hidden';
 }
 
-function showPinLogin(user){
-  pinGuardUser=user;
-  pinGuardTitle.textContent='Enter your security PIN';
-  pinGuardDescription.textContent='Your Google identity is recognized. Enter your KOMNI security PIN to continue.';
-  pinProvisionBox.hidden=true;
-  pinEntryBox.style.display='block';
-  resetPinEntry();
-  pinGuardSetMessage('');
-  pinGuardOpen();
-  setTimeout(()=>pinInput.focus(),150);
+function pinGuardSetMessage(message, success = false) {
+    pinGuardMessage.textContent = message || '';
+    pinGuardMessage.classList.toggle('success', Boolean(success));
 }
 
-function showPinProvision(user, pin){
-  pinGuardUser=user;
-  provisionedPin=String(pin||'').replace(/\D/g,'').slice(0,6);
-  if(provisionedPin.length!==6) throw new Error('Security service returned an invalid PIN.');
-  pinGuardTitle.textContent='Secure your KOMNI PIN';
-  pinGuardDescription.textContent='Your account is ready. Copy the masked PIN securely and store it before proceeding.';
-  pinProvisionBox.hidden=false;
-  pinEntryBox.style.display='none';
-  document.getElementById('pinMask').textContent='••••••';
-  pinSavedCheck.checked=false;
-  confirmPinButton.disabled=true;
-  pinGuardSetMessage('Copy the PIN, store it safely, then confirm.');
-  pinGuardOpen();
+function setPinGuardStatus(text, success = true) {
+    pinGuardStatus.textContent = text;
+    pinGuardStatus.style.color = success ? '#22c55e' : '#ef4444';
 }
 
-async function handleAuthenticatedUser(user){
-  pinGuardUser=user;
-  pinGuardToken=await getFirebaseToken(user);
-  const status=await pinGuardRequest('/status');
-  if(status.provisioned || status.pinProvisioned || status.hasPin){
-    showPinLogin(user);
-    return;
-  }
-  const provision=await pinGuardRequest('/provision',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
-  const pin=provision.pin || provision.oneTimePin || provision.provisionedPin;
-  if(!pin) throw new Error('PIN was provisioned but the security API did not return the one-time PIN.');
-  showPinProvision(user,pin);
+function renderPinDots() {
+    const value = pinInput.value.replace(/\D/g, '').slice(0, 6);
+    pinInput.value = value;
+    pinDots.forEach((dot, index) => dot.classList.toggle('filled', index < value.length));
 }
 
-async function confirmProvisionedPin(){
-  if(!provisionedPin || !pinSavedCheck.checked) return;
-  confirmPinButton.disabled=true;
-  pinGuardSetMessage('Registering your PIN…');
-  try{
-    const result=await pinGuardRequest('/confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmed:true})});
-    pinGuardSetMessage('PIN secured. Welcome to KOMNI.',true);
-    provisionedPin='';
-    setTimeout(()=>window.location.href='dashboard.html',650);
-  }catch(err){
-    confirmPinButton.disabled=false;
-    pinGuardSetMessage(err.message||'Unable to register PIN.');
-  }
+function resetPinEntry() {
+    pinInput.value = '';
+    renderPinDots();
 }
 
-async function verifyExistingPin(){
-  const pin=pinInput.value;
-  if(!/^\d{6}$/.test(pin)){pinGuardSetMessage('Enter all 6 PIN digits.');return;}
-  verifyPinButton.disabled=true;
-  pinGuardSetMessage('Verifying secure credential…');
-  try{
-    const result=await pinGuardRequest('/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});
-    if(!result.verified && !result.ok) throw new Error(result.message||'PIN verification failed.');
-    sessionStorage.setItem('komniPinVerified','true');
-    sessionStorage.setItem('komniPinVerifiedAt',String(Date.now()));
-    pinGuardSetMessage('PIN verified. Access granted.',true);
-    setTimeout(()=>window.location.href='dashboard.html',450);
-  }catch(err){
+async function pinGuardRequest(path, options = {}) {
+    if (!pinGuardToken) throw new Error('Google authentication token is unavailable.');
+
+    const headers = {
+        Accept: 'application/json',
+        ...(options.headers || {}),
+        Authorization: `Bearer ${pinGuardToken}`
+    };
+
+    const response = await fetch(`${PIN_GUARD_API}${path}`, {
+        ...options,
+        headers
+    });
+
+    let data = {};
+    try {
+        data = await response.json();
+    } catch (_) {}
+
+    if (!response.ok) {
+        throw new Error(data.detail || data.message || `Security service returned HTTP ${response.status}`);
+    }
+
+    return data;
+}
+
+async function refreshFirebaseToken(user) {
+    pinGuardToken = await user.getIdToken(true);
+    return pinGuardToken;
+}
+
+function showPinLogin(user) {
+    pinGuardUser = user;
+    provisionedPin = '';
+
+    pinGuardTitle.textContent = 'Enter your security PIN';
+    pinGuardDescription.textContent =
+        'Your Google identity is recognized. Enter your KOMNI security PIN to continue.';
+    pinProvisionBox.hidden = true;
+    pinEntryBox.style.display = 'block';
+
     resetPinEntry();
-    pinGuardSetMessage(err.message||'Incorrect PIN.');
-    verifyPinButton.disabled=false;
-  }
+    pinGuardSetMessage('');
+    setPinGuardStatus('SECURE SESSION REQUIRED', true);
+    pinGuardOpen();
+
+    setTimeout(() => pinInput.focus(), 150);
 }
 
-copyPinButton.addEventListener('click',async()=>{
-  try{
-    await navigator.clipboard.writeText(provisionedPin);
-    copyPinButton.textContent='PIN Copied';
-    pinGuardSetMessage('PIN copied. Store it somewhere secure.',true);
-    setTimeout(()=>copyPinButton.textContent='Copy PIN',1500);
-  }catch(_){
-    pinGuardSetMessage('Clipboard access failed. Your PIN remains masked; use a secure password manager that supports clipboard input.');
-  }
-});
-pinSavedCheck.addEventListener('change',()=>{confirmPinButton.disabled=!pinSavedCheck.checked;});
-confirmPinButton.addEventListener('click',confirmProvisionedPin);
-verifyPinButton.addEventListener('click',verifyExistingPin);
-pinInput.addEventListener('input',renderPinDots);
-pinInput.addEventListener('keydown',e=>{if(e.key==='Enter')verifyExistingPin();});
-document.querySelectorAll('.pin-key').forEach(btn=>btn.addEventListener('click',()=>{
-  const key=btn.dataset.key;
-  if(key==='clear') pinInput.value='';
-  else if(key==='back') pinInput.value=pinInput.value.slice(0,-1);
-  else if(/^\d$/.test(key) && pinInput.value.length<6) pinInput.value+=key;
-  renderPinDots();
-  if(pinInput.value.length===6) pinInput.focus();
-}));
+function showPinProvision(user, pin) {
+    pinGuardUser = user;
+    provisionedPin = String(pin || '').replace(/\D/g, '').slice(0, 6);
 
-/* Override the original listener so an existing Firebase session never sees Google login. */
-function setupAuthListener(){
-  if(!firebaseAuth)return;
-  firebaseAuth.onAuthStateChanged(async user=>{
-    if(authHandled)return;
-    if(!user){
-      authHandled=false;
-      pinGuardClose();
-      loginCard.style.display='block';
-      validationCard.style.display='none';
-      wizardCard.classList.remove('is-active');
-      return;
+    if (!/^\d{6}$/.test(provisionedPin)) {
+        throw new Error('Security service returned an invalid PIN.');
     }
-    authHandled=true;
-    loginCard.style.display='none';
-    validationCard.style.display='none';
-    try{
-      sessionStorage.setItem('komniAuthUser',JSON.stringify({uid:user.uid,email:user.email||'',displayName:user.displayName||'',photoURL:user.photoURL||'',providerId:user.providerData?.[0]?.providerId||'google.com'}));
-      await handleAuthenticatedUser(user);
-    }catch(err){
-      authHandled=false;
-      loginCard.style.display='none';
-      pinGuardOpen();
-      pinGuardTitle.textContent='Security service unavailable';
-      pinGuardDescription.textContent='Google authentication succeeded, but KOMNI could not reach the PIN Guard service.';
-      pinProvisionBox.hidden=true;
-      pinEntryBox.style.display='none';
-      pinGuardSetMessage(err.message||'Try again later.');
+
+    pinGuardTitle.textContent = 'Secure your KOMNI PIN';
+    pinGuardDescription.textContent =
+        'A security PIN has been generated for your Google identity. It is intentionally never displayed. Use Copy PIN, store it securely, then continue.';
+    pinProvisionBox.hidden = false;
+    pinEntryBox.style.display = 'none';
+
+    document.getElementById('pinMask').textContent = '••••••';
+    pinSavedCheck.checked = false;
+    confirmPinButton.disabled = true;
+    copyPinButton.textContent = 'Copy PIN';
+
+    pinGuardSetMessage('Copy the PIN, store it safely, then confirm.', false);
+    setPinGuardStatus('NEW SECURITY CREDENTIAL GENERATED', true);
+    pinGuardOpen();
+}
+
+async function handleAuthenticatedUser(user) {
+    pinGuardUser = user;
+    await refreshFirebaseToken(user);
+
+    const status = await pinGuardRequest('/status');
+
+    if (status.provisioned || status.pinProvisioned || status.hasPin) {
+        showPinLogin(user);
+        return;
     }
-  });
+
+    const provision = await pinGuardRequest('/provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+    });
+
+    const pin = provision.pin || provision.oneTimePin || provision.provisionedPin;
+
+    if (!/^\d{6}$/.test(String(pin || ''))) {
+        throw new Error('PIN was generated, but the security API did not return a valid one-time PIN.');
+    }
+
+    showPinProvision(user, pin);
+}
+
+async function confirmProvisionedPin() {
+    if (pinGuardBusy || !/^\d{6}$/.test(provisionedPin) || !pinSavedCheck.checked) return;
+
+    pinGuardBusy = true;
+    confirmPinButton.disabled = true;
+    copyPinButton.disabled = true;
+    pinGuardSetMessage('Registering your PIN securely…');
+
+    try {
+        const result = await pinGuardRequest('/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ confirmed: true })
+        });
+
+        if (!result.confirmed && !result.ok && result.status !== 'confirmed') {
+            throw new Error(result.message || 'The security service did not confirm PIN registration.');
+        }
+
+        // Do not retain the plaintext PIN after confirmation.
+        provisionedPin = '';
+        pinGuardSetMessage('PIN secured. Access granted.', true);
+        setPinGuardStatus('PIN GUARD VERIFIED', true);
+
+        setTimeout(() => {
+            window.location.assign(DASHBOARD_URL);
+        }, 450);
+    } catch (error) {
+        pinGuardSetMessage(error.message || 'Unable to register PIN.');
+        confirmPinButton.disabled = false;
+        copyPinButton.disabled = false;
+    } finally {
+        pinGuardBusy = false;
+    }
+}
+
+async function verifyExistingPin() {
+    const pin = pinInput.value;
+
+    if (!/^\d{6}$/.test(pin)) {
+        pinGuardSetMessage('Enter all 6 PIN digits.');
+        return;
+    }
+
+    if (pinGuardBusy) return;
+
+    pinGuardBusy = true;
+    verifyPinButton.disabled = true;
+    pinGuardSetMessage('Verifying secure credential…');
+
+    try {
+        // The backend verifies the PIN against its server-side hash.
+        // The plaintext PIN is never written to Firestore by this page.
+        const result = await pinGuardRequest('/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin })
+        });
+
+        if (!result.verified && !result.ok) {
+            throw new Error(result.message || 'PIN verification failed.');
+        }
+
+        sessionStorage.setItem('komniPinVerified', 'true');
+        sessionStorage.setItem('komniPinVerifiedAt', String(Date.now()));
+
+        pinGuardSetMessage('PIN verified. Access granted.', true);
+        setPinGuardStatus('PIN GUARD VERIFIED', true);
+
+        setTimeout(() => {
+            window.location.assign(DASHBOARD_URL);
+        }, 450);
+    } catch (error) {
+        resetPinEntry();
+        pinGuardSetMessage(error.message || 'Incorrect PIN.');
+        verifyPinButton.disabled = false;
+    } finally {
+        pinGuardBusy = false;
+    }
+}
+
+copyPinButton.addEventListener('click', async () => {
+    if (!provisionedPin || pinGuardBusy) return;
+
+    try {
+        await navigator.clipboard.writeText(provisionedPin);
+
+        copyPinButton.textContent = 'PIN Copied';
+        pinGuardSetMessage('PIN copied. Store it securely; it will not be displayed.', true);
+
+        // Clear the browser clipboard after a short period where supported.
+        setTimeout(async () => {
+            try {
+                await navigator.clipboard.writeText('');
+            } catch (_) {}
+        }, 30000);
+
+        setTimeout(() => {
+            copyPinButton.textContent = 'Copy PIN';
+        }, 1500);
+    } catch (_) {
+        pinGuardSetMessage(
+            'Clipboard access was blocked. Enable clipboard permission and try Copy PIN again.'
+        );
+    }
+});
+
+pinSavedCheck.addEventListener('change', () => {
+    confirmPinButton.disabled = !pinSavedCheck.checked || !provisionedPin;
+});
+
+confirmPinButton.addEventListener('click', confirmProvisionedPin);
+verifyPinButton.addEventListener('click', verifyExistingPin);
+
+pinInput.addEventListener('input', renderPinDots);
+pinInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') verifyExistingPin();
+});
+
+document.querySelectorAll('.pin-key').forEach(button => {
+    button.addEventListener('click', () => {
+        const key = button.dataset.key;
+
+        if (key === 'clear') {
+            pinInput.value = '';
+        } else if (key === 'back') {
+            pinInput.value = pinInput.value.slice(0, -1);
+        } else if (/^\d$/.test(key) && pinInput.value.length < 6) {
+            pinInput.value += key;
+        }
+
+        renderPinDots();
+
+        if (pinInput.value.length === 6) {
+            verifyPinButton.focus();
+        }
+    });
+});
+
+/*
+ * Existing Firebase sessions are intentionally routed to PIN Guard.
+ * New Google accounts are also routed through the same path; the backend
+ * decides whether a PIN already exists or must be provisioned.
+ */
+function setupAuthListener() {
+    if (!firebaseAuth) return;
+
+    firebaseAuth.onAuthStateChanged(async user => {
+        if (authHandled) return;
+
+        if (!user) {
+            authHandled = false;
+            pinGuardClose();
+            loginCard.style.display = 'block';
+            validationCard.style.display = 'none';
+            wizardCard.classList.remove('is-active');
+            return;
+        }
+
+        authHandled = true;
+        loginCard.style.display = 'none';
+        validationCard.style.display = 'none';
+        wizardCard.classList.remove('is-active');
+
+        try {
+            sessionStorage.setItem('komniAuthUser', JSON.stringify({
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || '',
+                photoURL: user.photoURL || '',
+                providerId: user.providerData?.[0]?.providerId || 'google.com'
+            }));
+
+            await handleAuthenticatedUser(user);
+        } catch (error) {
+            authHandled = false;
+            pinGuardOpen();
+
+            pinGuardTitle.textContent = 'Security service unavailable';
+            pinGuardDescription.textContent =
+                'Google authentication succeeded, but KOMNI could not complete PIN Guard verification.';
+
+            pinProvisionBox.hidden = true;
+            pinEntryBox.style.display = 'none';
+            setPinGuardStatus('PIN GUARD ERROR', false);
+            pinGuardSetMessage(error.message || 'Try again later.');
+        }
+    });
 }
 </script>
 </body>
