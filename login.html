@@ -836,6 +836,220 @@
             margin-top: 20px;
         }
 
+
+        /* ======================================================================
+           4A. BANK-STYLE PIN + MFA SECURITY GATE
+           ====================================================================== */
+        .security-gate {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            background:
+                radial-gradient(circle at 50% 18%, rgba(96,54,225,.18), transparent 34%),
+                #020205;
+            color: #fff;
+            overflow: auto;
+        }
+        .security-gate.is-active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: securityGateIn .45s var(--ease-expensive) both;
+        }
+        @keyframes securityGateIn {
+            from { opacity: 0; transform: scale(1.015); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+        .security-gate-shell {
+            width: min(100%, 560px);
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 32px 22px;
+        }
+        .security-gate-top {
+            position: fixed;
+            top: 24px;
+            left: 28px;
+            right: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+        }
+        .security-gate-top .brand-pill { pointer-events: auto; }
+        .security-gate-status {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: .16em;
+            color: #6f6f78;
+            text-transform: uppercase;
+        }
+        .security-gate-card {
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 22px;
+            padding: 38px;
+            background: linear-gradient(180deg, rgba(13,7,34,.9), rgba(3,3,8,.96));
+            box-shadow: 0 40px 120px rgba(0,0,0,.8), 0 0 70px rgba(96,54,225,.1);
+        }
+        .security-gate-kicker {
+            color: #777783;
+            font: 500 10px/1 var(--font-mono);
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .security-gate-title {
+            font-size: clamp(27px, 5vw, 40px);
+            line-height: 1.05;
+            letter-spacing: -.04em;
+            margin-bottom: 10px;
+        }
+        .security-gate-desc {
+            color: #9999a5;
+            font-size: 13px;
+            line-height: 1.65;
+            margin-bottom: 26px;
+        }
+        .security-account {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,.07);
+            background: rgba(255,255,255,.025);
+            border-radius: 12px;
+        }
+        .security-account img,
+        .security-account-initial {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex: 0 0 auto;
+        }
+        .security-account-initial {
+            display: grid;
+            place-items: center;
+            background: var(--logo-gradient);
+            font-weight: 700;
+        }
+        .security-account strong { display:block; font-size:12px; }
+        .security-account span { display:block; color:#70707b; font:10px var(--font-mono); margin-top:3px; }
+        .pin-dots {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 24px 0 20px;
+        }
+        .pin-dot {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.28);
+            background: transparent;
+            transition: .2s ease;
+        }
+        .pin-dot.filled {
+            background: #fff;
+            border-color: #fff;
+            box-shadow: 0 0 18px rgba(255,255,255,.35);
+        }
+        .pin-input {
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+        .pin-entry {
+            text-align: center;
+            cursor: text;
+            outline: none;
+        }
+        .pin-hint {
+            text-align: center;
+            color: #666671;
+            font: 10px/1.6 var(--font-mono);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .pin-action {
+            width: 100%;
+            height: 50px;
+            margin-top: 24px;
+            border: 0;
+            border-radius: 10px;
+            background: #fff;
+            color: #000;
+            font: 700 11px var(--font-main);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .pin-action:disabled { opacity: .35; cursor: not-allowed; }
+        .pin-error {
+            min-height: 18px;
+            margin-top: 14px;
+            color: #ef4444;
+            text-align: center;
+            font-size: 11px;
+        }
+        .provisioned-pin {
+            display: none;
+            margin: 20px 0;
+            padding: 22px;
+            border: 1px solid rgba(216,61,194,.25);
+            background: rgba(216,61,194,.06);
+            border-radius: 14px;
+            text-align: center;
+        }
+        .provisioned-pin.is-active { display:block; }
+        .provisioned-pin-label {
+            color:#9999a5;
+            font: 10px var(--font-mono);
+            letter-spacing:.15em;
+            text-transform:uppercase;
+        }
+        .provisioned-pin-value {
+            display:block;
+            margin:9px 0 7px;
+            font: 800 32px var(--font-mono);
+            letter-spacing:.28em;
+        }
+        .save-confirm {
+            display:flex;
+            gap:10px;
+            align-items:flex-start;
+            text-align:left;
+            margin-top:16px;
+            color:#a1a1aa;
+            font-size:11px;
+            line-height:1.5;
+        }
+        .mfa-code-wrap { display:none; }
+        .mfa-code-wrap.is-active { display:block; }
+        .mfa-code {
+            width:100%;
+            height:54px;
+            border:1px solid rgba(255,255,255,.12);
+            border-radius:10px;
+            background:rgba(255,255,255,.035);
+            color:#fff;
+            text-align:center;
+            font:700 20px var(--font-mono);
+            letter-spacing:.3em;
+            outline:none;
+        }
+        .mfa-code:focus { border-color: rgba(216,61,194,.65); box-shadow:0 0 22px rgba(216,61,194,.12); }
+        @media (max-width: 480px) {
+            .security-gate-card { padding: 28px 20px; }
+            .security-gate-top { left:16px; right:16px; top:16px; }
+        }
+
         /* Responsive UI */
         @media (max-width: 1024px) {
             .app-viewport {
@@ -979,6 +1193,68 @@
         </div>
     </div>
 
+
+
+    <!-- ======================================================================
+         BANK-STYLE PIN + 2FA GATE
+         ====================================================================== -->
+    <div class="security-gate" id="securityGate" aria-modal="true" role="dialog">
+        <div class="security-gate-top">
+            <div class="brand-pill">
+                <img src="https://i.postimg.cc/Tw07fHGW/Gemini-Generated-Image-5oc6dw5oc6dw5oc6.png" alt="KOMNI Emblem" />
+                <span>KOMNI</span>
+            </div>
+            <div class="security-gate-status" id="securityGateStatus">SECURE SESSION GATE</div>
+        </div>
+
+        <div class="security-gate-shell">
+            <div class="security-gate-card">
+                <div class="security-gate-kicker" id="securityKicker">Identity verified</div>
+                <h2 class="security-gate-title" id="securityTitle">Enter your security PIN</h2>
+                <p class="security-gate-desc" id="securityDesc">
+                    Google has already authenticated this account. A separate PIN and second factor are required before the workspace can open.
+                </p>
+
+                <div class="security-account">
+                    <div id="securityAvatar" class="security-account-initial">K</div>
+                    <div>
+                        <strong id="securityName">Associate</strong>
+                        <span id="securityEmail">user@example.com</span>
+                    </div>
+                </div>
+
+                <div class="provisioned-pin" id="provisionedPinBox">
+                    <div class="provisioned-pin-label">One-time PIN — save it now</div>
+                    <span class="provisioned-pin-value" id="provisionedPinValue">000000</span>
+                    <div class="pin-hint">This PIN is shown once. Do not store it in source code or local storage.</div>
+                    <label class="save-confirm">
+                        <input type="checkbox" id="pinSavedCheck" />
+                        <span>I saved this PIN somewhere secure. I understand it will be required for future sessions.</span>
+                    </label>
+                </div>
+
+                <div id="pinEntryWrap">
+                    <div class="pin-entry" id="pinEntry" tabindex="0" aria-label="Enter six digit security PIN">
+                        <input id="pinInput" class="pin-input" type="password" inputmode="numeric" autocomplete="one-time-code" maxlength="6" />
+                        <div class="pin-dots" id="pinDots" aria-hidden="true">
+                            <span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span>
+                            <span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span>
+                        </div>
+                        <div class="pin-hint">6-digit security PIN</div>
+                    </div>
+                </div>
+
+                <div class="mfa-code-wrap" id="mfaCodeWrap">
+                    <input id="mfaCode" class="mfa-code" inputmode="numeric" autocomplete="one-time-code"
+                           maxlength="8" placeholder="••••••" aria-label="Two-factor authentication code" />
+                    <div class="pin-hint" style="margin-top:10px;">Enter the current code from your enrolled authenticator.</div>
+                </div>
+
+                <button class="pin-action" id="securityAction" disabled>Continue</button>
+                <div class="pin-error" id="securityError" role="alert"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- ======================================================================
          5. FULLSCREEN WELCOME WIZARD OVERLAY
@@ -1337,7 +1613,8 @@
                 if (user) {
                     authHandled = true;
 
-                    // Cache basic session locally regardless of database connection
+                    // Firebase owns the identity. The security gate below must
+                    // be backed by a trusted server for real PIN/MFA enforcement.
                     sessionStorage.setItem('komniAuthUser', JSON.stringify({
                         uid: user.uid,
                         displayName: user.displayName || '',
@@ -1346,20 +1623,22 @@
                         providerId: user.providerData?.[0]?.providerId || 'google.com'
                     }));
 
-                    showValidationCard(user);
-
-                    // Attempt indexing non-fatally
                     try {
                         await indexUserInFirestore(user);
                     } catch (err) {
-                        console.warn('Firestore sync bypassed due to offline/missing DB status:', err.message);
+                        console.warn('Firestore sync bypassed:', err.message);
                     }
+
+                    // If Google is already signed in, this path runs immediately
+                    // on page load — no second Google button click is required.
+                    await beginSecurityGate(user);
                 } else {
                     authHandled = false;
+                    hideSecurityGate();
                     loginCard.style.display = 'block';
                     validationCard.style.display = 'none';
                     wizardCard.classList.remove('is-active');
-                    
+
                     const btn = document.getElementById('googleSignInBtn');
                     const txt = document.getElementById('googleSignInText');
                     if (btn) btn.disabled = false;
@@ -1367,6 +1646,244 @@
                 }
             });
         }
+
+        /* ====================================================================
+           PIN + MFA SECURITY GATE
+           ==================================================================== */
+        const SECURITY_API_BASE = '/api/auth/security';
+
+        let securityUser = null;
+        let securityMode = 'verify-pin';
+        let provisionedPin = '';
+
+        function getFirebaseIdToken() {
+            return firebaseAuth?.currentUser?.getIdToken(true);
+        }
+
+        async function securityRequest(path, options = {}) {
+            const token = await getFirebaseIdToken();
+            if (!token) throw new Error('Your Google session has expired. Please sign in again.');
+
+            const response = await fetch(`${SECURITY_API_BASE}${path}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...(options.headers || {})
+                }
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.message || 'Security service unavailable.');
+            return data;
+        }
+
+        async function beginSecurityGate(user) {
+            securityUser = user;
+            showSecurityGate(user);
+            setSecurityBusy(true, 'Checking security profile…');
+
+            try {
+                const status = await securityRequest(`/status?uid=${encodeURIComponent(user.uid)}`);
+
+                if (!status.pinProvisioned) {
+                    securityMode = 'provision';
+                    setSecurityProvisionMode();
+                    const data = await securityRequest('/provision-pin', {
+                        method: 'POST',
+                        body: JSON.stringify({ uid: user.uid })
+                    });
+
+                    provisionedPin = String(data.pin || '');
+                    if (!/^\d{6}$/.test(provisionedPin)) {
+                        throw new Error('The security service returned an invalid PIN.');
+                    }
+
+                    document.getElementById('provisionedPinValue').textContent = provisionedPin;
+                    document.getElementById('provisionedPinBox').classList.add('is-active');
+                    document.getElementById('pinEntryWrap').style.display = 'none';
+                    document.getElementById('pinSavedCheck').checked = false;
+                    document.getElementById('securityAction').disabled = true;
+                    setSecurityBusy(false);
+                    return;
+                }
+
+                securityMode = 'verify-pin';
+                setSecurityPinMode();
+                setSecurityBusy(false);
+                focusPin();
+
+            } catch (err) {
+                showSecurityError(err.message || 'Unable to initialize secure sign-in.');
+                setSecurityBusy(false);
+            }
+        }
+
+        function showSecurityGate(user) {
+            const gate = document.getElementById('securityGate');
+            gate.classList.add('is-active');
+            document.body.style.overflow = 'hidden';
+
+            document.getElementById('securityName').textContent = user.displayName || 'Associate';
+            document.getElementById('securityEmail').textContent = user.email || 'Google Account';
+
+            const avatar = document.getElementById('securityAvatar');
+            if (user.photoURL) {
+                avatar.outerHTML = `<img id="securityAvatar" src="${escapeHtml(user.photoURL)}" alt="" />`;
+            } else {
+                avatar.textContent = (user.displayName || 'A').charAt(0).toUpperCase();
+            }
+        }
+
+        function hideSecurityGate() {
+            document.getElementById('securityGate').classList.remove('is-active');
+            document.body.style.overflow = '';
+        }
+
+        function setSecurityBusy(busy, text = 'Continue') {
+            const btn = document.getElementById('securityAction');
+            btn.disabled = busy || (securityMode === 'provision' && !document.getElementById('pinSavedCheck').checked);
+            btn.textContent = text;
+        }
+
+        function setSecurityProvisionMode() {
+            document.getElementById('securityKicker').textContent = 'New security profile';
+            document.getElementById('securityTitle').textContent = 'Save your security PIN';
+            document.getElementById('securityDesc').textContent =
+                'This PIN is provisioned once for your Google identity. Save it securely; it is required at every new KOMNI login session.';
+            document.getElementById('pinEntryWrap').style.display = 'none';
+            document.getElementById('mfaCodeWrap').classList.remove('is-active');
+            document.getElementById('securityAction').textContent = 'I Saved My PIN';
+            document.getElementById('securityAction').disabled = true;
+            document.getElementById('securityError').textContent = '';
+        }
+
+        function setSecurityPinMode() {
+            document.getElementById('securityKicker').textContent = 'Google identity verified';
+            document.getElementById('securityTitle').textContent = 'Enter your security PIN';
+            document.getElementById('securityDesc').textContent =
+                'Your Google session is recognized. Enter the separate KOMNI PIN before the second-factor challenge.';
+            document.getElementById('provisionedPinBox').classList.remove('is-active');
+            document.getElementById('pinEntryWrap').style.display = 'block';
+            document.getElementById('mfaCodeWrap').classList.remove('is-active');
+            document.getElementById('securityAction').textContent = 'Verify PIN';
+            document.getElementById('securityError').textContent = '';
+            updatePinDots('');
+        }
+
+        function focusPin() {
+            setTimeout(() => document.getElementById('pinInput')?.focus(), 50);
+        }
+
+        function updatePinDots(value) {
+            document.querySelectorAll('#pinDots .pin-dot').forEach((dot, i) => {
+                dot.classList.toggle('filled', i < value.length);
+            });
+        }
+
+        async function handleSecurityAction() {
+            if (!securityUser) return;
+
+            const btn = document.getElementById('securityAction');
+            btn.disabled = true;
+            document.getElementById('securityError').textContent = '';
+
+            try {
+                if (securityMode === 'provision') {
+                    if (!document.getElementById('pinSavedCheck').checked) {
+                        throw new Error('Confirm that you saved the PIN before continuing.');
+                    }
+
+                    // The server should atomically mark the one-time PIN as
+                    // provisioned. The plaintext PIN never goes into Firestore.
+                    await securityRequest('/confirm-pin-saved', {
+                        method: 'POST',
+                        body: JSON.stringify({ uid: securityUser.uid })
+                    });
+
+                    securityMode = 'verify-pin';
+                    setSecurityPinMode();
+                    focusPin();
+                    return;
+                }
+
+                if (securityMode === 'verify-pin') {
+                    const pin = document.getElementById('pinInput').value;
+                    if (!/^\d{6}$/.test(pin)) throw new Error('Enter your 6-digit PIN.');
+
+                    const result = await securityRequest('/verify-pin', {
+                        method: 'POST',
+                        body: JSON.stringify({ uid: securityUser.uid, pin })
+                    });
+
+                    if (!result.mfaRequired) {
+                        throw new Error('MFA is not enabled for this account.');
+                    }
+
+                    securityMode = 'verify-mfa';
+                    document.getElementById('securityKicker').textContent = 'Second factor required';
+                    document.getElementById('securityTitle').textContent = 'Verify 2-step authentication';
+                    document.getElementById('securityDesc').textContent =
+                        'Enter the current code from your enrolled authenticator. This challenge is required for every login session.';
+                    document.getElementById('pinEntryWrap').style.display = 'none';
+                    document.getElementById('mfaCodeWrap').classList.add('is-active');
+                    btn.textContent = 'Verify & Enter Workspace';
+                    document.getElementById('mfaCode').focus();
+                    btn.disabled = false;
+                    return;
+                }
+
+                if (securityMode === 'verify-mfa') {
+                    const code = document.getElementById('mfaCode').value.trim();
+                    if (!code) throw new Error('Enter your 2FA code.');
+
+                    const result = await securityRequest('/verify-mfa', {
+                        method: 'POST',
+                        body: JSON.stringify({ uid: securityUser.uid, code })
+                    });
+
+                    if (!result.verified) throw new Error('That 2FA code was not accepted.');
+
+                    sessionStorage.setItem('komniSecurityVerified', JSON.stringify({
+                        uid: securityUser.uid,
+                        verifiedAt: Date.now(),
+                        sessionId: result.sessionId || null
+                    }));
+
+                    hideSecurityGate();
+                    launchWizard(securityUser);
+                }
+            } catch (err) {
+                showSecurityError(err.message || 'Security verification failed.');
+                btn.disabled = false;
+            }
+        }
+
+        function showSecurityError(message) {
+            document.getElementById('securityError').textContent = message;
+        }
+
+        document.getElementById('securityAction').addEventListener('click', handleSecurityAction);
+        document.getElementById('pinSavedCheck').addEventListener('change', (e) => {
+            document.getElementById('securityAction').disabled = !e.target.checked;
+        });
+        document.getElementById('pinEntry').addEventListener('click', focusPin);
+        document.getElementById('pinInput').addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+            updatePinDots(e.target.value);
+            if (securityMode === 'verify-pin') {
+                document.getElementById('securityAction').disabled = e.target.value.length !== 6;
+            }
+        });
+        document.getElementById('pinInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.value.length === 6) handleSecurityAction();
+        });
+        document.getElementById('mfaCode').addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 8);
+            if (securityMode === 'verify-mfa') {
+                document.getElementById('securityAction').disabled = e.target.value.length < 6;
+            }
+        });
 
         /* ====================================================================
            FULLSCREEN GOOGLE AUTH (signInWithRedirect)
