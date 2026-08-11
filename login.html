@@ -1873,11 +1873,25 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
         }
 
         function resetPinVisualState() {
-            pinGuardContent.classList.remove('success-state');
-            pinDots.forEach(dot => dot.classList.remove('success'));
-            pinDots.classList.remove('error', 'typing');
-            pinGuardIcon.textContent = '⌁';
-        }
+    // Example: If you are querying PIN dots, safeguard the NodeList
+    const pinDots = document.querySelectorAll('.pin-dot'); // Update selector to match yours
+    
+    if (pinDots && pinDots.length > 0) {
+        pinDots.forEach(dot => {
+            // The ?. ensures .remove() only fires if classList exists
+            dot?.classList?.remove('active');
+            dot?.classList?.remove('error');
+        });
+    }
+}
+
+function resetPinEntry() {
+    // Safeguard your PIN variable reset
+    currentPin = ''; // Update variable name to match yours
+    
+    // Call the newly safeguarded visual reset
+    resetPinVisualState();
+}
 
         function renderPinDots() {
             const value = pinInput.value.replace(/\D/g, '').slice(0, 6);
@@ -1937,6 +1951,29 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
 
             return data;
         }
+        async function handlePinSubmit(enteredPin) {
+    // 1. Fetch your user/merchant configuration object first
+    const configData = await getYourConfigObject(); // Update to your actual state fetcher
+    
+    // 2. GUARD: Do not proceed if M_ID is missing or undefined
+    if (!configData || typeof configData.M_ID === 'undefined') {
+        console.error("Authentication aborted: Missing M_ID in configuration.");
+        // Optional: Show error to user on the UI
+        showErrorOnUI("System configuration error. Please try again.");
+        return; 
+    }
+
+    try {
+        // 3. Only call the request once you know the payload is valid
+        await pinGuardRequest({
+            pin: enteredPin,
+            M_ID: configData.M_ID,
+            // ... any other required payload data
+        });
+    } catch (error) {
+        console.error("PIN Guard Request failed:", error);
+    }
+}
 
         async function refreshFirebaseToken(user) {
             pinGuardToken = await user.getIdToken(true);
