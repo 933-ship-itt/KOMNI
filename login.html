@@ -1454,30 +1454,31 @@
            FULLSCREEN GOOGLE AUTH (signInWithRedirect)
            ==================================================================== */
         async function handleGoogleSignIn() {
-            const button = document.getElementById('googleSignInBtn');
-            const text = document.getElementById('googleSignInText');
+    const button = document.getElementById('googleSignInBtn');
+    const text = document.getElementById('googleSignInText');
 
-            if (!firebaseAuth) {
-                showAuthError('Firebase auth unavailable.');
-                return;
-            }
+    if (!firebaseAuth) {
+        showAuthError('Firebase auth unavailable.');
+        return;
+    }
 
-            button.disabled = true;
-            text.textContent = 'Redirecting to Google…';
+    button.disabled = true;
+    text.textContent = 'Authenticating via Google…';
 
-            const provider = new firebase.auth.GoogleAuthProvider();
-            provider.addScope('email');
-            provider.addScope('profile');
-            provider.setCustomParameters({ prompt: 'select_account' });
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
+    provider.setCustomParameters({ prompt: 'select_account' });
 
-            try {
-                await firebaseAuth.signInWithRedirect(provider);
-            } catch (err) {
-                button.disabled = false;
-                text.textContent = 'Sign in with Google';
-                showAuthError(err?.message || 'Authentication error occurred.');
-            }
-        }
+    try {
+        // Change this line from signInWithRedirect to signInWithPopup
+        await firebaseAuth.signInWithPopup(provider);
+    } catch (err) {
+        button.disabled = false;
+        text.textContent = 'Sign in with Google';
+        showAuthError(err?.message || 'Authentication error occurred.');
+    }
+}
 
         /* ====================================================================
            FIRESTORE INDEXING
@@ -2073,48 +2074,57 @@ document.querySelectorAll('.pin-key').forEach(button => {
  * New Google accounts are also routed through the same path; the backend
  * decides whether a PIN already exists or must be provisioned.
  */
+// Consolidated Auth Listener
 function setupAuthListener() {
     if (!firebaseAuth) return;
 
-    firebaseAuth.onAuthStateChanged(async user => {
+    firebaseAuth.onAuthStateChanged(async (user) => {
+        console.log('Auth state changed. User:', user ? user.uid : 'null');
         if (authHandled) return;
 
-        if (!user) {
+        if (user) {
+            authHandled = true;
+
+            // Cache session locally
+            sessionStorage.setItem('komniAuthUser', JSON.stringify({
+                uid: user.uid,
+                displayName: user.displayName || '',
+                email: user.email || '',
+                photoURL: user.photoURL || '',
+                providerId: user.providerData?.[0]?.providerId || 'google.com'
+            }));
+
+            // Index the user in Firestore silently
+            try {
+                await indexUserInFirestore(user);
+            } catch (err) {
+                console.warn('Firestore sync bypassed due to offline/missing DB status:', err.message);
+            }
+
+            // Trigger the PIN Guard sequence
+            try {
+                await handleAuthenticatedUser(user);
+            } catch (error) {
+                pinGuardOpen();
+                document.getElementById('pinGuardTitle').textContent = 'Security service unavailable';
+                document.getElementById('pinGuardDescription').textContent = 'Google authentication succeeded, but KOMNI could not complete PIN Guard verification.';
+                document.getElementById('pinProvisionBox').hidden = true;
+                document.getElementById('pinEntryBox').style.display = 'none';
+                setPinGuardStatus('PIN GUARD ERROR', false);
+                pinGuardSetMessage(error.message || 'Try again later.');
+            }
+
+        } else {
             authHandled = false;
             pinGuardClose();
             loginCard.style.display = 'block';
             validationCard.style.display = 'none';
             wizardCard.classList.remove('is-active');
-            return;
-        }
 
-        authHandled = true;
-        loginCard.style.display = 'none';
-        validationCard.style.display = 'none';
-        wizardCard.classList.remove('is-active');
-
-        try {
-            sessionStorage.setItem('komniAuthUser', JSON.stringify({
-                uid: user.uid,
-                email: user.email || '',
-                displayName: user.displayName || '',
-                photoURL: user.photoURL || '',
-                providerId: user.providerData?.[0]?.providerId || 'google.com'
-            }));
-
-            await handleAuthenticatedUser(user);
-        } catch (error) {
-            authHandled = false;
-            pinGuardOpen();
-
-            pinGuardTitle.textContent = 'Security service unavailable';
-            pinGuardDescription.textContent =
-                'Google authentication succeeded, but KOMNI could not complete PIN Guard verification.';
-
-            pinProvisionBox.hidden = true;
-            pinEntryBox.style.display = 'none';
-            setPinGuardStatus('PIN GUARD ERROR', false);
-            pinGuardSetMessage(error.message || 'Try again later.');
+            const btn = document.getElementById('googleSignInBtn');
+            const txt = document.getElementById('googleSignInText');
+            if (btn) btn.disabled = false;
+            if (txt) txt.textContent = 'Sign in with Google';
         }
     });
 }
