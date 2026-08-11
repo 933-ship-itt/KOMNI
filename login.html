@@ -315,7 +315,6 @@
             position: relative;
         }
 
-        /* ---- Login Card ---- */
         .login-card {
             display: block;
             background: transparent;
@@ -858,9 +857,8 @@
                 flex-direction: column;
             }
         }
-    
 
-/* AUTH BOOT: prevent a returning Firebase session from flashing the login page */
+/* AUTH BOOT */
 body.auth-booting > .app-viewport { visibility:hidden; }
 body.auth-boot-ready > .app-viewport { visibility:visible; }
 
@@ -1029,7 +1027,7 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
     .pin-guard-back{top:14px;left:14px}
 }
 
-/* PIN GUARD */
+/* PIN GUARD OVERLAY */
 .pin-guard-overlay{position:fixed;inset:0;z-index:2500;display:none;align-items:center;justify-content:center;padding:0;background:radial-gradient(circle at 50% 30%,rgba(13,7,34,.98) 0%,#020205 62%,#000 100%);backdrop-filter:blur(18px)}
 .pin-guard-overlay.is-active{display:flex;animation:pinFade .35s ease both}
 .pin-guard-frame{width:100vw;height:100vh;min-height:100vh;display:flex;flex-direction:column;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:hidden}
@@ -1051,19 +1049,12 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
 .pin-guard-button.secondary{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#fff}
 .pin-guard-button:disabled{opacity:.4;cursor:not-allowed}
 .pin-guard-button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(0,0,0,.35)}
-.pin-input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
 .pin-dots{display:flex;gap:14px;margin:28px 0 22px}
 .pin-dots span{width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:transparent;transition:.15s}
 .pin-dots span.filled{background:#fff;border-color:#fff;box-shadow:0 0 12px rgba(255,255,255,.4)}
-.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:min(330px,100%);margin-top:8px}
-.pin-key{height:52px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:#fff;font:500 18px var(--font-mono);cursor:pointer}
-.pin-key:hover{background:rgba(255,255,255,.08)}
-.pin-guard-message{min-height:22px;margin-top:16px;font:500 10px var(--font-mono);color:#ef4444;letter-spacing:.04em}
-.pin-guard-message.success{color:#22c55e}
 .pin-guard-footer{padding:16px 22px;border-top:1px solid rgba(255,255,255,.06);text-align:center;font:9px var(--font-mono);letter-spacing:.12em;color:#444}
 @keyframes pinFade{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
 @media(max-width:600px){.pin-guard-content{padding:30px 20px}.pin-guard-content h1{font-size:23px}}
-
     </style>
 </head>
 <body class="auth-booting">
@@ -1149,7 +1140,6 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
                         <p class="login-subtitle">Authenticate via full-screen Google OAuth to access your KOMNI workspace.</p>
                     </div>
 
-                    <!-- Direct Fullscreen Google Sign In Trigger -->
                     <button type="button" class="google-signin-btn" id="googleSignInBtn" onclick="handleGoogleSignIn();">
                         <span class="google-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" width="19" height="19">
@@ -1185,49 +1175,45 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
         </div>
     </div>
 
-
-
-<!-- PIN GUARD PANEL -->
-<div class="pin-guard-overlay" id="pinGuardOverlay" aria-hidden="true">
-  <div class="pin-guard-frame">
-    <div class="pin-guard-brand">
-      <span class="pin-guard-lock">◆</span> KOMNI SECURITY GATE
-    </div>
-    <div class="pin-guard-status" id="pinGuardStatus">SECURE SESSION REQUIRED</div>
-    <div class="pin-guard-content">
-      <div class="pin-guard-icon" id="pinGuardIcon">⌁</div>
-      <h1 id="pinGuardTitle">Enter your security PIN</h1>
-      <p id="pinGuardDescription">Your Google account is recognized. Enter your KOMNI security PIN to continue.</p>
-
-      <div class="pin-provision-box" id="pinProvisionBox" hidden>
-        <div class="pin-provision-label">YOUR ONE-TIME PIN</div>
-        <div class="pin-mask" id="pinMask" aria-label="PIN hidden">••••••</div>
-        <p class="pin-provision-note">Your PIN is intentionally masked. Copy it securely now. Do not share it.</p>
-        <button class="pin-guard-button secondary" id="copyPinButton" type="button">Copy PIN</button>
-        <label class="pin-save-check">
-          <input id="pinSavedCheck" type="checkbox" />
-          <span>I have stored this PIN safely.</span>
-        </label>
-        <button class="pin-guard-button primary" id="confirmPinButton" type="button" disabled>Proceed</button>
-      </div>
-
-      <div id="pinEntryBox" class="pin-login-mode">
-        <button class="pin-guard-back" id="pinGuardBackButton" type="button" aria-label="Back to Google sign in">← Back</button>
-        <div class="pin-dots" id="pinDots" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span>
+    <!-- PIN GUARD PANEL -->
+    <div class="pin-guard-overlay" id="pinGuardOverlay" aria-hidden="true">
+      <div class="pin-guard-frame">
+        <div class="pin-guard-brand">
+          <span class="pin-guard-lock">◆</span> KOMNI SECURITY GATE
         </div>
-        <input id="pinInput" class="pin-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" aria-label="6 digit security PIN" />
+        <div class="pin-guard-status" id="pinGuardStatus">SECURE SESSION REQUIRED</div>
+        <div class="pin-guard-content">
+          <div class="pin-guard-icon" id="pinGuardIcon">⌁</div>
+          <h1 id="pinGuardTitle">Enter your security PIN</h1>
+          <p id="pinGuardDescription">Your Google account is recognized. Enter your KOMNI security PIN to continue.</p>
+
+          <div class="pin-provision-box" id="pinProvisionBox" hidden>
+            <div class="pin-provision-label">YOUR ONE-TIME PIN</div>
+            <div class="pin-mask" id="pinMask" aria-label="PIN hidden">••••••</div>
+            <p class="pin-provision-note">Your PIN is intentionally masked. Copy it securely now. Do not share it.</p>
+            <button class="pin-guard-button secondary" id="copyPinButton" type="button">Copy PIN</button>
+            <label class="pin-save-check">
+              <input id="pinSavedCheck" type="checkbox" />
+              <span>I have stored this PIN safely.</span>
+            </label>
+            <button class="pin-guard-button primary" id="confirmPinButton" type="button" disabled>Proceed</button>
+          </div>
+
+          <div id="pinEntryBox" class="pin-login-mode">
+            <button class="pin-guard-back" id="pinGuardBackButton" type="button" aria-label="Back to Google sign in">← Back</button>
+            <div class="pin-dots" id="pinDots" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <input id="pinInput" class="pin-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" aria-label="6 digit security PIN" />
+          </div>
+
+          <div class="pin-guard-message" id="pinGuardMessage" role="status"></div>
+        </div>
+        <div class="pin-guard-footer">KOMNI // GOOGLE IDENTITY + PIN GUARD</div>
       </div>
-
-      <div class="pin-guard-message" id="pinGuardMessage" role="status"></div>
     </div>
-    <div class="pin-guard-footer">KOMNI // GOOGLE IDENTITY + PIN GUARD</div>
-  </div>
-</div>
 
-    <!-- ======================================================================
-         5. FULLSCREEN WELCOME WIZARD OVERLAY
-         ====================================================================== -->
+    <!-- FULLSCREEN WELCOME WIZARD OVERLAY -->
     <div class="wizard-card" id="wizardCard">
         <div class="wizard-brand-bar">
             <div class="brand-pill">
@@ -1238,7 +1224,6 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
         </div>
 
         <div class="wizard-content-box">
-            <!-- Progress Dots -->
             <div class="wizard-progress" id="wizardProgress">
                 <span class="wizard-dot active" data-step="0"></span>
                 <span class="wizard-dot" data-step="1"></span>
@@ -1369,7 +1354,7 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
 
                 <div style="margin-top:24px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.18); border-radius:8px; padding:16px; text-align:center;">
                     <span style="font-size:12px; color:#22c55e; font-weight:600;">✓ Ready to Initialize Node</span>
-                    <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Redirecting directly to /dashboard.html</span>
+                    <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">Redirecting directly to dashboard.html</span>
                 </div>
 
                 <div class="wizard-btn-group">
@@ -1383,24 +1368,20 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
         <div class="wizard-footer-note">KOMNI FINANCIAL TECHNOLOGIES // FULLSCREEN WORKSPACE ENVIRONMENT</div>
     </div>
 
-
-    <!-- ======================================================================
-         SCRIPT ENGINE
-         ====================================================================== -->
+    <!-- SCRIPT ENGINE -->
     <script>
         /* ====================================================================
-           FIREBASE CONFIG (Sanitized for compat layer)
+           FIREBASE CONFIG
            ==================================================================== */
         const firebaseConfig = {
-  apiKey: "AIzaSyCAGeF1z2VW5lf0qUcOio2MVNZ8vWTHHWg",
-  authDomain: "komni-eb72e.firebaseapp.com",
-  projectId: "komni-eb72e",
-  storageBucket: "komni-eb72e.firebasestorage.app",
-  messagingSenderId: "754396573424",
-  appId: "1:754396573424:web:87b1638b20903dae94dc35",
-  measurementId: "G-6GZYWR2G78"
-};
-
+            apiKey: "AIzaSyCAGeF1z2VW5lf0qUcOio2MVNZ8vWTHHWg",
+            authDomain: "komni-eb72e.firebaseapp.com",
+            projectId: "komni-eb72e",
+            storageBucket: "komni-eb72e.firebasestorage.app",
+            messagingSenderId: "754396573424",
+            appId: "1:754396573424:web:87b1638b20903dae94dc35",
+            measurementId: "G-6GZYWR2G78"
+        };
 
         let firebaseApp, firebaseAuth, firestore;
         let authHandled = false;
@@ -1414,16 +1395,10 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
             console.error('Firebase init error:', e);
         }
 
-        /* ====================================================================
-           STATE
-           ==================================================================== */
         let currentWizardStep = 0;
         const TOTAL_STEPS = 4;
         let wizardUserData = null;
 
-        /* ====================================================================
-           DOM REFS
-           ==================================================================== */
         const loginCard = document.getElementById('loginCard');
         const validationCard = document.getElementById('validationCard');
         const wizardCard = document.getElementById('wizardCard');
@@ -1558,7 +1533,6 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
 
             initAdvertEngine('loginAdvertCanvas', '.stage-wrapper');
 
-            // Catch redirect results safely
             if (firebaseAuth) {
                 firebaseAuth.getRedirectResult().then((result) => {
                     if (result && result.user && !authHandled) {
@@ -1571,7 +1545,7 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
         });
 
         /* ====================================================================
-           FULLSCREEN GOOGLE AUTH (signInWithRedirect)
+           FULLSCREEN GOOGLE AUTH
            ==================================================================== */
         async function handleGoogleSignIn() {
             const button = document.getElementById('googleSignInBtn');
@@ -1616,7 +1590,7 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
                 userDoc = await userRef.get();
                 exists = userDoc.exists;
             } catch (e) {
-                console.warn('Firestore read error (DB probably not created yet):', e.message);
+                console.warn('Firestore read warning:', e.message);
             }
 
             const googleMeta = {
@@ -1674,42 +1648,6 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
                 updatedAt: now,
                 createdAt: exists ? (userDoc?.data()?.createdAt || now) : now
             }, { merge: true });
-
-            console.log('User & Client collection successfully synced in Firestore.');
-        }
-
-        /* ====================================================================
-           VALIDATION CARD & TRANSITION TO FULLSCREEN WIZARD
-           ==================================================================== */
-        function showValidationCard(user) {
-            loginCard.style.display = 'none';
-            validationCard.style.display = 'block';
-            validationCard.classList.add('is-active');
-
-            const pill = validationStatusPill;
-            const term = validationTerminal;
-
-            pill.className = 'auth-status-pill is-success';
-            pill.innerText = 'Google Authenticated';
-
-            const email = user.email || 'Google Account';
-            const name = user.displayName || 'Associate';
-
-            term.innerHTML =
-                '<span class="terminal-line info">> Executing Google OAuth Redirect Verification…</span>' +
-                '<span class="terminal-line accent">> Verifying session tokens with Firebase Auth…</span>' +
-                `<span class="terminal-line success">> Authenticated: ${escapeHtml(email)}</span>` +
-                '<span class="terminal-line info">> Preparing onboarding posture environment…</span>';
-
-            setTimeout(() => {
-                term.innerHTML += '<span class="terminal-line success">> Authentication Handshake Verified ✓</span>';
-                term.innerHTML += `<span class="terminal-line accent">> Launching setup wizard for ${escapeHtml(name)}…</span>`;
-            }, 600);
-
-            setTimeout(() => {
-                validationCard.style.display = 'none';
-                launchWizard(user);
-            }, 1400);
         }
 
         /* ====================================================================
@@ -1753,9 +1691,6 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
             updateWizardUI();
         }
 
-        /* ====================================================================
-           WIZARD NAVIGATION
-           ==================================================================== */
         function wizardNext() {
             if (currentWizardStep === 1) {
                 const company = document.getElementById('wizCompany').value.trim();
@@ -1799,9 +1734,6 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
             });
         }
 
-        /* ====================================================================
-           SAVE WIZARD DATA TO FIRESTORE
-           ==================================================================== */
         async function saveWizardData() {
             const user = firebaseAuth?.currentUser;
             if (!user || !firestore) return;
@@ -1830,25 +1762,17 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
                     jobRole,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
-                console.log('Enterprise wizard preferences saved to Firestore.');
             } catch (err) {
-                console.warn('Could not persist preferences to Firestore:', err.message);
+                console.warn('Could not persist preferences:', err.message);
             }
         }
 
-        /* ====================================================================
-           LAUNCH DASHBOARD (FIXED ROUTE)
-           ==================================================================== */
         function launchDashboard() {
             saveWizardData().finally(() => {
-                // Updated relative routing for GitHub static pages
                 window.location.href = 'dashboard.html';
             });
         }
 
-        /* ====================================================================
-           HELPERS
-           ==================================================================== */
         function escapeHtml(value) {
             return String(value)
                 .replace(/&/g, '&amp;')
@@ -1890,486 +1814,468 @@ body.auth-boot-ready > .app-viewport { visibility:visible; }
             authHandled = false;
         }
     </script>
-<script>
-/* =====================================================================
-   KOMNI PIN GUARD FRONTEND
-   Backend: https://komni-backend.vercel.app/api/security/auth/pin_guard
-   ===================================================================== */
-const PIN_GUARD_API = 'https://komni-backend.vercel.app/api/security/auth/pin_guard';
-const DASHBOARD_URL = '/dashboard';
 
-let pinGuardUser = null;
-let pinGuardToken = null;
-let provisionedPin = '';
-let pinGuardBusy = false;
+    <!-- PIN GUARD API INTEGRATION ALIGNED WITH pinguard.py -->
+    <script>
+        const PIN_GUARD_API = 'https://komni-backend.vercel.app/api/security/auth/pin_guard';
+        const DASHBOARD_URL = 'dashboard.html';
 
-const pinGuardOverlay = document.getElementById('pinGuardOverlay');
-const pinGuardTitle = document.getElementById('pinGuardTitle');
-const pinGuardDescription = document.getElementById('pinGuardDescription');
-const pinGuardMessage = document.getElementById('pinGuardMessage');
-const pinProvisionBox = document.getElementById('pinProvisionBox');
-const pinEntryBox = document.getElementById('pinEntryBox');
-const pinInput = document.getElementById('pinInput');
-const pinDots = [...document.querySelectorAll('#pinDots span')];
-const pinSavedCheck = document.getElementById('pinSavedCheck');
-const confirmPinButton = document.getElementById('confirmPinButton');
-const copyPinButton = document.getElementById('copyPinButton');
-const pinGuardStatus = document.getElementById('pinGuardStatus');
-const pinGuardContent = document.querySelector('.pin-guard-content');
-const pinGuardIcon = document.getElementById('pinGuardIcon');
-const pinGuardBackButton = document.getElementById('pinGuardBackButton');
+        let pinGuardUser = null;
+        let pinGuardToken = null;
+        let provisionedPin = '';
+        let pinGuardBusy = false;
 
-function pinGuardOpen() {
-    pinGuardOverlay.classList.add('is-active');
-    pinGuardOverlay.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-}
+        const pinGuardOverlay = document.getElementById('pinGuardOverlay');
+        const pinGuardTitle = document.getElementById('pinGuardTitle');
+        const pinGuardDescription = document.getElementById('pinGuardDescription');
+        const pinGuardMessage = document.getElementById('pinGuardMessage');
+        const pinProvisionBox = document.getElementById('pinProvisionBox');
+        const pinEntryBox = document.getElementById('pinEntryBox');
+        const pinInput = document.getElementById('pinInput');
+        const pinDots = [...document.querySelectorAll('#pinDots span')];
+        const pinSavedCheck = document.getElementById('pinSavedCheck');
+        const confirmPinButton = document.getElementById('confirmPinButton');
+        const copyPinButton = document.getElementById('copyPinButton');
+        const pinGuardStatus = document.getElementById('pinGuardStatus');
+        const pinGuardContent = document.querySelector('.pin-guard-content');
+        const pinGuardIcon = document.getElementById('pinGuardIcon');
+        const pinGuardBackButton = document.getElementById('pinGuardBackButton');
 
-function pinGuardClose() {
-    pinGuardOverlay.classList.remove('is-active');
-    pinGuardOverlay.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-}
-
-function pinGuardSetMessage(message, success = false, verifying = false) {
-    pinGuardMessage.classList.remove('success', 'pin-verifying-dots');
-    pinGuardMessage.innerHTML = '';
-    if (!message) return;
-
-    if (success) {
-        pinGuardMessage.innerHTML = `<span class="pin-success-word">${escapeHtml(message)}</span>`;
-        pinGuardMessage.classList.add('success');
-    } else {
-        pinGuardMessage.textContent = message;
-        if (verifying) pinGuardMessage.classList.add('pin-verifying-dots');
-    }
-}
-
-function setPinGuardStatus(text, success = true) {
-    pinGuardStatus.textContent = text;
-    pinGuardStatus.style.color = success ? '#22c55e' : '#ef4444';
-}
-
-function resetPinVisualState() {
-    pinGuardContent.classList.remove('success-state');
-    pinDots.forEach(dot => dot.classList.remove('success'));
-    pinDots.classList.remove('error', 'typing');
-    pinGuardIcon.textContent = '⌁';
-}
-
-function renderPinDots() {
-    const value = pinInput.value.replace(/\D/g, '').slice(0, 6);
-    pinInput.value = value;
-    pinDots.forEach((dot, index) => dot.classList.toggle('filled', index < value.length));
-    pinDots.classList.toggle('typing', value.length > 0 && value.length < 6);
-}
-
-function resetPinEntry() {
-    pinInput.value = '';
-    resetPinVisualState();
-    renderPinDots();
-}
-
-async function pinGuardRequest(path, options = {}) {
-    if (!pinGuardToken) {
-        throw new Error('Google authentication token is unavailable.');
-    }
-
-    const headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${pinGuardToken}`,
-        ...(options.headers || {})
-    };
-
-    // Always use explicit CORS mode. The backend must expose the requesting
-    // KOMNI origin and allow Authorization + Content-Type.
-    const response = await fetch(`${PIN_GUARD_API}${path}`, {
-        ...options,
-        mode: 'cors',
-        headers
-    });
-
-    let data = {};
-    try {
-        data = await response.json();
-    } catch (_) {}
-
-    if (!response.ok) {
-        throw new Error(
-            data.detail ||
-            data.message ||
-            `Security service returned HTTP ${response.status}`
-        );
-    }
-
-    return data;
-}
-
-async function refreshFirebaseToken(user) {
-    pinGuardToken = await user.getIdToken(true);
-    return pinGuardToken;
-}
-
-function showPinLogin(user) {
-    pinGuardUser = user;
-    provisionedPin = '';
-    pinGuardBusy = false;
-
-    pinGuardContent.classList.add('pin-login-mode');
-    pinGuardContent.classList.remove('success-state');
-
-    pinGuardTitle.textContent = 'Enter your security PIN';
-    pinGuardDescription.textContent =
-        'Your Google identity is recognized. Type your 6-digit KOMNI security PIN with your keyboard.';
-    pinProvisionBox.hidden = true;
-    pinEntryBox.style.display = 'block';
-
-    resetPinEntry();
-    pinGuardSetMessage('');
-    setPinGuardStatus('SECURE SESSION REQUIRED', true);
-    pinGuardOpen();
-
-    // Focus immediately so keyboard entry works without a visible input.
-    requestAnimationFrame(() => {
-        pinInput.focus({ preventScroll: true });
-    });
-}
-
-function showPinProvision(user, pin) {
-    pinGuardUser = user;
-    provisionedPin = String(pin || '').replace(/\D/g, '').slice(0, 6);
-
-    if (!/^\d{6}$/.test(provisionedPin)) {
-        throw new Error('Security service returned an invalid PIN.');
-    }
-
-    pinGuardContent.classList.remove('pin-login-mode', 'success-state');
-
-    pinGuardTitle.textContent = 'Secure your KOMNI PIN';
-    pinGuardDescription.textContent =
-        'A security PIN has been generated for your Google identity. It is intentionally never displayed. Use Copy PIN, store it securely, then continue.';
-    pinProvisionBox.hidden = false;
-    pinEntryBox.style.display = 'none';
-
-    document.getElementById('pinMask').textContent = '••••••';
-    pinSavedCheck.checked = false;
-    confirmPinButton.disabled = true;
-    copyPinButton.textContent = 'Copy PIN';
-
-    pinGuardSetMessage('Copy the PIN, store it safely, then confirm.', false);
-    setPinGuardStatus('NEW SECURITY CREDENTIAL GENERATED', true);
-    pinGuardOpen();
-}
-
-
-
-async function continueAfterPinVerification(user) {
-    // indexUserInFirestore() has already populated wizardUserData before PIN
-    // Guard. Refresh it once more so onboarding state is current.
-    await indexUserInFirestore(user);
-
-    const onboarded = Boolean(wizardUserData?.isOnboarded);
-
-    pinGuardSetMessage(
-        onboarded ? 'Correct — access granted.' : 'PIN secured. Setup ready.',
-        true
-    );
-    setPinGuardStatus('PIN GUARD VERIFIED', true);
-
-    setTimeout(() => {
-        if (onboarded) {
-            window.location.assign(DASHBOARD_URL);
-        } else {
-            pinGuardClose();
-            pinGuardContent.classList.remove('pin-login-mode');
-            pinEntryBox.style.display = 'none';
-            launchWizard(user);
-        }
-    }, 700);
-}
-
-async function confirmProvisionedPin() {
-    if (pinGuardBusy || !/^\d{6}$/.test(provisionedPin) || !pinSavedCheck.checked) return;
-
-    pinGuardBusy = true;
-    confirmPinButton.disabled = true;
-    copyPinButton.disabled = true;
-    pinGuardSetMessage('Registering your PIN securely…', false, true);
-
-    try {
-        const result = await pinGuardRequest('/confirm', {
-            method: 'POST',
-            body: JSON.stringify({ confirmed: true })
-        });
-
-        if (!result.confirmed && !result.ok && result.status !== 'confirmed') {
-            throw new Error(result.message || 'The security service did not confirm PIN registration.');
+        function pinGuardOpen() {
+            pinGuardOverlay.classList.add('is-active');
+            pinGuardOverlay.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
         }
 
-        provisionedPin = '';
-        pinGuardContent.classList.add('success-state');
-        pinGuardIcon.textContent = '✓';
-
-        await continueAfterPinVerification(pinGuardUser);
-    } catch (error) {
-        pinGuardSetMessage(error.message || 'Unable to register PIN.');
-        confirmPinButton.disabled = false;
-        copyPinButton.disabled = false;
-    } finally {
-        pinGuardBusy = false;
-    }
-}
-
-async function verifyExistingPin() {
-    const pin = pinInput.value;
-
-    if (!/^\d{6}$/.test(pin) || pinGuardBusy) return;
-
-    pinGuardBusy = true;
-    pinGuardSetMessage('Verifying secure credential', false, true);
-    setPinGuardStatus('VERIFYING CREDENTIAL', true);
-
-    try {
-        const result = await pinGuardRequest('/verify', {
-            method: 'POST',
-            body: JSON.stringify({ pin })
-        });
-
-        if (!result.verified && !result.ok) {
-            throw new Error(result.message || 'PIN verification failed.');
+        function pinGuardClose() {
+            pinGuardOverlay.classList.remove('is-active');
+            pinGuardOverlay.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
         }
 
-        // Clear the credential immediately after successful submission.
-        pinInput.value = '';
-        pinDots.forEach(dot => dot.classList.add('success'));
-        pinDots.classList.remove('typing');
-        pinGuardContent.classList.add('success-state');
-        pinGuardIcon.textContent = '✓';
+        function pinGuardSetMessage(message, success = false, verifying = false) {
+            pinGuardMessage.classList.remove('success', 'pin-verifying-dots');
+            pinGuardMessage.innerHTML = '';
+            if (!message) return;
 
-        sessionStorage.setItem('komniPinVerified', 'true');
-        sessionStorage.setItem('komniPinVerifiedAt', String(Date.now()));
-
-        await continueAfterPinVerification(pinGuardUser);
-    } catch (error) {
-        resetPinEntry();
-        pinDots.classList.add('error');
-        pinGuardSetMessage(error.message || 'Incorrect PIN.');
-        setPinGuardStatus('PIN NOT VERIFIED', false);
-
-        setTimeout(() => pinDots.classList.remove('error'), 450);
-    } finally {
-        pinGuardBusy = false;
-        if (pinGuardOverlay.classList.contains('is-active')) {
-            pinInput.focus({ preventScroll: true });
-        }
-    }
-}
-
-copyPinButton.addEventListener('click', async () => {
-    if (!provisionedPin || pinGuardBusy) return;
-
-    try {
-        await navigator.clipboard.writeText(provisionedPin);
-
-        copyPinButton.textContent = 'PIN Copied';
-        pinGuardSetMessage('PIN copied. Store it securely; it will not be displayed.', true);
-
-        setTimeout(async () => {
-            try { await navigator.clipboard.writeText(''); } catch (_) {}
-        }, 30000);
-
-        setTimeout(() => {
-            copyPinButton.textContent = 'Copy PIN';
-            pinGuardSetMessage('Copy the PIN, store it safely, then confirm.', false);
-        }, 1500);
-    } catch (_) {
-        pinGuardSetMessage(
-            'Clipboard access was blocked. Enable clipboard permission and try Copy PIN again.'
-        );
-    }
-});
-
-pinSavedCheck.addEventListener('change', () => {
-    confirmPinButton.disabled = !pinSavedCheck.checked || !provisionedPin;
-});
-
-confirmPinButton.addEventListener('click', confirmProvisionedPin);
-
-/* Keyboard-only PIN entry. There is deliberately no keypad, Clear button,
-   Backspace button, or Enter/Unlock button in the UI. */
-pinInput.addEventListener('input', () => {
-    renderPinDots();
-
-    if (pinInput.value.length === 6) {
-        verifyExistingPin();
-    }
-});
-
-pinInput.addEventListener('keydown', event => {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        return;
-    }
-    if (event.key === 'Escape') {
-        event.preventDefault();
-        goBackFromPinGuard();
-    }
-});
-
-pinGuardContent.addEventListener('pointerdown', event => {
-    if (pinGuardContent.classList.contains('pin-login-mode') &&
-        !event.target.closest('button')) {
-        pinInput.focus({ preventScroll: true });
-    }
-});
-
-function goBackFromPinGuard() {
-    // Back means leaving the authenticated session, not bypassing PIN Guard.
-    // Sign out first, then reveal the normal Google login page.
-    if (pinGuardBusy) return;
-
-    pinGuardBusy = true;
-    pinGuardSetMessage('Signing out securely…', false, true);
-
-    if (firebaseAuth) {
-        firebaseAuth.signOut().catch(() => {}).finally(() => {
-            pinGuardBusy = false;
-            pinGuardToken = null;
-            pinGuardUser = null;
-            provisionedPin = '';
-            resetPinEntry();
-            pinGuardClose();
-
-            loginCard.style.display = 'block';
-            validationCard.style.display = 'none';
-            wizardCard.classList.remove('is-active');
-
-            document.body.classList.remove('auth-booting');
-            document.body.classList.add('auth-boot-ready');
-
-            const btn = document.getElementById('googleSignInBtn');
-            const txt = document.getElementById('googleSignInText');
-            if (btn) btn.disabled = false;
-            if (txt) txt.textContent = 'Sign in with Google';
-        });
-    } else {
-        pinGuardBusy = false;
-    }
-}
-
-pinGuardBackButton.addEventListener('click', goBackFromPinGuard);
-
-/*
- * Existing Firebase sessions are routed directly to PIN Guard.
- * The login page remains hidden until Firebase resolves the initial auth state,
- * so a returning user never sees the Google sign-in screen first.
- */
-async function setupAuthListener() {
-    if (!firebaseAuth) {
-        document.body.classList.remove('auth-booting');
-        document.body.classList.add('auth-boot-ready');
-        return;
-    }
-
-    firebaseAuth.onAuthStateChanged(async user => {
-        if (!user) {
-            authHandled = false;
-            pinGuardClose();
-            loginCard.style.display = 'block';
-            validationCard.style.display = 'none';
-            wizardCard.classList.remove('is-active');
-
-            document.body.classList.remove('auth-booting');
-            document.body.classList.add('auth-boot-ready');
-
-            const btn = document.getElementById('googleSignInBtn');
-            const txt = document.getElementById('googleSignInText');
-            if (btn) btn.disabled = false;
-            if (txt) txt.textContent = 'Sign in with Google';
-            return;
+            if (success) {
+                pinGuardMessage.innerHTML = `<span class="pin-success-word">${escapeHtml(message)}</span>`;
+                pinGuardMessage.classList.add('success');
+            } else {
+                pinGuardMessage.textContent = message;
+                if (verifying) pinGuardMessage.classList.add('pin-verifying-dots');
+            }
         }
 
-        if (authHandled) return;
-        authHandled = true;
+        function setPinGuardStatus(text, success = true) {
+            pinGuardStatus.textContent = text;
+            pinGuardStatus.style.color = success ? '#22c55e' : '#ef4444';
+        }
 
-        // Keep the login surface hidden while the unified security pipeline runs.
-        loginCard.style.display = 'none';
-        validationCard.style.display = 'none';
-        wizardCard.classList.remove('is-active');
+        function resetPinVisualState() {
+            pinGuardContent.classList.remove('success-state');
+            pinDots.forEach(dot => dot.classList.remove('success'));
+            pinDots.classList.remove('error', 'typing');
+            pinGuardIcon.textContent = '⌁';
+        }
 
-        document.body.classList.remove('auth-booting');
-        document.body.classList.add('auth-boot-ready');
+        function renderPinDots() {
+            const value = pinInput.value.replace(/\D/g, '').slice(0, 6);
+            pinInput.value = value;
+            pinDots.forEach((dot, index) => dot.classList.toggle('filled', index < value.length));
+            pinDots.classList.toggle('typing', value.length > 0 && value.length < 6);
+        }
 
-        try {
-            sessionStorage.setItem('komniAuthUser', JSON.stringify({
-                uid: user.uid,
-                displayName: user.displayName || '',
-                email: user.email || '',
-                photoURL: user.photoURL || '',
-                providerId: user.providerData?.[0]?.providerId || 'google.com'
-            }));
+        function resetPinEntry() {
+            pinInput.value = '';
+            resetPinVisualState();
+            renderPinDots();
+        }
 
-            /*
-             * UNIFIED PIPELINE
-             * 1. Firestore Indexing
-             * 2. PIN Guard Handshake
-             * 3. Onboarding Wizard OR Dashboard
-             *
-             * Do not reorder these operations. PIN Guard expects the base
-             * Firestore user record to exist before its handshake.
-             */
-            if (!firestore) {
-                throw new Error('Firestore is unavailable. Cannot initialize your KOMNI identity.');
+        /*
+         * REST client for pinguard.py
+         * Correctly handles 503, 500, CORS, and JSON responses.
+         */
+        async function pinGuardRequest(path, options = {}) {
+            if (!pinGuardToken) {
+                throw new Error('Google authorization token is unassigned.');
             }
 
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${pinGuardToken}`,
+                ...(options.headers || {})
+            };
+
+            let response;
+            try {
+                response = await fetch(`${PIN_GUARD_API}${path}`, {
+                    ...options,
+                    mode: 'cors',
+                    headers
+                });
+            } catch (netErr) {
+                throw new Error(`Network failure connecting to security endpoint (${path}). Check backend CORS configuration.`);
+            }
+
+            let data = {};
+            try {
+                data = await response.json();
+            } catch (_) {}
+
+            if (!response.ok) {
+                if (response.status === 503) {
+                    throw new Error('Security Backend Unavailable (HTTP 503). Check Vercel serverless functions and Firebase Admin SDK credentials.');
+                }
+                throw new Error(
+                    data.detail ||
+                    data.message ||
+                    `Security service error HTTP ${response.status}`
+                );
+            }
+
+            return data;
+        }
+
+        async function refreshFirebaseToken(user) {
+            pinGuardToken = await user.getIdToken(true);
+            return pinGuardToken;
+        }
+
+        function showPinLogin(user) {
+            pinGuardUser = user;
+            provisionedPin = '';
+            pinGuardBusy = false;
+
+            pinGuardContent.classList.add('pin-login-mode');
+            pinGuardContent.classList.remove('success-state');
+
+            pinGuardTitle.textContent = 'Enter your security PIN';
+            pinGuardDescription.textContent =
+                'Your Google identity is recognized. Type your 6-digit KOMNI security PIN with your keyboard.';
+            pinProvisionBox.hidden = true;
+            pinEntryBox.style.display = 'block';
+
+            resetPinEntry();
+            pinGuardSetMessage('');
+            setPinGuardStatus('SECURE SESSION REQUIRED', true);
+            pinGuardOpen();
+
+            requestAnimationFrame(() => {
+                pinInput.focus({ preventScroll: true });
+            });
+        }
+
+        function showPinProvision(user, pin) {
+            pinGuardUser = user;
+            provisionedPin = String(pin || '').replace(/\D/g, '').slice(0, 6);
+
+            if (!/^\d{6}$/.test(provisionedPin)) {
+                throw new Error('Security service returned an invalid 6-digit PIN format.');
+            }
+
+            pinGuardContent.classList.remove('pin-login-mode', 'success-state');
+
+            pinGuardTitle.textContent = 'Secure your KOMNI PIN';
+            pinGuardDescription.textContent =
+                'A security PIN has been generated for your Google identity. Copy your PIN, store it securely, then confirm.';
+            pinProvisionBox.hidden = false;
+            pinEntryBox.style.display = 'none';
+
+            document.getElementById('pinMask').textContent = '••••••';
+            pinSavedCheck.checked = false;
+            confirmPinButton.disabled = true;
+            copyPinButton.textContent = 'Copy PIN';
+
+            pinGuardSetMessage('Copy the PIN, store it safely, then confirm.', false);
+            setPinGuardStatus('NEW SECURITY CREDENTIAL GENERATED', true);
+            pinGuardOpen();
+        }
+
+        async function continueAfterPinVerification(user) {
             await indexUserInFirestore(user);
+            const onboarded = Boolean(wizardUserData?.isOnboarded);
 
-            await refreshFirebaseToken(user);
+            pinGuardSetMessage(
+                onboarded ? 'Correct — access granted.' : 'PIN secured. Setup ready.',
+                true
+            );
+            setPinGuardStatus('PIN GUARD VERIFIED', true);
 
-            const status = await pinGuardRequest('/status');
+            setTimeout(() => {
+                if (onboarded) {
+                    window.location.assign(DASHBOARD_URL);
+                } else {
+                    pinGuardClose();
+                    pinGuardContent.classList.remove('pin-login-mode');
+                    pinEntryBox.style.display = 'none';
+                    launchWizard(user);
+                }
+            }, 700);
+        }
 
-            if (status.provisioned || status.pinProvisioned || status.hasPin) {
-                showPinLogin(user);
+        async function confirmProvisionedPin() {
+            if (pinGuardBusy || !/^\d{6}$/.test(provisionedPin) || !pinSavedCheck.checked) return;
+
+            pinGuardBusy = true;
+            confirmPinButton.disabled = true;
+            copyPinButton.disabled = true;
+            pinGuardSetMessage('Registering your PIN securely…', false, true);
+
+            try {
+                const result = await pinGuardRequest('/confirm', {
+                    method: 'POST',
+                    body: JSON.stringify({ confirmed: true })
+                });
+
+                if (!result.confirmed && !result.ok && result.status !== 'confirmed') {
+                    throw new Error(result.message || 'The security service did not confirm PIN registration.');
+                }
+
+                provisionedPin = '';
+                pinGuardContent.classList.add('success-state');
+                pinGuardIcon.textContent = '✓';
+
+                await continueAfterPinVerification(pinGuardUser);
+            } catch (error) {
+                pinGuardSetMessage(error.message || 'Unable to register PIN.');
+                confirmPinButton.disabled = false;
+                copyPinButton.disabled = false;
+            } finally {
+                pinGuardBusy = false;
+            }
+        }
+
+        async function verifyExistingPin() {
+            const pin = pinInput.value;
+            if (!/^\d{6}$/.test(pin) || pinGuardBusy) return;
+
+            pinGuardBusy = true;
+            pinGuardSetMessage('Verifying secure credential', false, true);
+            setPinGuardStatus('VERIFYING CREDENTIAL', true);
+
+            try {
+                const result = await pinGuardRequest('/verify', {
+                    method: 'POST',
+                    body: JSON.stringify({ pin })
+                });
+
+                if (!result.verified && !result.ok && result.status !== 'verified') {
+                    throw new Error(result.message || 'PIN verification failed.');
+                }
+
+                pinInput.value = '';
+                pinDots.forEach(dot => dot.classList.add('success'));
+                pinDots.classList.remove('typing');
+                pinGuardContent.classList.add('success-state');
+                pinGuardIcon.textContent = '✓';
+
+                sessionStorage.setItem('komniPinVerified', 'true');
+                sessionStorage.setItem('komniPinVerifiedAt', String(Date.now()));
+
+                await continueAfterPinVerification(pinGuardUser);
+            } catch (error) {
+                resetPinEntry();
+                pinDots.classList.add('error');
+                pinGuardSetMessage(error.message || 'Incorrect PIN.');
+                setPinGuardStatus('PIN NOT VERIFIED', false);
+
+                setTimeout(() => pinDots.classList.remove('error'), 450);
+            } finally {
+                pinGuardBusy = false;
+                if (pinGuardOverlay.classList.contains('is-active')) {
+                    pinInput.focus({ preventScroll: true });
+                }
+            }
+        }
+
+        copyPinButton.addEventListener('click', async () => {
+            if (!provisionedPin || pinGuardBusy) return;
+
+            try {
+                await navigator.clipboard.writeText(provisionedPin);
+                copyPinButton.textContent = 'PIN Copied';
+                pinGuardSetMessage('PIN copied to clipboard securely.', true);
+
+                setTimeout(() => {
+                    copyPinButton.textContent = 'Copy PIN';
+                    pinGuardSetMessage('Copy the PIN, store it safely, then confirm.', false);
+                }, 2000);
+            } catch (_) {
+                pinGuardSetMessage('Clipboard access was blocked. Enable permissions and retry.');
+            }
+        });
+
+        pinSavedCheck.addEventListener('change', () => {
+            confirmPinButton.disabled = !pinSavedCheck.checked || !provisionedPin;
+        });
+
+        confirmPinButton.addEventListener('click', confirmProvisionedPin);
+
+        pinInput.addEventListener('input', () => {
+            renderPinDots();
+            if (pinInput.value.length === 6) {
+                verifyExistingPin();
+            }
+        });
+
+        pinInput.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                return;
+            }
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                goBackFromPinGuard();
+            }
+        });
+
+        pinGuardContent.addEventListener('pointerdown', event => {
+            if (pinGuardContent.classList.contains('pin-login-mode') && !event.target.closest('button')) {
+                pinInput.focus({ preventScroll: true });
+            }
+        });
+
+        function goBackFromPinGuard() {
+            if (pinGuardBusy) return;
+
+            pinGuardBusy = true;
+            pinGuardSetMessage('Signing out securely…', false, true);
+
+            if (firebaseAuth) {
+                firebaseAuth.signOut().catch(() => {}).finally(() => {
+                    pinGuardBusy = false;
+                    pinGuardToken = null;
+                    pinGuardUser = null;
+                    provisionedPin = '';
+                    resetPinEntry();
+                    pinGuardClose();
+
+                    loginCard.style.display = 'block';
+                    validationCard.style.display = 'none';
+                    wizardCard.classList.remove('is-active');
+
+                    document.body.classList.remove('auth-booting');
+                    document.body.classList.add('auth-boot-ready');
+
+                    const btn = document.getElementById('googleSignInBtn');
+                    const txt = document.getElementById('googleSignInText');
+                    if (btn) btn.disabled = false;
+                    if (txt) txt.textContent = 'Sign in with Google';
+                });
+            } else {
+                pinGuardBusy = false;
+            }
+        }
+
+        pinGuardBackButton.addEventListener('click', goBackFromPinGuard);
+
+        /*
+         * Main Authentication Listener aligned with pinguard.py
+         */
+        async function setupAuthListener() {
+            if (!firebaseAuth) {
+                document.body.classList.remove('auth-booting');
+                document.body.classList.add('auth-boot-ready');
                 return;
             }
 
-            const provision = await pinGuardRequest('/provision', {
-                method: 'POST',
-                body: JSON.stringify({})
+            firebaseAuth.onAuthStateChanged(async user => {
+                if (!user) {
+                    authHandled = false;
+                    pinGuardClose();
+                    loginCard.style.display = 'block';
+                    validationCard.style.display = 'none';
+                    wizardCard.classList.remove('is-active');
+
+                    document.body.classList.remove('auth-booting');
+                    document.body.classList.add('auth-boot-ready');
+
+                    const btn = document.getElementById('googleSignInBtn');
+                    const txt = document.getElementById('googleSignInText');
+                    if (btn) btn.disabled = false;
+                    if (txt) txt.textContent = 'Sign in with Google';
+                    return;
+                }
+
+                if (authHandled) return;
+                authHandled = true;
+
+                loginCard.style.display = 'none';
+                validationCard.style.display = 'none';
+                wizardCard.classList.remove('is-active');
+
+                document.body.classList.remove('auth-booting');
+                document.body.classList.add('auth-boot-ready');
+
+                try {
+                    sessionStorage.setItem('komniAuthUser', JSON.stringify({
+                        uid: user.uid,
+                        displayName: user.displayName || '',
+                        email: user.email || '',
+                        photoURL: user.photoURL || '',
+                        providerId: user.providerData?.[0]?.providerId || 'google.com'
+                    }));
+
+                    if (!firestore) {
+                        throw new Error('Firestore is unavailable. Cannot sync client record.');
+                    }
+
+                    // Step 1: Sync client record in Firestore
+                    await indexUserInFirestore(user);
+
+                    // Step 2: Refresh auth token for Bearer submission
+                    await refreshFirebaseToken(user);
+
+                    // Step 3: Query PIN Guard status endpoint
+                    const status = await pinGuardRequest('/status');
+
+                    if (status.provisioned || status.pinProvisioned || status.hasPin) {
+                        showPinLogin(user);
+                        return;
+                    }
+
+                    // Step 4: If not provisioned, request new PIN provisioning
+                    const provision = await pinGuardRequest('/provision', {
+                        method: 'POST',
+                        body: JSON.stringify({})
+                    });
+
+                    const pin = provision.pin || provision.oneTimePin || provision.provisionedPin;
+
+                    if (!/^\d{6}$/.test(String(pin || ''))) {
+                        throw new Error('PIN Guard endpoint returned invalid 6-digit PIN format.');
+                    }
+
+                    showPinProvision(user, pin);
+
+                } catch (error) {
+                    console.error('Authentication pipeline error:', error);
+
+                    authHandled = false;
+                    pinGuardClose();
+                    loginCard.style.display = 'none';
+                    validationCard.style.display = 'none';
+                    wizardCard.classList.remove('is-active');
+
+                    pinGuardContent.classList.remove('pin-login-mode', 'success-state');
+                    pinProvisionBox.hidden = true;
+                    pinEntryBox.style.display = 'none';
+
+                    // Accurately reflect exact failure details in UI modal
+                    pinGuardTitle.textContent = error.message.includes('503') 
+                        ? 'Backend Service Unavailable (503)' 
+                        : 'Authentication Handshake Failed';
+
+                    pinGuardDescription.textContent = error.message;
+                    setPinGuardStatus('SECURITY PIPELINE ERROR', false);
+                    pinGuardSetMessage(error.message || 'Unable to establish identity handshake.');
+
+                    pinGuardOpen();
+                }
             });
-
-            const pin = provision.pin || provision.oneTimePin || provision.provisionedPin;
-
-            if (!/^\d{6}$/.test(String(pin || ''))) {
-                throw new Error('PIN Guard did not return a valid six-digit PIN.');
-            }
-
-            showPinProvision(user, pin);
-
-        } catch (error) {
-            console.error('Unified authentication pipeline failed:', error);
-
-            authHandled = false;
-            pinGuardClose();
-            loginCard.style.display = 'none';
-            validationCard.style.display = 'none';
-            wizardCard.classList.remove('is-active');
-
-            pinGuardContent.classList.remove('pin-login-mode', 'success-state');
-            pinProvisionBox.hidden = true;
-            pinEntryBox.style.display = 'none';
-
-            pinGuardTitle.textContent = 'Security service unavailable';
-            pinGuardDescription.textContent =
-                'Google authentication succeeded, but KOMNI could not complete the secure identity handshake.';
-            setPinGuardStatus('AUTHENTICATION PIPELINE ERROR', false);
-            pinGuardSetMessage(error.message || 'Unable to initialize secure access.');
-
-            pinGuardOpen();
         }
-    });
-}
-</script>
+    </script>
 </body>
 </html>
